@@ -2,7 +2,7 @@
 #include "../global/base.h"
 #include<Windows.h>
 
-#define App Application::instance();
+#define App Application::instance()
 
 class Application
 {
@@ -13,7 +13,7 @@ public:
 	bool init(HINSTANCE hInstance, const uint32_t& width = 800, const uint32_t& height = 600);
 
 	//托管了wndProc捕获的消息，并且进行处理
-	void handle_message(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+	LRESULT handle_message(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 	//每一帧/每一次循环，都会调用，捕获以及分发窗体消息
 	bool peek_message();
@@ -28,13 +28,13 @@ private:
 private:
 	static Application* _instance;
 
-	bool		_active = {true};
+	bool _active = {true};
 
-	HINSTANCE	_window_inst;
-	WCHAR		_window_class_name[100] = L"AppWindow";
-	HWND		_hwnd;
+	HINSTANCE _window_inst;
+	WCHAR _window_class_name[100] = L"AppWindow";
+	HWND _hwnd;
 
-	int			_width = 800;
-	int			_height = 600;
+	int _width = 800;
+	int _height = 600;
 
 };

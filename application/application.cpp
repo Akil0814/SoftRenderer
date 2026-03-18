@@ -1,6 +1,6 @@
 #include "application.h"
 
-Application* Application::mInstance = nullptr;
+Application* Application::_instance = nullptr;
 
 Application* Application::instance()
 {
@@ -10,18 +10,19 @@ Application* Application::instance()
 	return _instance;
 }
 
-LRESULT CALLBACK Wndproc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	Application::instance()->handle_message(hWnd, message, wParam, lParam);
-	return(DefWindowProc(hWnd, message, wParam, lParam));
-}
+//HWND hWnd:窗口句柄  UINT message:消息类型  WPARAM wParam:补充参数1  LPARAM lParam:补充参数 2
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)//消息中转站
+{	return Application::instance()->handle_message(hWnd, message, wParam, lParam);	}
 
-bool Application::init(HINSTANCE hInstance, const uint32_t& width, const uint32_t& height) {
+//HINSTANCE hInstance 本应用程序实例句柄，唯一指代当前程序
+bool Application::init(HINSTANCE hInstance, const uint32_t& width, const uint32_t& height)
+{
 	_width = width;
 	_height = height;
 
 	//初始化窗体类型，并且注册
-	register_window_class(hInstance);
+	if (!register_window_class(hInstance))
+		return false;
 
 	//生成一个窗体，并且显示
 	if (!create_window(hInstance))
@@ -30,26 +31,37 @@ bool Application::init(HINSTANCE hInstance, const uint32_t& width, const uint32_
 	return true;
 }
 
+//HINSTANCE hInstance 本应用程序实例句柄，唯一指代当前程序
 ATOM Application::register_window_class(HINSTANCE hInstance)
 {
-	WNDCLASSEXW wndClass;
+	WNDCLASSEXW wnd_class = {};
 
-	wndClass.cbSize = sizeof(WNDCLASSEX);
-	wndClass.style = CS_HREDRAW | CS_VREDRAW;	//水平/垂直大小发生变化重绘窗口
-	wndClass.lpfnWndProc = Wndproc;
-	wndClass.cbClsExtra = 0;
-	wndClass.cbWndExtra = 0;
-	wndClass.hInstance = hInstance;		//应用程序句柄
-	wndClass.hIcon = LoadIcon(NULL, IDI_APPLICATION);//应用程序图标,即任务栏的大图标
-	wndClass.hCursor = LoadCursor(NULL, IDC_ARROW);//鼠标图标
-	wndClass.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);//窗口背景色
-	wndClass.lpszMenuName = NULL;
-	wndClass.lpszClassName = mWindowClassName;//窗口类名
-	wndClass.hIconSm = LoadIcon(NULL, IDI_WINLOGO);//窗口标题图标
+	wnd_class.cbSize = sizeof(WNDCLASSEXW);//设置结构体大小
+	wnd_class.style = CS_HREDRAW | CS_VREDRAW;//水平/垂直大小发生变化重绘窗口
+	wnd_class.lpfnWndProc = WndProc;//这个窗口类创建出来的窗口，收到系统消息时，都交给 WndProc 处理
+	wnd_class.cbClsExtra = 0;//类额外内存:窗口类本身
+	wnd_class.cbWndExtra = 0;//类额外内存:每个窗口实例->额外预留多少字节内存
+	wnd_class.hInstance = hInstance;//应用程序句柄
+	wnd_class.hIcon = LoadIcon(NULL, IDI_APPLICATION);//应用程序图标,即任务栏的大图标
+	wnd_class.hCursor = LoadCursor(NULL, IDC_ARROW);//鼠标图标
+	wnd_class.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);//窗口背景色
+	wnd_class.lpszMenuName = NULL;//菜单名
+	wnd_class.lpszClassName = _window_class_name;//窗口类名
+	wnd_class.hIconSm = LoadIcon(NULL, IDI_WINLOGO);//窗口标题小图标
 
-	return RegisterClassExW(&wndClass);
+	ATOM result = RegisterClassExW(&wnd_class);
+	if (result == 0)
+	{
+		DWORD err = GetLastError();
+		std::cerr << "RegisterClassExW failed. Error = " << err << '\n';
+		return 0;
+	}
+
+	return result;
 }
 
+
+//按照前面注册好的窗口类，真正创建一个 Windows 窗口，并把它显示出来
 BOOL Application::create_window(HINSTANCE hInstance)
 {
 	_window_inst = hInstance;
@@ -62,71 +74,89 @@ BOOL Application::create_window(HINSTANCE hInstance)
 	* WS_CLIPCHILDREN:被子窗口遮挡住的区域不绘制
 	*/
 
-	auto dwExStyle = WS_EX_APPWINDOW;
-	auto dwStyle = WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+	DWORD dw_style = WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;//普通窗口样式
+	DWORD dw_ex_style = WS_EX_APPWINDOW;//扩展样式
 
 	//由于存在标题栏等，所以需要计算中间显示区域的大小,比如PopUp的窗体，就没有标题栏，则不会改变
-	RECT windowRect;
-	windowRect.left = 0L;
-	windowRect.top = 0L;
-	windowRect.right = (long)_width;
-	windowRect.bottom = (long)_height;
-	AdjustWindowRectEx(&windowRect, dwStyle, FALSE, dwExStyle);
+	RECT window_rect = {};//定义目标客户区矩形
+	window_rect.left = 0L;
+	window_rect.top = 0L;
+	window_rect.right = (long)_width;
+	window_rect.bottom = (long)_height;
 
-	_Hwnd = CreateWindowW(
-		_window_class_name,
-		(LPCWSTR)"GraphicLearning",	//窗体标题
-		dwStyle,
-		500,//x位置，相对左上角
-		500,//y位置，相对左上角
-		windowRect.right - windowRect.left,
-		windowRect.bottom - windowRect.top,
-		nullptr,//父窗体
-		nullptr,//菜单栏
-		hInstance,//程序实例
-		nullptr);//额外参数
-
-
-	if (!_Hwnd)
+	if (!AdjustWindowRectEx(&window_rect, dw_style, FALSE, dw_ex_style))//把客户区大小换算成整个窗口大小
 	{
+		DWORD err = GetLastError();
+		std::cerr << "AdjustWindowRectEx failed. Error = " << err << '\n';
 		return FALSE;
 	}
 
-	ShowWindow(_Hwnd, true);
-	UpdateWindow(_Hwnd);
+	//创建窗口
+	_hwnd = CreateWindowW(
+		_window_class_name,
+		L"GraphicLearning",//窗体标题
+		dw_style,
+		50,//x位置，相对左上角
+		50,//y位置，相对左上角
+		window_rect.right - window_rect.left,//窗口总宽高
+		window_rect.bottom - window_rect.top,
+		nullptr,//父窗体
+		nullptr,//菜单栏
+		_window_inst,//程序实例
+		nullptr);//额外参数
+
+
+	if (!_hwnd)
+		return FALSE;
+
+	ShowWindow(_hwnd, SW_SHOW);
+	UpdateWindow(_hwnd);
 
 	return TRUE;
 }
 
-bool Application::peek_message() {
+
+// 从消息队列里取一条消息出来，然后交给系统分发处理
+bool Application::peek_message()//取消息
+{
 	MSG msg;
+
+	//从消息队列里取一条消息出来，然后交给系统分发处理
+	//如果有，就取出一条，放进 msg, PM_REMOVE 表示取出来后顺便从队列里移除
 	if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 	{
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
+		TranslateMessage(&msg);//键盘字符输入辅助处理
+		DispatchMessage(&msg);//把消息真正派发给对应窗口的 WndProc//把消息转发到窗口
 	}
 
 	return _active;
 }
 
-void Application::handle_message(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+//真正处理窗口消息
+LRESULT Application::handle_message(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)//处理消息
+{
 	switch (message)
 	{
-	case WM_CLOSE: {
-		DestroyWindow(hWnd);//此处销毁窗体,会自动发出WM_DESTROY
-		break;
-	}
+	case WM_CLOSE:
+		DestroyWindow(hWnd);//销毁窗口 -> WM_DESTROY
+		return 0;
+
 	case WM_PAINT:
 	{
 		PAINTSTRUCT ps;
 		HDC hdc = BeginPaint(hWnd, &ps);
+
+		// 在这里绘制
+
 		EndPaint(hWnd, &ps);
+		return 0;
 	}
-	break;
-	case WM_DESTROY: {
-		PostQuitMessage(0);//发出线程终止请求
+
+	case WM_DESTROY://
+		PostQuitMessage(0);//向线程消息队列里放一个退出消息，告诉整个消息循环该结束了
 		_active = false;
-		break;
+		return 0;
 	}
-	}
+
+	return DefWindowProc(hWnd, message, wParam, lParam);//如果不是特别处理的消息，就让 Windows 默认逻辑处理
 }

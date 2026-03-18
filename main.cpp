@@ -11,14 +11,14 @@ int APIENTRY wWinMain(
 	_In_ LPWSTR lpCmdLine, //应用程序运行参数
 	_In_ int nCmdShow) //窗口如何显示（最大化、最小化、隐藏），不需理会
 {
-	if (!app->init(hInstance, 800, 600))
+	if (!App->init(hInstance, 800, 600))
 		return -1;
 
 	bool active = true;
 
 	while (active)
 	{
-		active = App->peek_message
+		active = App->peek_message();
 	}
 
 	return 0;
