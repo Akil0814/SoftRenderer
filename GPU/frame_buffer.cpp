@@ -1,0 +1,23 @@
+#include "frame_buffer.h"
+
+FrameBuffer::FrameBuffer(uint32_t width, uint32_t height, void* buffer)
+{
+	_width = width;
+	_height = height;
+
+	if (!buffer)
+	{
+		buffer = new RGBA[width * height];
+		_extern_buffer = false;
+	}
+	else
+		_extern_buffer = true;
+
+	_color_buffer = (RGBA*)buffer;
+}
+
+FrameBuffer::~FrameBuffer()
+{
+	if (!_extern_buffer && _color_buffer)
+		delete[] _color_buffer;
+}

@@ -8,26 +8,31 @@
 
 #define PI					3.14159265358979323
 #define DEG2RAD(theta)		(0.01745329251994329 * (theta))
-#define FRACTION(v)			((v) - (int)(v))//返回小数部分
+#define FRACTION(v)			((v) - (int)(v))//杩斿洖灏忔暟閮ㄥ垎
 
 using byte = unsigned char;
 
 struct RGBA
 {
-	byte _R;
 	byte _G;
 	byte _B;
+	byte _R;
 	byte _A;
 
-	RGBA(
-		byte r = 255,
-		byte g = 255,
-		byte b = 255,
-		byte a = 255)
-	{
-		_R = r;
-		_G = g;
-		_B = b;
-		_A = a;
-	}
+	constexpr RGBA(byte r = 255,byte g = 255,byte b = 255,byte a = 255) 
+		: _R(r), _G(g), _B(b), _A(a)
+	{}
 };
+
+namespace Color
+{
+	inline constexpr RGBA Black{ 0,   0,   0,   255 };
+	inline constexpr RGBA White{ 255, 255, 255, 255 };
+	inline constexpr RGBA Red{ 255, 0,   0,   255 };
+	inline constexpr RGBA Green{ 0,   255, 0,   255 };
+	inline constexpr RGBA Blue{ 0,   0,   255, 255 };
+	inline constexpr RGBA Yellow{ 255, 255, 0,   255 };
+	inline constexpr RGBA Cyan{ 0,   255, 255, 255 };
+	inline constexpr RGBA Magenta{ 255, 0,   255, 255 };
+	inline constexpr RGBA Gray{ 128, 128, 128, 255 };
+}
