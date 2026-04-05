@@ -16,11 +16,17 @@ void on_render()
 {
 	MAI_sgl->clear();
 
-	mai::Point p1{ 200,250,mai::Color::Red };
+	mai::Point p1{ 200,101,mai::Color::Red };
 	mai::Point p2{ 100,100,mai::Color::Blue };
 	mai::Point p3{ 300,100, mai::Color::Green };
 
+	mai::Point p4{ 300,300,mai::Color::Red };
+	mai::Point p5{ 100,100,mai::Color::Blue };
+	mai::Point p6{ 300,100, mai::Color::Green };
+
 	MAI_sgl->draw_triangle(p1, p2, p3);
+	//MAI_sgl->draw_triangle(p1, p3, p4);
+
 
 }
 

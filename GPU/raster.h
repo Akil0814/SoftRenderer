@@ -20,6 +20,8 @@ public:
 
 	static void interpolant_line(const Point& v0, const Point& v1, Point& target);
 
+	static void interpolant_triangle(const Point& v0, const Point& v1, const Point& v2, Point& target);
+
 
 };
 
