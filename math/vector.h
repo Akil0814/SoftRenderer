@@ -14,20 +14,20 @@ namespace mai
 	class Vector2
 	{
 	public:
-		Vector2() { x = _y = 0; }
-		Vector2(T x, T y) :x(x), _y(y) {}
-		Vector2(const Vector2<T>& v) :x(v.x), _y(v._y) {}
-		Vector2(const Vector3<T>& v) :x(v.x), _y(v._y) {}
-		Vector2(const Vector4<T>& v) :x(v.x), _y(v._y) {}
+		Vector2() : x(0), y(0) {}
+		Vector2(T x, T y) :x(x), y(y) {}
+		Vector2(const Vector2<T>& v) :x(v.x), y(v.y) {}
+		explicit Vector2(const Vector3<T>& v) :x(v.x), y(v.y) {}
+		explicit Vector2(const Vector4<T>& v) :x(v.x), y(v.y) {}
 
 	
 		//取得向量某个元素
-		T operator[](int i) const
+		const T& operator[](int i) const
 		{
 			assert(i >= 0 && i < 2);
 			if (i == 0)
 				return x;
-			return _y;
+			return y;
 		}
 
 		//给向量某个元素赋值
@@ -41,15 +41,15 @@ namespace mai
 		}
 
 		//等号运算符重载
-		Vector2<T> operator=(const Vector3<T>& v)
+		Vector2<T>& operator=(const Vector3<T>& v)
 		{
-			x = v.x; _y = v._y;
+			x = v.x; y = v.y;
 			return *this;
 		}
 
-		Vector2<T> operator=(const Vector4<T>& v)
+		Vector2<T>& operator=(const Vector4<T>& v)
 		{
-			x = v.x; _y = v._y;
+			x = v.x; y = v.y;
 			return *this;
 		}
 
@@ -57,14 +57,27 @@ namespace mai
 		//v = v1+v2
 		Vector2<T> operator+(const Vector2<T>& v) const
 		{
-			return Vector2(x + v.x, _y + v._y);
+			return Vector2<T>(x + v.x, y + v.y);
 		}
 
 		//加法并赋值
 		//v += v2
-		Vector2<T> operator+=(const Vector2<T>& v)
+		Vector2<T>& operator+=(const Vector2<T>& v)
 		{
-			x += v.x; _y += v._y;
+			x += v.x; y += v.y;
+			return *this;
+		}
+
+		//减法
+		Vector2<T> operator-(const Vector2<T>& v) const
+		{
+			return Vector2<T>(x - v.x, y - v.y);
+		}
+
+		Vector2<T>& operator-=(const Vector2<T>& v)
+		{
+			x -= v.x;
+			y -= v.y;
 			return *this;
 		}
 
@@ -72,232 +85,280 @@ namespace mai
 		//v = v1 * s
 		Vector2<T> operator*(T s) const
 		{
-			return Vector2(x * s, _y * s);
+			return Vector2<T>(x * s, y * s);
 		}
 
 		//乘法并赋值
 		//v *= s
-		Vector2<T> operator*=(T s)
+		Vector2<T>& operator*=(T s)
 		{
-			x *= s; _y *= s;
+			x *= s; y *= s;
 			return *this;
 		}
 
 		//除法
 		//v = v1 / f
+		//int 除法可能会被截断
 		Vector2<T> operator/(T f) const
 		{
 			assert(f != 0);
 			float inv = static_cast<T>(1) / f;
 
-			return Vector2(x * inv, _y * inv);
+			return Vector2(x * inv, y * inv);
 		}
 
 		//除法并赋值
 		//v /= f
-		Vector2<T> operator/=(T f)
+		Vector2<T>& operator/=(T f)
 		{
 			assert(f != 0);
 			float inv = static_cast<T>(1) / f;
-			x *= inv; _y *= inv;
+			x *= inv; y *= inv;
 			return *this;
 		}
 
 		//取反
-		Vector2<T> operator-() 
+		Vector2<T> operator-() const
 		{
-			return Vector2(-x, -y);
+			return Vector2<T>(-x, -y);
 		}
 
 
-		void print()
+		void print() const
 		{
 			std::cout << "Vector2 is:" << std::endl;
-			std::cout << "x = " << x << ", y = " << _y << std::endl;
-			std::cout << std::endl;
+			std::cout << "x = " << x << ", y = " << y << std::endl;
 		}
 
 	public:
-		T x, _y;
+		T x, y;
 	};
 
 	template<typename T>
 	class Vector3 {
 	public:
-		Vector3() { x = y = z = 0; }
+		Vector3():x(0), y(0), z(0) {}
 		Vector3(T x, T y, T z) :x(x), y(y), z(z) {}
 		Vector3(const Vector3<T>& v) :x(v.x), y(v.y), z(v.z) {}
-		Vector3(const Vector4<T>& v) :x(v.x), y(v.y), z(v.z) {}
+		explicit Vector3(const Vector4<T>& v) :x(v.x), y(v.y), z(v.z) {}
 
-		T operator[](int i) const {
+		const T& operator[](int i) const
+		{
 			assert(i >= 0 && i <= 2);
 
-			if (i == 0) return x;
-			if (i == 1) return y;
+			if (i == 0)
+				return x;
+			if (i == 1)
+				return y;
 
 			return z;
 		}
 
-		T& operator[](int i) {
+		T& operator[](int i)
+		{
 			assert(i >= 0 && i <= 2);
 
-			if (i == 0) return x;
-			if (i == 1) return y;
+			if (i == 0)
+				return x;
+			if (i == 1)
+				return y;
 
 			return z;
 		}
 
-		Vector3<T> operator=(const Vector2<T>& v) {
-			x = v.x; y = v.y;
+		Vector3<T>& operator=(const Vector2<T>& v)
+		{
+			x = v.x;
+			y = v.y;
+			z = 0;
 			return *this;
 		}
 
-		Vector3<T> operator=(const Vector4<T>& v) {
-			x = v.x; y = v.y; z = v.z;
+		Vector3<T>& operator=(const Vector4<T>& v)
+		{
+			x = v.x;
+			y = v.y;
+			z = v.z;
 			return *this;
 		}
 
-		Vector3<T> operator+(const Vector3<T>& v) const {
+		Vector3<T> operator+(const Vector3<T>& v) const
+		{
 			return Vector3<T>(x + v.x, y + v.y, z + v.z);
 		}
 
-		Vector3<T> operator+=(const Vector3<T>& v) {
+		Vector3<T>& operator+=(const Vector3<T>& v)
+		{
 			x += v.x; y += v.y; z += v.z;
 			return *this;
 		}
 
-		Vector3<T> operator-(const Vector3<T>& v) const {
-			return Vector3(x - v.x, y - v.y, z - v.z);
+		Vector3<T> operator-(const Vector3<T>& v) const
+		{
+			return Vector3<T>(x - v.x, y - v.y, z - v.z);
 		}
 
-		Vector3<T> operator-=(const Vector3<T>& v) {
+		Vector3<T>& operator-=(const Vector3<T>& v)
+		{
 			x -= v.x; y -= v.y; z -= v.z;
 			return *this;
 		}
 
-		Vector3<T> operator*(T s) const {
-			return Vector3(x * s, y * s, z * s);
+		Vector3<T> operator*(T s) const
+		{
+			return Vector3<T>(x * s, y * s, z * s);
 		}
 
-		Vector3<T> operator*=(T s) {
+		Vector3<T>& operator*=(T s)
+		{
 			x *= s; y *= s; z *= s;
 			return *this;
 		}
 
-		Vector3<T> operator/(T f) const {
+		Vector3<T> operator/(T f) const
+		{
 			assert(f != 0);
 			float inv = 1.0 / f;
-			return Vector3(x * inv, y * inv, z * inv);
+			return Vector3<T>(x * inv, y * inv, z * inv);
 		}
 
-		Vector3<T> operator/=(T f) {
+		Vector3<T>& operator/=(T f)
+		{
 			assert(f != 0);
 			float inv = 1.0 / f;
 			x *= inv; y *= inv; z *= inv;
 			return *this;
 		}
 
-		Vector3<T>  operator-() const {
+		Vector3<T>  operator-() const
+		{
 			return Vector3<T>(-x, -y, -z);
 		}
 
-		void print() {
+		void print() const
+		{
 			std::cout << "Vector3 is:" << std::endl;
-			std::cout << "x = " << x << ", y = " << _y << ", z = " << _z << std::endl;
-			std::cout << std::endl;
+			std::cout << "x = " << x << ", y = " << y << ", z = " << z << std::endl;
 		}
 
 	public:
-		T x, _y, _z;
+		T x, y, z;
 	};
 
 	template<typename T>
 	class Vector4 {
 	public:
-		Vector4() { x = y = z = w = 0; }
+		Vector4() : x(0), y(0), z(0), w(0) {}
 		Vector4(T x, T y, T z, T w) :x(x), y(y), z(z), w(w) {}
 		Vector4(const Vector4<T>& v) :x(v.x), y(v.y), z(v.z), w(v.w) {}
 
-		T operator[](int i) const {
+		const T& operator[](int i) const
+		{
 			assert(i >= 0 && i <= 3);
 
-			if (i == 0) return x;
-			if (i == 1) return y;
-			if (i == 2) return z;
+			if (i == 0)
+				return x;
+			if (i == 1)
+				return y;
+			if (i == 2)
+				return z;
 
 			return w;
 		}
 
-		T& operator[](int i) {
+		T& operator[](int i)
+		{
 			assert(i >= 0 && i <= 3);
 
-			if (i == 0) return x;
-			if (i == 1) return y;
-			if (i == 2) return z;
+			if (i == 0)
+				return x;
+			if (i == 1)
+				return y;
+			if (i == 2)
+				return z;
 
 			return w;
 		}
 
-		Vector4<T> operator=(const Vector2<T>& v) {
-			x = v.x; y = v.y;;
+		Vector4<T>& operator=(const Vector2<T>& v)
+		{
+			x = v.x;
+			y = v.y;
+			z = 0;
+			w = 0;
 			return *this;
 		}
 
-		Vector4<T> operator=(const Vector3<T>& v) {
-			x = v.x; y = v.y; z = v.z;
+		Vector4<T>& operator=(const Vector3<T>& v)
+		{
+			x = v.x;
+			y = v.y;
+			z = v.z;
+			w = 0;
 			return *this;
 		}
 
-		Vector4<T> operator+(const Vector4<T>& v) const {
-			return Vector4(x + v.x, y + v.y, z + v.z, w + v.w);
+		Vector4<T> operator+(const Vector4<T>& v) const
+		{
+			return Vector4<T>(x + v.x, y + v.y, z + v.z, w + v.w);
 		}
 
-		Vector4<T> operator+=(const Vector4<T>& v) {
+		Vector4<T>& operator+=(const Vector4<T>& v)
+		{
 			x += v.x; y += v.y; z += v.z; w += v.w;
 			return *this;
 		}
 
-		Vector4<T> operator-(const Vector4<T>& v) const {
+		Vector4<T> operator-(const Vector4<T>& v) const
+		{
 			return Vector4<T>(x - v.x, y - v.y, z - v.z, w - v.w);
 		}
 
-		Vector4<T> operator-=(const Vector4<T>& v) {
+		Vector4<T>& operator-=(const Vector4<T>& v)
+		{
 			x -= v.x; y -= v.y; z -= v.z; w -= v.w;
 			return *this;
 		}
 
-		Vector4<T> operator*(T s) const {
-			return Vector4(x * s, y * s, z * s, w * s);
+		Vector4<T> operator*(T s) const
+		{
+			return Vector4<T>(x * s, y * s, z * s, w * s);
 		}
 
-		Vector4<T> operator*=(T s) {
+		Vector4<T>& operator*=(T s)
+		{
 			x *= s; y *= s; z *= s; w *= s;
 			return *this;
 		}
 
-		Vector4<T> operator*=(const Vector3<T>& v) {
+		Vector4<T>& operator*=(const Vector3<T>& v)
+		{
 			x *= v.x; y *= v.y; z *= v.z;
 			return *this;
 		}
 
-		Vector4<T> operator/(T f) const {
+		Vector4<T> operator/(T f) const
+		{
 			assert(f != 0);
 			float inv = 1.0 / f;
-			return Vector4(x * inv, y * inv, z * inv, w * inv);
+			return Vector4<T>(x * inv, y * inv, z * inv, w * inv);
 		}
 
-		Vector4<T> operator/=(T f) {
+		Vector4<T>& operator/=(T f)
+		{
 			assert(f != 0);
 			float inv = 1.0 / f;
 			x *= inv; y *= inv; z *= inv; w *= inv;
 			return *this;
 		}
 
-		Vector4<T> operator-() const {
-			return Vector3(-x, -y, -z, -w);
+		Vector4<T> operator-() const
+		{
+			return Vector4<T>(-x, -y, -z, -w);
 		}
 
-		void print() {
+		void print() const
+		{
 			std::cout << "Vector4 is:" << std::endl;
 			std::cout << "x = " << x << ", y = " << y << ", z = " << z << ", w = " << w << std::endl;
 			std::cout << std::endl;

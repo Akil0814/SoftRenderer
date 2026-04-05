@@ -4,6 +4,7 @@
 
 #include "application/application.h"
 #include "gpu/gpu.h"
+#include "math/math.h"
 
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_win32.h"
@@ -37,6 +38,11 @@ int APIENTRY wWinMain(
 
 	//将bmp指向的内存配置到sgl当中
 	MAI_sgl->init_surface(MAI_App->get_width(), MAI_App->get_height(), MAI_App->get_canvas());
+
+	mai::Vector2<int> test;
+	mai::Vector3<int> test2;
+	mai::Vector4<int> test3;
+	
 
 	bool active = true;
 	while (active)
