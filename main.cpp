@@ -1,10 +1,13 @@
 #include <iostream>
 #include <Windows.h>
-
 #include <cmath>
 
 #include "application/application.h"
 #include "gpu/gpu.h"
+
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_win32.h"
+using namespace mai;
 
 #pragma comment(linker, "/subsystem:console /entry:wWinMainCRTStartup" )//更改main入口
 
@@ -32,7 +35,16 @@ void on_render()
 		sgl->draw_point(i,100,Color::Red);
 	}
 
-	draw_circle(250, 250, 50);
+	Point p1{ 100,200,Color::Red };
+	Point p2{ 200,100,Color::Blue };
+	Point p3{ 200,200, Color::Green };
+
+	sgl->draw_line(p1, p3);
+
+	int r = 150;
+	Point c{ 400, 300, RGBA(255, 0, 0, 255) };
+
+
 }
 
 

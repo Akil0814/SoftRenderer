@@ -1,5 +1,8 @@
 #include "frame_buffer.h"
 
+namespace mai
+{
+
 FrameBuffer::FrameBuffer(uint32_t width, uint32_t height, void* buffer)
 {
 	_width = width;
@@ -20,4 +23,6 @@ FrameBuffer::~FrameBuffer()
 {
 	if (!_extern_buffer && _color_buffer)
 		delete[] _color_buffer;
+}
+
 }

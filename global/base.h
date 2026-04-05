@@ -12,6 +12,9 @@
 
 using byte = unsigned char;
 
+namespace mai
+{
+
 struct RGBA
 {
 	byte _G;
@@ -24,6 +27,13 @@ struct RGBA
 	{}
 };
 
+struct Point
+{
+	int32_t x = { 0 };
+	int32_t y = { 0 };
+	RGBA color= { 255, 255, 255, 255 };
+};
+
 namespace Color
 {
 	inline constexpr RGBA Black{ 0,   0,   0,   255 };
@@ -34,5 +44,7 @@ namespace Color
 	inline constexpr RGBA Yellow{ 255, 255, 0,   255 };
 	inline constexpr RGBA Cyan{ 0,   255, 255, 255 };
 	inline constexpr RGBA Magenta{ 255, 0,   255, 255 };
-	inline constexpr RGBA Gray{ 128, 128, 128, 255 };
+inline constexpr RGBA Gray{ 128, 128, 128, 255 };
+}
+
 }

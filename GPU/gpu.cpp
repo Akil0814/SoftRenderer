@@ -1,4 +1,8 @@
 #include "gpu.h"
+#include "raster.h"
+
+namespace mai
+{
 
 GPU* GPU::_instance = nullptr;
 GPU* GPU::instance()
@@ -31,4 +35,17 @@ void GPU::draw_point(const uint32_t& x, const uint32_t& y, const RGBA& color)
 	//从窗口左下角开始算起
 	uint32_t pixelPos = y * _frame_buffer->_width + x;
 	_frame_buffer->_color_buffer[pixelPos] = color;
+}
+
+void GPU::draw_line(const Point& p1, const Point& p2)
+{
+	std::vector<Point> pixels;
+	Raster::rasterize_line(pixels, p1, p2);
+
+	for (const auto& p : pixels)
+	{
+		draw_point(p.x, p.y, p.color);
+	}
+}
+
 }

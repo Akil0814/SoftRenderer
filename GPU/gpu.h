@@ -3,7 +3,10 @@
 #include "frame_buffer.h"
 #include "../application/application.h"
 
-#define sgl GPU::instance()
+#define sgl mai::GPU::instance()
+
+namespace mai
+{
 
 class GPU
 {
@@ -21,8 +24,12 @@ public:
 	//传入像素位置，绘制成某种颜色
 	void draw_point(const uint32_t& x, const uint32_t& y, const RGBA& color);
 
+	void draw_line(const Point& p1, const Point& p2);
+
 private:
 	static GPU* _instance;
 
 	FrameBuffer* _frame_buffer = { nullptr };
 };
+
+}

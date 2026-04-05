@@ -2,7 +2,10 @@
 #include "../global/base.h"
 #include<Windows.h>
 
-#define App Application::instance()
+#define App mai::Application::instance()
+
+namespace mai
+{
 
 class Application
 {
@@ -50,3 +53,5 @@ private:
 	void* _canvas_buffer{ nullptr };//_hBmp对应的内存起始位置指针
 
 };
+
+}

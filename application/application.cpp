@@ -1,5 +1,8 @@
 #include "application.h"
 
+namespace mai
+{
+
 Application* Application::_instance = nullptr;
 
 Application* Application::instance()
@@ -201,4 +204,6 @@ LRESULT Application::handle_message(HWND hWnd, UINT message, WPARAM wParam, LPAR
 void Application::show()
 {
 	BitBlt(_hDC, 0, 0, _width, _height, _CanvasDC, 0, 0, SRCCOPY);
+}
+
 }
