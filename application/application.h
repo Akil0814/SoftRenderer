@@ -2,7 +2,7 @@
 #include "../global/base.h"
 #include<Windows.h>
 
-#define App mai::Application::instance()
+#define MAI_App mai::Application::instance()
 
 namespace mai
 {

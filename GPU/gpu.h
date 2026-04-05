@@ -3,7 +3,7 @@
 #include "frame_buffer.h"
 #include "../application/application.h"
 
-#define sgl mai::GPU::instance()
+#define MAI_sgl mai::GPU::instance()
 
 namespace mai
 {
