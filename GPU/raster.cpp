@@ -1,12 +1,12 @@
 #include "raster.h"
+#include "../math/math.h"
 
 namespace mai
 {
 
 void Raster::rasterize_line(
-	std::vector<Point>& results,
-	const Point& v0,
-	const Point& v1
+	const Point& v0,const Point& v1,
+	std::vector<Point>& results
 )
 {
 	//变换到第一象限/第一八分区再还原
@@ -78,6 +78,40 @@ void Raster::rasterize_line(
 		interpolant_line(v0, v1, current_point);
 
 		results.push_back(current_point);
+	}
+}
+
+void Raster::rasterize_triangle(
+	const Point& v0, const Point& v1, const Point& v2,
+	std::vector<Point>& results)
+{
+	int max_X = static_cast<int>(std::max(v0.x, std::max(v1.x, v2.x)));
+	int min_X = static_cast<int>(std::min(v0.x, std::min(v1.x, v2.x)));
+	int max_Y = static_cast<int>(std::max(v0.y, std::max(v1.y, v2.y)));
+	int min_Y = static_cast<int>(std::min(v0.y, std::min(v1.y, v2.y)));
+
+	Point right,left;
+
+	rasterize_line(v0, v1, results);
+	rasterize_line(v1, v2, results);
+	rasterize_line(v2, v0,results);
+
+	std::vector<Point> tmp = results;
+
+	while(!tmp.empty())
+	{
+		right = tmp.back();
+		tmp.pop_back();
+		for (int i = 0; i < tmp.size(); ++i)
+		{
+			if (tmp[i].x == right.x)
+			{
+				left = tmp[i];
+				std::swap(tmp[i], tmp.back());
+				tmp.pop_back();
+				rasterize_line(right, left, results);
+			}
+		}
 	}
 }
 

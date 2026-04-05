@@ -5,7 +5,7 @@
 namespace mai
 {
 	//标量与向量
-	//-s* v
+	//s* v
 	template<typename T, typename S>
 	inline Vector2<T> operator * (S s, const Vector2<T>& v)
 	{
@@ -25,7 +25,7 @@ namespace mai
 	}
 
 	//向量与向量
-	//-v = v0 * v1
+	//v = v0 * v1
 	template<typename T>
 	inline Vector2<T> operator * (const Vector2<T>& v0, const Vector2<T>& v1)
 	{

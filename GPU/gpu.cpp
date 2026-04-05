@@ -5,6 +5,7 @@ namespace mai
 {
 
 GPU* GPU::_instance = nullptr;
+
 GPU* GPU::instance()
 {
 	if (!_instance)
@@ -40,12 +41,25 @@ void GPU::draw_point(const uint32_t& x, const uint32_t& y, const RGBA& color)
 void GPU::draw_line(const Point& p1, const Point& p2)
 {
 	std::vector<Point> pixels;
-	Raster::rasterize_line(pixels, p1, p2);
+	Raster::rasterize_line(p1, p2, pixels);
 
 	for (const auto& p : pixels)
 	{
 		draw_point(p.x, p.y, p.color);
 	}
 }
+
+void GPU::draw_triangle(const Point& p1, const Point& p2, const Point& p3)
+{
+	std::vector<Point> pixels;
+	Raster::rasterize_triangle(p1, p2, p3, pixels);
+
+	for (const auto& p : pixels)
+	{
+		draw_point(p.x, p.y, p.color);
+	}
+}
+
+
 
 }

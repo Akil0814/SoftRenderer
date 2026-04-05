@@ -26,6 +26,8 @@ public:
 
 	void draw_line(const Point& p1, const Point& p2);
 
+	void draw_triangle(const Point& p1, const Point& p2,const Point& p3);
+
 private:
 	static GPU* _instance;
 
