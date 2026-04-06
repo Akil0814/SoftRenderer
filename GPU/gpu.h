@@ -1,9 +1,11 @@
 #pragma once
 #include "../global/base.h"
 #include "frame_buffer.h"
-#include "../application/application.h"
 
-#define MAI_sgl mai::GPU::instance()
+#include "../application/application.h"
+#include "../application/image.h"
+
+#define MAI_SGL mai::GPU::instance()
 
 namespace mai
 {
@@ -28,8 +30,17 @@ public:
 
 	void draw_triangle(const Point& p1, const Point& p2,const Point& p3);
 
+	void draw_image(const Image* image);
+
+	void draw_image_with_alpha(const Image* image, const uint32_t& alpha);
+
+	//设置状态
+	void set_blending(bool enable);
+
 private:
 	static GPU* _instance;
+
+	bool _enable_blending = { false };
 
 	FrameBuffer* _frame_buffer = { nullptr };
 };
