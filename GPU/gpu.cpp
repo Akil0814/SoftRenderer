@@ -1,5 +1,6 @@
 #include "gpu.h"
 #include "raster.h"
+#include <algorithm>
 
 namespace mai
 {
@@ -87,9 +88,15 @@ void GPU::draw_triangle(const Point& p1, const Point& p2, const Point& p3)
 	std::vector<Point> pixels;
 	Raster::rasterize_triangle(p1, p2, p3, pixels);
 
+	RGBA result_color;
 	for (const auto& p : pixels)
 	{
-		draw_point(p.x, p.y, p.color);
+		if (_image)
+			result_color = _enable_bilinear ? sample_bilinear(p.uv) : sample_nearest(p.uv);
+		else
+			result_color = p.color;
+
+		draw_point(p.x, p.y, result_color);
 	}
 }
 
@@ -125,10 +132,81 @@ void GPU::draw_image_with_alpha(const Image* image, const uint32_t& alpha)
 	}
 }
 
+RGBA GPU::sample_nearest(const mai::vec2f& uv)
+{
+	mai::vec2f f_uv = uv;
+	f_uv.x = std::clamp(f_uv.x, 0.0f, 1.0f);
+	f_uv.y = std::clamp(f_uv.y, 0.0f, 1.0f);
+
+	//四舍五入到最近整数
+	// u = 0 对应 x = 0，u = 1 对应 x = width - 1
+	// v = 0 对应 y = 0，v = 1 对应 y = height - 1
+	int x = std::round(f_uv.x * (_image->_width - 1));
+	int y = std::round(f_uv.y * (_image->_height - 1));
+	x = std::clamp(x, 0, static_cast<int>(_image->_width) - 1);
+	y = std::clamp(y, 0, static_cast<int>(_image->_height) - 1);
+
+	int position = y * _image->_width + x;
+
+	return _image->_data[position];
+}
+
+RGBA GPU::sample_bilinear(const mai::vec2f& uv)
+{
+	RGBA result_color;
+
+	float x = uv.x * static_cast<float>(_image->_width - 1);
+	float y = uv.y * static_cast<float>(_image->_height - 1);
+
+
+	//获取目标点周围四个点的坐标
+	int left = std::floor(x);
+	int right = std::ceil(x);
+	int bottom = std::floor(y);
+	int top = std::ceil(y);
+
+	//对上下插值，得到左右
+	float y_scale = 0.0f;
+	if (top == bottom)
+		y_scale = 1.0f;
+	else
+		y_scale = (y - static_cast<float>(bottom)) / static_cast<float>(top - bottom);
+
+	int position_left_top = top * _image->_width + left;
+	int position_left_bottom = bottom * _image->_width + left;
+	int position_right_top = top * _image->_width + right;
+	int position_right_bottom = bottom * _image->_width + right;
+
+	RGBA left_color = Raster::lerpRGBA(_image->_data[position_left_bottom], _image->_data[position_left_top], y_scale);
+	RGBA right_color = Raster::lerpRGBA(_image->_data[position_right_bottom], _image->_data[position_right_top], y_scale);
+
+	//对左右插值，得到结果
+	float x_scale = 0.0f;
+	if (right == left)
+		x_scale = 1.0f;
+	else
+		x_scale = (x - static_cast<float>(left)) / static_cast<float>(right - left);
+
+	result_color = Raster::lerpRGBA(left_color, right_color, x_scale);
+
+	return result_color;
+}
+
+
 void GPU::set_blending(bool enable)
 {
 	_enable_blending = enable;
 }
 
+void GPU::set_bilinear(bool enable)
+{
+	_enable_bilinear = enable;
+}
+
+
+void GPU::set_texture(Image* image)
+{
+	_image = image;
+}
 
 }

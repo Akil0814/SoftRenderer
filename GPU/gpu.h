@@ -37,12 +37,24 @@ public:
 	//设置状态
 	void set_blending(bool enable);
 
+	void set_bilinear(bool enable);
+
+	void set_texture(Image* image);
+
+private:
+
+	RGBA sample_nearest(const mai::vec2f& uv);
+	RGBA sample_bilinear(const mai::vec2f& uv);
+
 private:
 	static GPU* _instance;
 
 	bool _enable_blending = { false };
+	bool _enable_bilinear = { false };
 
 	FrameBuffer* _frame_buffer = { nullptr };
+
+	Image* _image = { nullptr };
 };
 
 }

@@ -5,6 +5,7 @@
 #include<map>
 #include<cmath>
 #include<assert.h>
+#include "../math/math.h"
 
 #define PI					3.14159265358979323
 #define DEG2RAD(theta)		(0.01745329251994329 * (theta))
@@ -32,6 +33,7 @@ struct Point
 	int32_t x = { 0 };
 	int32_t y = { 0 };
 	RGBA color= { 255, 255, 255, 255 };
+	vec2f uv;
 };
 
 namespace Color
@@ -44,7 +46,7 @@ namespace Color
 	inline constexpr RGBA Yellow{ 255, 255, 0,   255 };
 	inline constexpr RGBA Cyan{ 0,   255, 255, 255 };
 	inline constexpr RGBA Magenta{ 255, 0,   255, 255 };
-inline constexpr RGBA Gray{ 128, 128, 128, 255 };
+	inline constexpr RGBA Gray{ 128, 128, 128, 255 };
 }
 
 }

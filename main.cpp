@@ -15,25 +15,69 @@
 
 mai::Image* image01 = nullptr;
 
+//mai::Point p1{ 500,500,mai::Color::Red , mai::vec2f(0.5f,1.0f)};
+//mai::Point p2{ 0,0,mai::Color::Blue , mai::vec2f(0.0f,0.0f) };
+//mai::Point p3{ 1000,0, mai::Color::Green , mai::vec2f(1.0f,0.0f) };
+
+mai::Point p1;
+mai::Point p2;
+mai::Point p3;
+
+mai::Point q1;
+mai::Point q2;
+mai::Point q3;
 
 void on_render()
 {
 	MAI_SGL->clear();
+	MAI_SGL->set_texture(image01);
 
-	mai::Point p1{ 200,200,mai::Color::Red };
-	mai::Point p2{ 100,100,mai::Color::Blue };
-	mai::Point p3{ 300,100, mai::Color::Green };
-
-	mai::Point p4{ 300,300,mai::Color::Red };
-	mai::Point p5{ 100,100,mai::Color::Blue };
-	mai::Point p6{ 300,100, mai::Color::Green };
-
-
-
+	MAI_SGL->set_bilinear(MAI_TRUE);
 	MAI_SGL->draw_triangle(p1, p2, p3);
-	MAI_SGL->draw_triangle(p1, p3, p4);
 
-	MAI_SGL->draw_image_with_alpha(image01, 230);
+	MAI_SGL->set_bilinear(MAI_FALSE);
+	MAI_SGL->draw_triangle(q1, q2, q3);
+}
+
+void prepare()
+{
+	image01 = mai::Image::create_image("assets/textures/Arcueid_morning_low.png");
+
+	if (image01 == nullptr)
+		std::cerr << "false" << std::endl;
+
+	p1.x = 0;
+	p1.y = 0;
+	p1.color = mai::RGBA(255, 0, 0, 255);
+	p1.uv = mai::vec2f(0.0f, 0.0f);
+
+	p2.x = 200;
+	p2.y = 600;
+	p2.color = mai::RGBA(0, 255, 0, 255);
+	p2.uv = mai::vec2f(0.5f, 1.0f);
+
+	p3.x = 400;
+	p3.y = 0;
+	p3.color = mai::RGBA(0, 0, 255, 255);
+	p3.uv = mai::vec2f(1.0f, 0.0f);
+
+	q1.x = 400;
+	q1.y = 0;
+	q1.color = mai::RGBA(255, 0, 0, 255);
+	q1.uv = mai::vec2f(0.0f, 0.0f);
+
+	q2.x = 600;
+	q2.y = 600;
+	q2.color = mai::RGBA(0, 255, 0, 255);
+	q2.uv = mai::vec2f(0.5f, 1.0f);
+
+	q3.x = 800;
+	q3.y = 0;
+	q3.color = mai::RGBA(0, 0, 255, 255);
+	q3.uv = mai::vec2f(1.0f, 0.0f);
+
+
+	MAI_SGL->set_blending(MAI_TRUE);
 }
 
 
@@ -49,15 +93,8 @@ int APIENTRY wWinMain(
 	//将bmp指向的内存配置到sgl当中
 	MAI_SGL->init_surface(MAI_APP->get_width(), MAI_APP->get_height(), MAI_APP->get_canvas());
 
-	mai::Vector2<int> test;
-	mai::Vector3<int> test2;
-	mai::Vector4<int> test3;
+	prepare();
 
-	image01 = mai::Image::create_image("assets/textures/Arcueid_morning.png");
-	MAI_SGL->set_blending(MAI_TRUE);
-
-	if (image01 == nullptr)
-		std::cerr << "false" << std::endl;
 
 	bool active = true;
 	while (active)

@@ -189,7 +189,46 @@ void Raster::interpolant_triangle(const Point& v0, const Point& v1, const Point&
 	result._A = static_cast<float>(c0._A) * weight0 + static_cast<float>(c1._A) * weight1 + static_cast<float>(c2._A) * weight2;
 
 	target.color = result;
+
+	target.uv = v0.uv * weight0 + v1.uv * weight1 + v2.uv * weight2;
+	//对uv坐标的插值
 }
+
+RGBA Raster::lerpRGBA(const RGBA& c0, const RGBA& c1, float weight)
+{
+	RGBA result;
+
+	result._R = static_cast<float>(c1._R) * weight + static_cast<float>(c0._R) * (1.0f - weight);
+	result._G = static_cast<float>(c1._G) * weight + static_cast<float>(c0._G) * (1.0f - weight);
+	result._B = static_cast<float>(c1._B) * weight + static_cast<float>(c0._B) * (1.0f - weight);
+	result._A = static_cast<float>(c1._A) * weight + static_cast<float>(c0._A) * (1.0f - weight);
+
+	return result;
+}
+
+RGBA Raster::lerpRGBA(
+	const RGBA& c0, const RGBA& c1, const RGBA& c2, 
+	float weight0, float weight1, float weight2)
+{
+	RGBA result;
+
+	result._R = static_cast<float>(c0._R) * weight0 + static_cast<float>(c1._R) * weight1 + static_cast<float>(c2._R) * weight2;
+	result._G = static_cast<float>(c0._G) * weight0 + static_cast<float>(c1._G) * weight1 + static_cast<float>(c2._G) * weight2;
+	result._B = static_cast<float>(c0._B) * weight0 + static_cast<float>(c1._B) * weight1 + static_cast<float>(c2._B) * weight2;
+	result._A = static_cast<float>(c0._A) * weight0 + static_cast<float>(c1._A) * weight1 + static_cast<float>(c2._A) * weight2;
+
+	return result;
+}
+
+mai::vec2f Raster::lerpUV(
+	const vec2f& uv0, const vec2f& uv1, const vec2f& uv2, 
+	float weight0, float weight1, float weight2)
+{
+	vec2f uv;
+	uv = uv0 * weight0 + uv1 * weight1 + uv2 * weight2;
+	return uv;
+}
+
 
 }
 
