@@ -135,8 +135,9 @@ void GPU::draw_image_with_alpha(const Image* image, const uint32_t& alpha)
 RGBA GPU::sample_nearest(const mai::vec2f& uv)
 {
 	mai::vec2f f_uv = uv;
-	f_uv.x = std::clamp(f_uv.x, 0.0f, 1.0f);
-	f_uv.y = std::clamp(f_uv.y, 0.0f, 1.0f);
+
+	check_wrap(f_uv.x);
+	check_wrap(f_uv.y);
 
 	//四舍五入到最近整数
 	// u = 0 对应 x = 0，u = 1 对应 x = width - 1
@@ -154,9 +155,13 @@ RGBA GPU::sample_nearest(const mai::vec2f& uv)
 RGBA GPU::sample_bilinear(const mai::vec2f& uv)
 {
 	RGBA result_color;
+	mai::vec2f f_uv = uv;
 
-	float x = uv.x * static_cast<float>(_image->_width - 1);
-	float y = uv.y * static_cast<float>(_image->_height - 1);
+	check_wrap(f_uv.x);
+	check_wrap(f_uv.y);
+
+	float x = f_uv.x * static_cast<float>(_image->_width - 1);
+	float y = f_uv.y * static_cast<float>(_image->_height - 1);
 
 
 	//获取目标点周围四个点的坐标
@@ -201,6 +206,32 @@ void GPU::set_blending(bool enable)
 void GPU::set_bilinear(bool enable)
 {
 	_enable_bilinear = enable;
+}
+
+void GPU::set_texture_wrap(uint32_t wrap)
+{
+	_wrap = wrap;
+}
+
+void GPU::check_wrap(float& n)
+{
+	if (n > 1.0f || n < 0.0f)
+	{
+		n = MAI_FRACTION(n);
+		switch (_wrap)
+		{
+		case MAI_TEXTURE_WRAP_REPEAT:
+			n = MAI_FRACTION(n + 1);
+			break;
+
+		case MAI_TEXTURE_WRAP_MIRROR:
+			n = 1.0f - MAI_FRACTION(n + 1);
+			break;
+
+		default:
+			break;
+		}
+	}
 }
 
 

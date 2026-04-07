@@ -41,16 +41,21 @@ public:
 
 	void set_texture(Image* image);
 
+	void set_texture_wrap(uint32_t wrap);
+
 private:
 
 	RGBA sample_nearest(const mai::vec2f& uv);
 	RGBA sample_bilinear(const mai::vec2f& uv);
+	void check_wrap(float& n);
 
 private:
 	static GPU* _instance;
 
 	bool _enable_blending = { false };
 	bool _enable_bilinear = { false };
+
+	uint32_t _wrap = { MAI_TEXTURE_WRAP_REPEAT };
 
 	FrameBuffer* _frame_buffer = { nullptr };
 

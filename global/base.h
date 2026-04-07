@@ -7,9 +7,15 @@
 #include<assert.h>
 #include "../math/math.h"
 
-#define PI					3.14159265358979323
-#define DEG2RAD(theta)		(0.01745329251994329 * (theta))
-#define FRACTION(v)			((v) - (int)(v))//返回小数部分
+#define MAI_PI					3.14159265358979323
+#define MAI_DEG2RAD(theta)		(0.01745329251994329 * (theta))
+#define MAI_FRACTION(v)			((v) - (int)(v))//返回小数部分
+
+#define MAI_TEXTURE_WRAP_REPEAT 0
+#define MAI_TEXTURE_WRAP_MIRROR 1
+
+#define MAI_TRUE 1
+#define MAI_FALSE 0
 
 using byte = unsigned char;
 

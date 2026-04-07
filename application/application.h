@@ -4,8 +4,6 @@
 
 #define MAI_APP mai::Application::instance()
 
-#define MAI_TRUE 1
-#define MAI_FALSE 0
 
 namespace mai
 {
