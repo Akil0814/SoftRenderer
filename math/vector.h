@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <assert.h>
+
 namespace mai
 {
 	template<typename T>
@@ -14,15 +15,15 @@ namespace mai
 	class Vector2
 	{
 	public:
-		Vector2() : x(0), y(0) {}
-		Vector2(T x, T y) :x(x), y(y) {}
-		Vector2(const Vector2<T>& v) :x(v.x), y(v.y) {}
-		explicit Vector2(const Vector3<T>& v) :x(v.x), y(v.y) {}
-		explicit Vector2(const Vector4<T>& v) :x(v.x), y(v.y) {}
+		Vector2()noexcept : x(0), y(0) {}
+		Vector2(T x, T y)noexcept :x(x), y(y) {}
+		Vector2(const Vector2<T>& v)noexcept :x(v.x), y(v.y) {}
+		explicit Vector2(const Vector3<T>& v)noexcept :x(v.x), y(v.y) {}
+		explicit Vector2(const Vector4<T>& v)noexcept :x(v.x), y(v.y) {}
 
 	
 		//取得向量某个元素
-		const T& operator[](int i) const
+		[[nodiscard]] const T& operator[](int i) const noexcept
 		{
 			assert(i >= 0 && i < 2);
 			if (i == 0)
@@ -31,7 +32,7 @@ namespace mai
 		}
 
 		//给向量某个元素赋值
-		T& operator[](int i)
+		T& operator[](int i)noexcept
 		{
 			assert(i >= 0 && i < 2);
 
@@ -41,13 +42,13 @@ namespace mai
 		}
 
 		//等号运算符重载
-		Vector2<T>& operator=(const Vector3<T>& v)
+		Vector2<T>& operator=(const Vector3<T>& v)noexcept
 		{
 			x = v.x; y = v.y;
 			return *this;
 		}
 
-		Vector2<T>& operator=(const Vector4<T>& v)
+		Vector2<T>& operator=(const Vector4<T>& v)noexcept
 		{
 			x = v.x; y = v.y;
 			return *this;
@@ -55,26 +56,26 @@ namespace mai
 
 		//加法
 		//v = v1+v2
-		Vector2<T> operator+(const Vector2<T>& v) const
+		[[nodiscard]] Vector2<T> operator+(const Vector2<T>& v) const noexcept
 		{
 			return Vector2<T>(x + v.x, y + v.y);
 		}
 
 		//加法并赋值
 		//v += v2
-		Vector2<T>& operator+=(const Vector2<T>& v)
+		Vector2<T>& operator+=(const Vector2<T>& v)noexcept
 		{
 			x += v.x; y += v.y;
 			return *this;
 		}
 
 		//减法
-		Vector2<T> operator-(const Vector2<T>& v) const
+		[[nodiscard]] Vector2<T> operator-(const Vector2<T>& v) const noexcept
 		{
 			return Vector2<T>(x - v.x, y - v.y);
 		}
 
-		Vector2<T>& operator-=(const Vector2<T>& v)
+		Vector2<T>& operator-=(const Vector2<T>& v)noexcept
 		{
 			x -= v.x;
 			y -= v.y;
@@ -83,14 +84,14 @@ namespace mai
 
 		//乘法
 		//v = v1 * s
-		Vector2<T> operator*(T s) const
+		[[nodiscard]] Vector2<T> operator*(T s) const noexcept
 		{
 			return Vector2<T>(x * s, y * s);
 		}
 
 		//乘法并赋值
 		//v *= s
-		Vector2<T>& operator*=(T s)
+		Vector2<T>& operator*=(T s)noexcept
 		{
 			x *= s; y *= s;
 			return *this;
@@ -99,7 +100,7 @@ namespace mai
 		//除法
 		//v = v1 / f
 		//int 除法可能会被截断
-		Vector2<T> operator/(T f) const
+		[[nodiscard]] Vector2<T> operator/(T f) const noexcept
 		{
 			assert(f != 0);
 			float inv = static_cast<T>(1) / f;
@@ -109,7 +110,7 @@ namespace mai
 
 		//除法并赋值
 		//v /= f
-		Vector2<T>& operator/=(T f)
+		Vector2<T>& operator/=(T f)noexcept
 		{
 			assert(f != 0);
 			float inv = static_cast<T>(1) / f;
@@ -118,7 +119,7 @@ namespace mai
 		}
 
 		//取反
-		Vector2<T> operator-() const
+		[[nodiscard]] Vector2<T> operator-() const noexcept
 		{
 			return Vector2<T>(-x, -y);
 		}
@@ -137,12 +138,12 @@ namespace mai
 	template<typename T>
 	class Vector3 {
 	public:
-		Vector3():x(0), y(0), z(0) {}
-		Vector3(T x, T y, T z) :x(x), y(y), z(z) {}
-		Vector3(const Vector3<T>& v) :x(v.x), y(v.y), z(v.z) {}
-		explicit Vector3(const Vector4<T>& v) :x(v.x), y(v.y), z(v.z) {}
+		Vector3()noexcept :x(0), y(0), z(0) {}
+		Vector3(T x, T y, T z)noexcept :x(x), y(y), z(z) {}
+		Vector3(const Vector3<T>& v)noexcept :x(v.x), y(v.y), z(v.z) {}
+		explicit Vector3(const Vector4<T>& v)noexcept :x(v.x), y(v.y), z(v.z) {}
 
-		const T& operator[](int i) const
+		[[nodiscard]] const T& operator[](int i) const noexcept
 		{
 			assert(i >= 0 && i <= 2);
 
@@ -154,7 +155,7 @@ namespace mai
 			return z;
 		}
 
-		T& operator[](int i)
+		T& operator[](int i)noexcept
 		{
 			assert(i >= 0 && i <= 2);
 
@@ -166,7 +167,7 @@ namespace mai
 			return z;
 		}
 
-		Vector3<T>& operator=(const Vector2<T>& v)
+		Vector3<T>& operator=(const Vector2<T>& v)noexcept
 		{
 			x = v.x;
 			y = v.y;
@@ -174,7 +175,7 @@ namespace mai
 			return *this;
 		}
 
-		Vector3<T>& operator=(const Vector4<T>& v)
+		Vector3<T>& operator=(const Vector4<T>& v)noexcept
 		{
 			x = v.x;
 			y = v.y;
@@ -182,47 +183,47 @@ namespace mai
 			return *this;
 		}
 
-		Vector3<T> operator+(const Vector3<T>& v) const
+		[[nodiscard]] Vector3<T> operator+(const Vector3<T>& v) const noexcept
 		{
 			return Vector3<T>(x + v.x, y + v.y, z + v.z);
 		}
 
-		Vector3<T>& operator+=(const Vector3<T>& v)
+		Vector3<T>& operator+=(const Vector3<T>& v)noexcept
 		{
 			x += v.x; y += v.y; z += v.z;
 			return *this;
 		}
 
-		Vector3<T> operator-(const Vector3<T>& v) const
+		[[nodiscard]] Vector3<T> operator-(const Vector3<T>& v) const noexcept
 		{
 			return Vector3<T>(x - v.x, y - v.y, z - v.z);
 		}
 
-		Vector3<T>& operator-=(const Vector3<T>& v)
+		Vector3<T>& operator-=(const Vector3<T>& v)noexcept
 		{
 			x -= v.x; y -= v.y; z -= v.z;
 			return *this;
 		}
 
-		Vector3<T> operator*(T s) const
+		[[nodiscard]] Vector3<T> operator*(T s) const noexcept
 		{
 			return Vector3<T>(x * s, y * s, z * s);
 		}
 
-		Vector3<T>& operator*=(T s)
+		Vector3<T>& operator*=(T s)noexcept
 		{
 			x *= s; y *= s; z *= s;
 			return *this;
 		}
 
-		Vector3<T> operator/(T f) const
+		[[nodiscard]] Vector3<T> operator/(T f) const noexcept
 		{
 			assert(f != 0);
 			float inv = 1.0 / f;
 			return Vector3<T>(x * inv, y * inv, z * inv);
 		}
 
-		Vector3<T>& operator/=(T f)
+		Vector3<T>& operator/=(T f)noexcept
 		{
 			assert(f != 0);
 			float inv = 1.0 / f;
@@ -230,7 +231,7 @@ namespace mai
 			return *this;
 		}
 
-		Vector3<T>  operator-() const
+		[[nodiscard]] Vector3<T>  operator-() const noexcept
 		{
 			return Vector3<T>(-x, -y, -z);
 		}
@@ -248,11 +249,11 @@ namespace mai
 	template<typename T>
 	class Vector4 {
 	public:
-		Vector4() : x(0), y(0), z(0), w(0) {}
-		Vector4(T x, T y, T z, T w) :x(x), y(y), z(z), w(w) {}
-		Vector4(const Vector4<T>& v) :x(v.x), y(v.y), z(v.z), w(v.w) {}
+		Vector4()noexcept : x(0), y(0), z(0), w(0) {}
+		Vector4(T x, T y, T z, T w)noexcept :x(x), y(y), z(z), w(w) {}
+		Vector4(const Vector4<T>& v)noexcept :x(v.x), y(v.y), z(v.z), w(v.w) {}
 
-		const T& operator[](int i) const
+		[[nodiscard]] const T& operator[](int i) const noexcept
 		{
 			assert(i >= 0 && i <= 3);
 
@@ -266,7 +267,7 @@ namespace mai
 			return w;
 		}
 
-		T& operator[](int i)
+		T& operator[](int i)noexcept
 		{
 			assert(i >= 0 && i <= 3);
 
@@ -280,7 +281,7 @@ namespace mai
 			return w;
 		}
 
-		Vector4<T>& operator=(const Vector2<T>& v)
+		Vector4<T>& operator=(const Vector2<T>& v)noexcept
 		{
 			x = v.x;
 			y = v.y;
@@ -289,7 +290,7 @@ namespace mai
 			return *this;
 		}
 
-		Vector4<T>& operator=(const Vector3<T>& v)
+		Vector4<T>& operator=(const Vector3<T>& v)noexcept
 		{
 			x = v.x;
 			y = v.y;
@@ -298,53 +299,53 @@ namespace mai
 			return *this;
 		}
 
-		Vector4<T> operator+(const Vector4<T>& v) const
+		[[nodiscard]] Vector4<T> operator+(const Vector4<T>& v) const noexcept
 		{
 			return Vector4<T>(x + v.x, y + v.y, z + v.z, w + v.w);
 		}
 
-		Vector4<T>& operator+=(const Vector4<T>& v)
+		Vector4<T>& operator+=(const Vector4<T>& v)noexcept
 		{
 			x += v.x; y += v.y; z += v.z; w += v.w;
 			return *this;
 		}
 
-		Vector4<T> operator-(const Vector4<T>& v) const
+		[[nodiscard]] Vector4<T> operator-(const Vector4<T>& v) const noexcept
 		{
 			return Vector4<T>(x - v.x, y - v.y, z - v.z, w - v.w);
 		}
 
-		Vector4<T>& operator-=(const Vector4<T>& v)
+		Vector4<T>& operator-=(const Vector4<T>& v)noexcept
 		{
 			x -= v.x; y -= v.y; z -= v.z; w -= v.w;
 			return *this;
 		}
 
-		Vector4<T> operator*(T s) const
+		[[nodiscard]] Vector4<T> operator*(T s) const noexcept
 		{
 			return Vector4<T>(x * s, y * s, z * s, w * s);
 		}
 
-		Vector4<T>& operator*=(T s)
+		Vector4<T>& operator*=(T s)noexcept
 		{
 			x *= s; y *= s; z *= s; w *= s;
 			return *this;
 		}
 
-		Vector4<T>& operator*=(const Vector3<T>& v)
+		Vector4<T>& operator*=(const Vector3<T>& v)noexcept
 		{
 			x *= v.x; y *= v.y; z *= v.z;
 			return *this;
 		}
 
-		Vector4<T> operator/(T f) const
+		[[nodiscard]] Vector4<T> operator/(T f) const noexcept
 		{
 			assert(f != 0);
 			float inv = 1.0 / f;
 			return Vector4<T>(x * inv, y * inv, z * inv, w * inv);
 		}
 
-		Vector4<T>& operator/=(T f)
+		Vector4<T>& operator/=(T f)noexcept
 		{
 			assert(f != 0);
 			float inv = 1.0 / f;
@@ -352,7 +353,7 @@ namespace mai
 			return *this;
 		}
 
-		Vector4<T> operator-() const
+		[[nodiscard]] Vector4<T> operator-() const noexcept
 		{
 			return Vector4<T>(-x, -y, -z, -w);
 		}
