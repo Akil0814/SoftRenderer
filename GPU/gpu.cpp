@@ -15,7 +15,7 @@ GPU* GPU::instance()
 	return _instance;
 }
 
-GPU::~GPU()
+GPU::~GPU() noexcept
 {
 	if (_frame_buffer)
 		delete _frame_buffer;
@@ -26,13 +26,13 @@ void GPU::init_surface(const uint32_t& width, const uint32_t& height, void* buff
 	_frame_buffer = new FrameBuffer(width, height, buffer);
 }
 
-void GPU::clear()
+void GPU::clear() noexcept
 {
 	size_t pixelSize = _frame_buffer->_width * _frame_buffer->_height;
 	std::fill_n(_frame_buffer->_color_buffer, pixelSize, RGBA(0, 0, 0, 0));
 }
 
-inline void GPU::draw_point(const uint32_t& x, const uint32_t& y, const RGBA& color)
+inline void GPU::draw_point(const uint32_t& x, const uint32_t& y, const RGBA& color) noexcept
 {
 	if (x >= _frame_buffer->_width || y >= _frame_buffer->_height)
 		return;
@@ -100,7 +100,7 @@ void GPU::draw_triangle(const Point& p1, const Point& p2, const Point& p3)
 	}
 }
 
-void GPU::draw_image(const Image* image)
+void GPU::draw_image(const Image* image) noexcept
 {
 	if (image == nullptr || image->_data == nullptr)
 		return;
@@ -114,7 +114,7 @@ void GPU::draw_image(const Image* image)
 	}
 }
 
-void GPU::draw_image_with_alpha(const Image* image, const uint32_t& alpha)
+void GPU::draw_image_with_alpha(const Image* image, const uint32_t& alpha) noexcept
 {
 	if (image == nullptr || image->_data == nullptr)
 		return;
@@ -132,7 +132,7 @@ void GPU::draw_image_with_alpha(const Image* image, const uint32_t& alpha)
 	}
 }
 
-RGBA GPU::sample_nearest(const mai::vec2f& uv)
+RGBA GPU::sample_nearest(const mai::vec2f& uv) noexcept
 {
 	mai::vec2f f_uv = uv;
 
@@ -152,7 +152,7 @@ RGBA GPU::sample_nearest(const mai::vec2f& uv)
 	return _image->_data[position];
 }
 
-RGBA GPU::sample_bilinear(const mai::vec2f& uv)
+RGBA GPU::sample_bilinear(const mai::vec2f& uv) noexcept
 {
 	RGBA result_color;
 	mai::vec2f f_uv = uv;
@@ -198,22 +198,22 @@ RGBA GPU::sample_bilinear(const mai::vec2f& uv)
 }
 
 
-void GPU::set_blending(bool enable)
+void GPU::set_blending(bool enable) noexcept
 {
 	_enable_blending = enable;
 }
 
-void GPU::set_bilinear(bool enable)
+void GPU::set_bilinear(bool enable) noexcept
 {
 	_enable_bilinear = enable;
 }
 
-void GPU::set_texture_wrap(uint32_t wrap)
+void GPU::set_texture_wrap(uint32_t wrap) noexcept
 {
 	_wrap = wrap;
 }
 
-void GPU::check_wrap(float& n)
+void GPU::check_wrap(float& n) noexcept
 {
 	if (n > 1.0f || n < 0.0f)
 	{
@@ -235,7 +235,7 @@ void GPU::check_wrap(float& n)
 }
 
 
-void GPU::set_texture(Image* image)
+void GPU::set_texture(Image* image) noexcept
 {
 	_image = image;
 }

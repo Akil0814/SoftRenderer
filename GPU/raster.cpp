@@ -126,7 +126,7 @@ void Raster::rasterize_triangle(
 
 }
 
-void  Raster::interpolant_line(const Point& v0, const Point& v1, Point& target)
+void  Raster::interpolant_line(const Point& v0, const Point& v1, Point& target) noexcept
 {
 	if (v0.x == v1.x && v0.y == v1.y)
 	{
@@ -149,7 +149,7 @@ void  Raster::interpolant_line(const Point& v0, const Point& v1, Point& target)
 	target.color = result;
 }
 
-void Raster::interpolant_triangle(const Point& v0, const Point& v1, const Point& v2, Point& target)
+void Raster::interpolant_triangle(const Point& v0, const Point& v1, const Point& v2, Point& target) noexcept
 {
 	//重心插值
 	
@@ -194,7 +194,7 @@ void Raster::interpolant_triangle(const Point& v0, const Point& v1, const Point&
 	//对uv坐标的插值
 }
 
-RGBA Raster::lerpRGBA(const RGBA& c0, const RGBA& c1, float weight)
+RGBA Raster::lerpRGBA(const RGBA& c0, const RGBA& c1, float weight) noexcept
 {
 	RGBA result;
 
@@ -208,7 +208,7 @@ RGBA Raster::lerpRGBA(const RGBA& c0, const RGBA& c1, float weight)
 
 RGBA Raster::lerpRGBA(
 	const RGBA& c0, const RGBA& c1, const RGBA& c2, 
-	float weight0, float weight1, float weight2)
+	float weight0, float weight1, float weight2) noexcept
 {
 	RGBA result;
 
@@ -222,7 +222,7 @@ RGBA Raster::lerpRGBA(
 
 mai::vec2f Raster::lerpUV(
 	const vec2f& uv0, const vec2f& uv1, const vec2f& uv2, 
-	float weight0, float weight1, float weight2)
+	float weight0, float weight1, float weight2) noexcept
 {
 	vec2f uv;
 	uv = uv0 * weight0 + uv1 * weight1 + uv2 * weight2;

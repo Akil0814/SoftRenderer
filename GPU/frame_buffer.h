@@ -12,7 +12,7 @@ class FrameBuffer
 {
 public:
 	FrameBuffer(uint32_t width, uint32_t height, void* buffer = nullptr);
-	~FrameBuffer();
+	~FrameBuffer() noexcept;
 	FrameBuffer(const FrameBuffer&) = delete;
 
 	uint32_t _width = { 0 };

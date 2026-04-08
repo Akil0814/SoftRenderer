@@ -19,7 +19,7 @@ FrameBuffer::FrameBuffer(uint32_t width, uint32_t height, void* buffer)
 	_color_buffer = (RGBA*)buffer;
 }
 
-FrameBuffer::~FrameBuffer()
+FrameBuffer::~FrameBuffer() noexcept
 {
 	if (!_extern_buffer && _color_buffer)
 		delete[] _color_buffer;
