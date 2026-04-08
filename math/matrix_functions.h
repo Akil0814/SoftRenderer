@@ -146,9 +146,9 @@ namespace mai
 
 		assert(determinant != 0);
 
-		T oneOverDeterminant = static_cast<T>(1) / determinant;
+		T one_over_determinant = static_cast<T>(1) / determinant;
 
-		return result * oneOverDeterminant;
+		return result * one_over_determinant;
 	}
 
 }
