@@ -28,6 +28,15 @@ mai::Point q2;
 mai::Point q3;
 
 float speed = 0.01;
+
+void test()
+{
+	mai::Mat3f m33;
+	auto m = m33 * 4.0f;
+	m.print_matrix();
+}
+
+
 void changeUV() {
 	p1.uv.x += speed;
 	p2.uv.x += speed;
@@ -61,6 +70,7 @@ void on_render()
 void prepare()
 {
 	image01 = mai::Image::create_image("assets/textures/Arcueid_morning_low.png");
+	test();
 
 	if (image01 == nullptr)
 		std::cerr << "false" << std::endl;
