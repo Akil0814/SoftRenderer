@@ -2,7 +2,9 @@
 #include "vector.h"
 #include "vector_functions.h"
 #include "matrix.h"
+#include "../global/base.h"
 #include <cmath>
+#include <iostream>
 
 namespace mai
 {
@@ -28,7 +30,7 @@ namespace mai
 	}
 
 	template<typename T>
-	[[nodiscard]] Matrix3x3<T> operator * (const Matrix3x3<T>& m1, const Matrix3x3<T>& m2) noexcept
+	[[nodiscard]] Matrix3x3<T> operator * (const Matrix3x3<T>& a, const Matrix3x3<T>& b) noexcept
 	{
 		Matrix3x3<T> r;
 
@@ -48,7 +50,7 @@ namespace mai
 	}
 
 	template<typename T>
-	[[nodiscard]] Matrix4x4<T> operator * (const Matrix4x4<T>& m1, const Matrix4x4<T>& m2) noexcept
+	[[nodiscard]] Matrix4x4<T> operator * (const Matrix4x4<T>& a, const Matrix4x4<T>& b) noexcept
 	{
 		Matrix4x4<T> r;
 
@@ -152,7 +154,7 @@ namespace mai
 	}
 
 	template<typename T, typename V>
-	Matrix4x4<T> scale(const Matrix4x4<T>& src, V x, V y, V z)noexcept
+	[[nodiscard]] Matrix4x4<T> scale(const Matrix4x4<T>& src, V x, V y, V z)noexcept
 	{
 		Matrix4x4<T> result;
 
@@ -174,7 +176,7 @@ namespace mai
 	}
 
 	template<typename T, typename V>
-	Matrix4x4<T> translate(const Matrix4x4<T>& src, V x, V y, V z)noexcept
+	[[nodiscard]] Matrix4x4<T> translate(const Matrix4x4<T>& src, V x, V y, V z)noexcept
 	{
 		Matrix4x4<T> result(src);
 		Vector4<T> col0 = src.get_column(0);
@@ -189,13 +191,13 @@ namespace mai
 	}
 
 	template<typename T, typename V>
-	Matrix4x4<T> translate(const Matrix4x4<T>& src, const Vector3<V>& v)noexcept
+	[[nodiscard]] Matrix4x4<T> translate(const Matrix4x4<T>& src, const Vector3<V>& v)noexcept
 	{
 		return translate(src, v.x, v.y, v.z);
 	}
 
 	template<typename T>
-	Matrix4x4<T> rotate(const Matrix4x4<T>& src, float angle, const Vector3<T>& v)
+	[[nodiscard]] Matrix4x4<T> rotate(const Matrix4x4<T>& src, float angle, const Vector3<T>& v)
 	{
 		T const c = std::cos(angle);
 		T const s = std::sin(angle);
@@ -242,5 +244,57 @@ namespace mai
 		return result;
 	}
 
+	//正交投影函数
+	template<typename T>
+	[[nodiscard]] Matrix4x4<T> orthographic(T left, T right, T bottom, T top, T near, T far)noexcept
+	{
+		Matrix4x4<T> result(static_cast<T>(1));
 
+		result.set(0, 0, static_cast<T>(2) / (right - left));
+		result.set(0, 3, -(right + left) / (right - left));
+		result.set(1, 1, static_cast<T>(2) / (top - bottom));
+		result.set(1, 3, -(top + bottom) / (top - bottom));
+		result.set(2, 2, -static_cast<T>(2) / (far - near));
+		result.set(2, 3, -(far + near) / (far - near));
+
+		return result;
+	}
+
+	//透视投影函数
+	//这里的fov是y方向的fov
+	template<typename T>
+	[[nodiscard]] Matrix4x4<T> perspective(T fovy, T aspect, T n, T f)noexcept
+	{
+		T const tanHalfFovy = std::tan(static_cast<float>(MAI_DEG2RAD(fovy / static_cast<T>(2))));
+
+		Matrix4x4<T> result(static_cast<T>(0));
+		result.set(0, 0, static_cast<T>(1) / (aspect * tanHalfFovy));
+		result.set(1, 1, static_cast<T>(1) / (tanHalfFovy));
+		result.set(2, 2, -(f + n) / (f - n));
+		result.set(2, 3, -static_cast<T>(2) * f * n / (f - n));
+		result.set(3, 2, -static_cast<T>(1));
+
+		return result;
+	}
+
+	//屏幕空间变换函数
+	template<typename T>
+	[[nodiscard]] Matrix4x4<T> screen_matrix(const uint32_t& width, const uint32_t& height)noexcept
+	{
+		Matrix4x4<T> result(static_cast<T>(1));
+
+		//x
+		result.set(0, 0, static_cast<T>(width) / static_cast<T>(2));
+		result.set(0, 3, static_cast<T>(width) / static_cast<T>(2));
+
+		//y
+		result.set(1, 1, static_cast<T>(height) / static_cast<T>(2));
+		result.set(1, 3, static_cast<T>(height) / static_cast<T>(2));
+
+		//z
+		result.set(2, 2, static_cast<T>(0.5));
+		result.set(2, 3, static_cast<T>(0.5));
+
+		return result;
+	}
 }

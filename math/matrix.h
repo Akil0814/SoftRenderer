@@ -277,6 +277,6 @@ namespace mai
 		T m[16] = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
 	};
 
-	using Mat3f = Matrix3x3<float>;
-	using Mat4f = Matrix4x4<float>;
+	using mat3f = Matrix3x3<float>;
+	using mat4f = Matrix4x4<float>;
 }

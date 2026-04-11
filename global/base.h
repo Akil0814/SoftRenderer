@@ -5,7 +5,7 @@
 #include<map>
 #include<cmath>
 #include<assert.h>
-#include "../math/math.h"
+#include "../math/vector.h"
 
 #define MAI_PI					3.14159265358979323
 #define MAI_DEG2RAD(theta)		(0.01745329251994329 * (theta))

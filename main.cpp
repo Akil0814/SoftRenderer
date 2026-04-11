@@ -7,107 +7,100 @@
 #include "gpu/gpu.h"
 #include "math/math.h"
 
-#include "imgui/imgui.h"
-#include "imgui/imgui_impl_win32.h"
-
 #pragma comment(linker, "/subsystem:console /entry:wWinMainCRTStartup" )//更改main入口
 
 
+uint32_t WIDTH = 1080;
+uint32_t HEIGHT = 720;
+
 mai::Image* image01 = nullptr;
 
-//mai::Point p1{ 500,500,mai::Color::Red , mai::vec2f(0.5f,1.0f)};
-//mai::Point p2{ 0,0,mai::Color::Blue , mai::vec2f(0.0f,0.0f) };
-//mai::Point p3{ 1000,0, mai::Color::Green , mai::vec2f(1.0f,0.0f) };
+mai::Point p1{ 500,500,mai::Color::Red , mai::vec2f(0.5f,1.0f)};
+mai::Point p2{ 0,0,mai::Color::Blue , mai::vec2f(0.0f,0.0f) };
+mai::Point p3{ 1000,0, mai::Color::Green , mai::vec2f(1.0f,0.0f) };
 
-mai::Point p1;
-mai::Point p2;
-mai::Point p3;
+mai::vec4f pos1;
+mai::vec4f pos2;
+mai::vec4f pos3;
 
-mai::Point q1;
-mai::Point q2;
-mai::Point q3;
+mai::mat4f modelMatrix;
+mai::mat4f viewMatrix;
+mai::mat4f perspectiveMatrix;
+mai::mat4f screenMatrix;
+
+float angle = 0.0f;
+float cameraPos = 5.0f;
 
 float speed = 0.01;
 
-void test()
+void transform()
 {
-	mai::Mat4f m4;
-	m4.print_matrix();
-	mai::vec3f v3(13.0f,21.0f,11.0f);
-	m4=mai::rotate(m4, 90, v3);
-	m4.print_matrix();
-}
+	angle += 0.01f;
+	cameraPos += 0.01f;
 
+	//模型变换
+	modelMatrix = mai::rotate(mai::mat4f(1.0f), angle, mai::vec3f{ 0.0f, 1.0f, 0.0f });
 
-void changeUV() {
-	p1.uv.x += speed;
-	p2.uv.x += speed;
-	p3.uv.x += speed;
-	q1.uv.x += speed;
-	q2.uv.x += speed;
-	q3.uv.x += speed;
+	//模拟摄像机往后退
+	auto cameraModelMatrix = mai::translate(mai::mat4f(1.0f), mai::vec3f{ 0.0f, 0.0f, cameraPos });
+	viewMatrix = mai::inverse(cameraModelMatrix);
 
-	p1.uv.y += speed;
-	p2.uv.y += speed;
-	p3.uv.y += speed;
-	q1.uv.y += speed;
-	q2.uv.y += speed;
-	q3.uv.y += speed;
+	//mvp矩阵相乘
+	auto sp1 = perspectiveMatrix * viewMatrix * modelMatrix * pos1;
+	auto sp2 = perspectiveMatrix * viewMatrix * modelMatrix * pos2;
+	auto sp3 = perspectiveMatrix * viewMatrix * modelMatrix * pos3;
+
+	//透视除法（此处故意设计z！=0）
+	sp1 /= sp1.w;
+	sp2 /= sp2.w;
+	sp3 /= sp3.w;
+
+	//屏幕空间
+	sp1 = screenMatrix * sp1;
+	sp2 = screenMatrix * sp2;
+	sp3 = screenMatrix * sp3;
+
+	p1.x = sp1.x;
+	p1.y = sp1.y;
+
+	p2.x = sp2.x;
+	p2.y = sp2.y;
+
+	p3.x = sp3.x;
+	p3.y = sp3.y;
 }
 
 void on_render()
 {
-	changeUV();
-
 	MAI_SGL->clear();
 	MAI_SGL->set_texture(image01);
 
 	MAI_SGL->set_bilinear(MAI_TRUE);
 	MAI_SGL->draw_triangle(p1, p2, p3);
-
-	MAI_SGL->set_bilinear(MAI_FALSE);
-	MAI_SGL->draw_triangle(q1, q2, q3);
 }
 
 void prepare()
 {
 	image01 = mai::Image::create_image("assets/textures/Arcueid_morning_low.png");
-	test();
 
 	if (image01 == nullptr)
 		std::cerr << "false" << std::endl;
 
-	p1.x = 0;
-	p1.y = 0;
 	p1.color = mai::RGBA(255, 0, 0, 255);
 	p1.uv = mai::vec2f(0.0f, 0.0f);
 
-	p2.x = 400;
-	p2.y = 300;
 	p2.color = mai::RGBA(0, 255, 0, 255);
 	p2.uv = mai::vec2f(1.0f, 1.0f);
 
-	p3.x = 400;
-	p3.y = 0;
 	p3.color = mai::RGBA(0, 0, 255, 255);
 	p3.uv = mai::vec2f(1.0f, 0.0f);
 
-	q1.x = 0;
-	q1.y = 0;
-	q1.color = mai::RGBA(255, 0, 0, 255);
-	q1.uv = mai::vec2f(0.0f, 0.0f);
+	pos1 = { -1.5f, 0.0f, 0.0f, 1.0f };
+	pos2 = { 1.5f, 0.0f, 0.0f, 1.0f };
+	pos3 = { 0.0f, 2.0f, 0.0f, 1.0f };
 
-	q2.x = 0;
-	q2.y = 300;
-	q2.color = mai::RGBA(0, 255, 0, 255);
-	q2.uv = mai::vec2f(0.0f, 1.0f);
-
-	q3.x = 400;
-	q3.y = 300;
-	q3.color = mai::RGBA(0, 0, 255, 255);
-	q3.uv = mai::vec2f(1.0f, 1.0f);
-
-	//MAI_SGL->set_texture_wrap(MAI_TEXTURE_WRAP_MIRROR);
+	perspectiveMatrix = mai::perspective(60.0f, (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
+	screenMatrix = mai::screen_matrix<float>(WIDTH, HEIGHT);
 }
 
 
@@ -131,8 +124,11 @@ int APIENTRY wWinMain(
 	{
 		active = MAI_APP->peek_message();
 		on_render();
+		transform();
 		MAI_APP->show();
 	}
+
+	mai::Image::destroy_image(image01);
 
 	return 0;
 }
