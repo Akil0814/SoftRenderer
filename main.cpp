@@ -31,9 +31,11 @@ float speed = 0.01;
 
 void test()
 {
-	mai::Mat3f m33;
-	auto m = m33 * 4.0f;
-	m.print_matrix();
+	mai::Mat4f m4;
+	m4.print_matrix();
+	mai::vec3f v3(13.0f,21.0f,11.0f);
+	m4=mai::rotate(m4, 90, v3);
+	m4.print_matrix();
 }
 
 

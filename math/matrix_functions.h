@@ -151,4 +151,96 @@ namespace mai
 		return result * one_over_determinant;
 	}
 
+	template<typename T, typename V>
+	Matrix4x4<T> scale(const Matrix4x4<T>& src, V x, V y, V z)noexcept
+	{
+		Matrix4x4<T> result;
+
+		Vector4<T> col0 = src.get_column(0);
+		Vector4<T> col1 = src.get_column(1);
+		Vector4<T> col2 = src.get_column(2);
+		Vector4<T> col3 = src.get_column(3);
+
+		col0 *= x;
+		col1 *= y;
+		col2 *= z;
+
+		result.set_column(col0, 0);
+		result.set_column(col1, 1);
+		result.set_column(col2, 2);
+		result.set_column(col3, 3);
+
+		return result;
+	}
+
+	template<typename T, typename V>
+	Matrix4x4<T> translate(const Matrix4x4<T>& src, V x, V y, V z)noexcept
+	{
+		Matrix4x4<T> result(src);
+		Vector4<T> col0 = src.get_column(0);
+		Vector4<T> col1 = src.get_column(1);
+		Vector4<T> col2 = src.get_column(2);
+		Vector4<T> col3 = src.get_column(3);
+
+		Vector4<T> dstCol3 = col0 * x + col1 * y + col2 * z + col3;
+		result.set_column(dstCol3, 3);
+
+		return result;
+	}
+
+	template<typename T, typename V>
+	Matrix4x4<T> translate(const Matrix4x4<T>& src, const Vector3<V>& v)noexcept
+	{
+		return translate(src, v.x, v.y, v.z);
+	}
+
+	template<typename T>
+	Matrix4x4<T> rotate(const Matrix4x4<T>& src, float angle, const Vector3<T>& v)
+	{
+		T const c = std::cos(angle);
+		T const s = std::sin(angle);
+
+		Vector3<T> axis = normalize(v);
+		Vector3<T> temp((T(1) - c) * axis);
+
+		Matrix4x4<T> Rotate = Matrix4x4<T>::identity();
+		Rotate.set(0, 0, c + temp[0] * axis[0]);
+		Rotate.set(1, 0, temp[0] * axis[1] + s * axis[2]);
+		Rotate.set(2, 0, temp[0] * axis[2] - s * axis[1]);
+
+		Rotate.set(0, 1, temp[1] * axis[0] - s * axis[2]);
+		Rotate.set(1, 1, c + temp[1] * axis[1]);
+		Rotate.set(2, 1, temp[1] * axis[2] + s * axis[0]);
+
+		Rotate.set(0, 2, temp[2] * axis[0] + s * axis[1]);
+		Rotate.set(1, 2, temp[2] * axis[1] - s * axis[0]);
+		Rotate.set(2, 2, c + temp[2] * axis[2]);
+
+		//接下来计算 src * rotate
+		Vector4<T> rCol0 = Rotate.get_column(0);
+		Vector4<T> rCol1 = Rotate.get_column(1);
+		Vector4<T> rCol2 = Rotate.get_column(2);
+		Vector4<T> rCol3 = Rotate.get_column(3);
+
+		Vector4<T> srcCol0 = src.get_column(0);
+		Vector4<T> srcCol1 = src.get_column(1);
+		Vector4<T> srcCol2 = src.get_column(2);
+		Vector4<T> srcCol3 = src.get_column(3);
+
+		Vector4<T> col0 = srcCol0 * rCol0[0] + srcCol1 * rCol0[1] + srcCol2 * rCol0[2];
+		Vector4<T> col1 = srcCol0 * rCol1[0] + srcCol1 * rCol1[1] + srcCol2 * rCol1[2];
+		Vector4<T> col2 = srcCol0 * rCol2[0] + srcCol1 * rCol2[1] + srcCol2 * rCol2[2];
+		Vector4<T> col3 = srcCol3;
+
+		Matrix4x4<T> result(src);
+
+		result.set_column(col0, 0);
+		result.set_column(col1, 1);
+		result.set_column(col2, 2);
+		result.set_column(col3, 3);
+
+		return result;
+	}
+
+
 }
