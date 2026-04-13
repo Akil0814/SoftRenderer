@@ -1,6 +1,9 @@
 #pragma once
 #include "../global/base.h"
+#include "data_structures.h"
 #include "frame_buffer.h"
+#include "buffer_object.h"
+#include "VAO.h"
 
 #include "../application/application.h"
 #include "../application/image.h"
@@ -23,43 +26,25 @@ public:
 	//清除画布内容
 	void clear() noexcept;
 
-	//传入像素位置，绘制成某种颜色
-	void draw_point(const uint32_t& x, const uint32_t& y, const RGBA& color) noexcept;
+	uint32_t gen_buffer();
+	void delete_buffer(const uint32_t& buffer_ID);
 
-	void draw_line(const Point& p1, const Point& p2);
+	uint32_t gen_vertex_array();
+	void delete_vertex_array(const uint32_t& VAO_ID);
 
-	void draw_triangle(const Point& p1, const Point& p2,const Point& p3);
-
-	void draw_image(const Image* image) noexcept;
-
-	void draw_image_with_alpha(const Image* image, const uint32_t& alpha) noexcept;
-
-	//设置状态
-	void set_blending(bool enable) noexcept;
-
-	void set_bilinear(bool enable) noexcept;
-
-	void set_texture(Image* image) noexcept;
-
-	void set_texture_wrap(uint32_t wrap) noexcept;
-
-private:
-
-	RGBA sample_nearest(const mai::vec2f& uv) noexcept;
-	RGBA sample_bilinear(const mai::vec2f& uv) noexcept;
-	void check_wrap(float& n) noexcept;
 
 private:
 	static GPU* _instance;
-
-	bool _enable_blending = { false };
-	bool _enable_bilinear = { false };
-
-	uint32_t _wrap = { MAI_TEXTURE_WRAP_REPEAT };
-
 	FrameBuffer* _frame_buffer = { nullptr };
 
-	Image* _image = { nullptr };
+	//VBO相关/EBO也存在内部
+	uint32_t _buffer_counter{ 0 };
+	std::map<uint32_t, BufferObject*> _buffer_map;
+
+	//VAO相关
+	uint32_t _VAO_counter{ 0 };
+	std::map<uint32_t, VertexArrayObject*> _VAO_map;
+
 };
 
 }

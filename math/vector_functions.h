@@ -4,6 +4,39 @@
 
 namespace mai
 {
+
+	//各类lerp函数
+	static vec2f lerp(const vec2f& v1, const vec2f& v2, const float& weight)noexcept
+	{
+		return v2 * weight + v1 * (1.0f - weight);
+	}
+
+	static vec3f lerp(const vec3f& v1, const vec3f& v2, const float& weight)noexcept
+	{
+		return v2 * weight + v1 * (1.0f - weight);
+	}
+
+	static vec4f lerp(const vec4f& v1, const vec4f& v2, const float& weight)noexcept
+	{
+		return v2 * weight + v1 * (1.0f - weight);
+	}
+
+	static vec2f lerp(const vec2f& v1, const vec2f& v2, const vec2f& v3, const float& weight1, const float& weight2, const float& weight3)noexcept
+	{
+		return v1 * weight1 + v2 * weight2 + v3 * weight3;
+	}
+
+	static vec3f lerp(const vec3f& v1, const vec3f& v2, const vec3f& v3, const float& weight1, const float& weight2, const float& weight3)noexcept
+	{
+		return v1 * weight1 + v2 * weight2 + v3 * weight3;
+	}
+
+	static vec4f lerp(const vec4f& v1, const vec4f& v2, const vec4f& v3, const float& weight1, const float& weight2, const float& weight3)noexcept
+	{
+		return v1 * weight1 + v2 * weight2 + v3 * weight3;
+	}
+
+
 	//标量与向量
 	//s* v
 	template<typename T, typename S>

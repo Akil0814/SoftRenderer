@@ -5,51 +5,50 @@ namespace mai
 {
 
 void Raster::rasterize_line(
-	const Point& v0,const Point& v1,
-	std::vector<Point>& results
+	const VertexShaderOutput& v0, const VertexShaderOutput& v1,
+	std::vector<VertexShaderOutput>& results
 )
 {
 	//变换到第一象限/第一八分区再还原
-
-	Point start = v0;
-	Point end = v1;
+	VsOutput start = v0;
+	VsOutput end = v1;
 
 	//确保是从小到大
-	if (start.x > end.x)
-		std::swap(start,end);
+	if (start._position.x > end._position.x)
+		std::swap(start, end);
 
 	results.push_back(start);
 
 	//保证y方向也是从小到大
 	bool flip_y = false;
-	if (start.y > end.y)
+	if (start._position.y > end._position.y)
 	{
-		start.y = -start.y;
-		end.y = -end.y;
+		start._position.y = -start._position.y;
+		end._position.y = -end._position.y;
 		flip_y = true;
 	}
 
 	//保证斜率在0-1之间
-	int delta_x = static_cast<int>(end.x - start.x);
-	int delta_y = static_cast<int>(end.y - start.y);
+	int delta_x = static_cast<int>(end._position.x - start._position.x);
+	int delta_y = static_cast<int>(end._position.y - start._position.y);
 
 	bool swap_xy = false;
 	if (delta_x < delta_y)
 	{
-		std::swap(start.x, start.y);
-		std::swap(end.x, end.y);
+		std::swap(start._position.x, start._position.y);
+		std::swap(end._position.x, end._position.y);
 		std::swap(delta_x, delta_y);
 		swap_xy = true;
 	}
 
 	//brensenham
-	int current_x = static_cast<int>(start.x);
-	int current_y = static_cast<int>(start.y);
+	int current_x = static_cast<int>(start._position.x);
+	int current_y = static_cast<int>(start._position.y);
 
 	int result_x = 0;
 	int result_y = 0;
 
-	Point current_point;
+	VsOutput current_point;
 	int p = 2 * delta_y - delta_x;
 
 	for (int i = 0; i < delta_x; ++i)
@@ -72,8 +71,8 @@ void Raster::rasterize_line(
 		if (flip_y)
 			result_y = -result_y;
 
-		current_point.x = result_x;
-		current_point.y = result_y;
+		current_point._position.x = result_x;
+		current_point._position.y = result_y;
 
 		interpolant_line(v0, v1, current_point);
 
@@ -82,16 +81,16 @@ void Raster::rasterize_line(
 }
 
 void Raster::rasterize_triangle(
-	const Point& v0, const Point& v1, const Point& v2,
-	std::vector<Point>& results)
+	const VertexShaderOutput& v0, const VertexShaderOutput& v1, const VertexShaderOutput& v2,
+	std::vector<VertexShaderOutput>& results)
 {
-	int max_X = static_cast<int>(std::max(v0.x, std::max(v1.x, v2.x)));
-	int min_X = static_cast<int>(std::min(v0.x, std::min(v1.x, v2.x)));
-	int max_Y = static_cast<int>(std::max(v0.y, std::max(v1.y, v2.y)));
-	int min_Y = static_cast<int>(std::min(v0.y, std::min(v1.y, v2.y)));
+	int max_X = static_cast<int>(std::max(v0._position.x, std::max(v1._position.x, v2._position.x)));
+	int min_X = static_cast<int>(std::min(v0._position.x, std::min(v1._position.x, v2._position.x)));
+	int max_Y = static_cast<int>(std::max(v0._position.y, std::max(v1._position.y, v2._position.y)));
+	int min_Y = static_cast<int>(std::min(v0._position.y, std::min(v1._position.y, v2._position.y)));
 
 	mai::vec2f pv0, pv1, pv2;
-	Point result;
+	VsOutput result;
 	
 	for (int i = min_X; i <= max_X; ++i)
 	{
@@ -102,9 +101,9 @@ void Raster::rasterize_triangle(
 			float py = j + 0.5f;
 
 			//获取当前点与三角形相关三个向量
-			pv0 = mai::vec2f(v0.x - px, v0.y - py);
-			pv1 = mai::vec2f(v1.x - px, v1.y - py);
-			pv2 = mai::vec2f(v2.x - px, v2.y - py);
+			pv0 = mai::vec2f(v0._position.x - px, v0._position.y - py);
+			pv1 = mai::vec2f(v1._position.x - px, v1._position.y - py);
+			pv2 = mai::vec2f(v2._position.x - px, v2._position.y - py);
 
 			float cross1 = mai::cross(pv0, pv1);
 			float cross2 = mai::cross(pv1, pv2);
@@ -115,8 +114,8 @@ void Raster::rasterize_triangle(
 
 			if (negative || positive)
 			{
-				result.x = i;
-				result.y = j;
+				result._position.x = i;
+				result._position.y = j;
 				interpolant_triangle(v0, v1, v2, result);
 
 				results.push_back(result);
@@ -126,45 +125,45 @@ void Raster::rasterize_triangle(
 
 }
 
-void  Raster::interpolant_line(const Point& v0, const Point& v1, Point& target) noexcept
+void  Raster::interpolant_line(const VertexShaderOutput& v0, const VertexShaderOutput& v1,
+	VertexShaderOutput& target) noexcept
 {
-	if (v0.x == v1.x && v0.y == v1.y)
+	if (v0._position.x == v1._position.x && v0._position.y == v1._position.y)
 	{
-		target.color = v0.color;
+		target._color = v0._color;
 		return;
 	}
 
 	float weight = 1.0f;
-	if (v1.x != v0.x)
-		weight = (float)(target.x - v0.x) / (float)(v1.x - v0.x);
-	else if(v1.y!=v0.y)
-		weight = (float)(target.y - v0.y) / (float)(v1.y - v0.y);
+	if (v1._position.x != v0._position.x)
+		weight = (float)(target._position.x - v0._position.x) / (float)(v1._position.x - v0._position.x);
+	else if(v1._position.y!=v0._position.y)
+		weight = (float)(target._position.y - v0._position.y) / (float)(v1._position.y - v0._position.y);
 
-	RGBA result;
-	result._R = static_cast<byte>(static_cast<float>(v1.color._R) * weight + (1.0f - weight) * static_cast<float>(v0.color._R));
-	result._G = static_cast<byte>(static_cast<float>(v1.color._G) * weight + (1.0f - weight) * static_cast<float>(v0.color._G));
-	result._B = static_cast<byte>(static_cast<float>(v1.color._B) * weight + (1.0f - weight) * static_cast<float>(v0.color._B));
-	result._A = static_cast<byte>(static_cast<float>(v1.color._A) * weight + (1.0f - weight) * static_cast<float>(v0.color._A));
+	//对于颜色的插值
+	target._color = mai::lerp(v0._color, v1._color, weight);
 
-	target.color = result;
+	//对于uv坐标的插值
+	target._UV = mai::lerp(v0._UV, v1._UV, weight);
 }
 
-void Raster::interpolant_triangle(const Point& v0, const Point& v1, const Point& v2, Point& target) noexcept
+void Raster::interpolant_triangle(const VertexShaderOutput& v0, const VertexShaderOutput& v1, const VertexShaderOutput& v2,
+	VertexShaderOutput& target) noexcept
 {
 	//重心插值
 	
 	//计算总面积
-	vec2f e1 = mai::vec2f(v1.x - v0.x, v1.y - v0.y);
-	vec2f e2 = mai::vec2f(v2.x - v0.x, v2.y - v0.y);
+	vec2f e1 = mai::vec2f(v1._position.x - v0._position.x, v1._position.y - v0._position.y);
+	vec2f e2 = mai::vec2f(v2._position.x - v0._position.x, v2._position.y - v0._position.y);
 	float area = std::abs(mai::cross(e1, e2));
 
 	if (area <= 1e-6f)
 		return;
 
 	//根据三角形内的点进行区域划分
-	vec2f pv0 = mai::vec2f(v0.x - target.x, v0.y - target.y);
-	vec2f pv1 = mai::vec2f(v1.x - target.x, v1.y - target.y);
-	vec2f pv2 = mai::vec2f(v2.x - target.x, v2.y - target.y);
+	vec2f pv0 = mai::vec2f(v0._position.x - target._position.x, v0._position.y - target._position.y);
+	vec2f pv1 = mai::vec2f(v1._position.x - target._position.x, v1._position.y - target._position.y);
+	vec2f pv2 = mai::vec2f(v2._position.x - target._position.x, v2._position.y - target._position.y);
 
 	//计算分区后的面积
 	float v0_area = std::abs(mai::cross(pv1, pv2));
@@ -177,58 +176,12 @@ void Raster::interpolant_triangle(const Point& v0, const Point& v1, const Point&
 	float weight1 = v1_area / area;
 	float weight2 = v2_area / area;
 
-	RGBA result;
+	//对于颜色的插值
+	target._color = mai::lerp(v0._color, v1._color, v2._color, weight0, weight1, weight2);
 
-	RGBA c0 = v0.color;
-	RGBA c1 = v1.color;
-	RGBA c2 = v2.color;
-
-	result._R = static_cast<float>(c0._R) * weight0 + static_cast<float>(c1._R) * weight1 + static_cast<float>(c2._R) * weight2;
-	result._G = static_cast<float>(c0._G) * weight0 + static_cast<float>(c1._G) * weight1 + static_cast<float>(c2._G) * weight2;
-	result._B = static_cast<float>(c0._B) * weight0 + static_cast<float>(c1._B) * weight1 + static_cast<float>(c2._B) * weight2;
-	result._A = static_cast<float>(c0._A) * weight0 + static_cast<float>(c1._A) * weight1 + static_cast<float>(c2._A) * weight2;
-
-	target.color = result;
-
-	target.uv = v0.uv * weight0 + v1.uv * weight1 + v2.uv * weight2;
-	//对uv坐标的插值
+	//对于uv坐标的插值
+	target._UV = mai::lerp(v0._UV, v1._UV, v2._UV, weight0, weight1, weight2);
 }
-
-RGBA Raster::lerpRGBA(const RGBA& c0, const RGBA& c1, float weight) noexcept
-{
-	RGBA result;
-
-	result._R = static_cast<float>(c1._R) * weight + static_cast<float>(c0._R) * (1.0f - weight);
-	result._G = static_cast<float>(c1._G) * weight + static_cast<float>(c0._G) * (1.0f - weight);
-	result._B = static_cast<float>(c1._B) * weight + static_cast<float>(c0._B) * (1.0f - weight);
-	result._A = static_cast<float>(c1._A) * weight + static_cast<float>(c0._A) * (1.0f - weight);
-
-	return result;
-}
-
-RGBA Raster::lerpRGBA(
-	const RGBA& c0, const RGBA& c1, const RGBA& c2, 
-	float weight0, float weight1, float weight2) noexcept
-{
-	RGBA result;
-
-	result._R = static_cast<float>(c0._R) * weight0 + static_cast<float>(c1._R) * weight1 + static_cast<float>(c2._R) * weight2;
-	result._G = static_cast<float>(c0._G) * weight0 + static_cast<float>(c1._G) * weight1 + static_cast<float>(c2._G) * weight2;
-	result._B = static_cast<float>(c0._B) * weight0 + static_cast<float>(c1._B) * weight1 + static_cast<float>(c2._B) * weight2;
-	result._A = static_cast<float>(c0._A) * weight0 + static_cast<float>(c1._A) * weight1 + static_cast<float>(c2._A) * weight2;
-
-	return result;
-}
-
-mai::vec2f Raster::lerpUV(
-	const vec2f& uv0, const vec2f& uv1, const vec2f& uv2, 
-	float weight0, float weight1, float weight2) noexcept
-{
-	vec2f uv;
-	uv = uv0 * weight0 + uv1 * weight1 + uv2 * weight2;
-	return uv;
-}
-
 
 }
 

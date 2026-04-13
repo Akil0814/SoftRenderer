@@ -16,6 +16,6 @@ add_subdirectory(gpu)
 add_subdirectory(imgui)
 
 #本工程所有cpp文件编译链接，生成exe
-add_executable(SoftRenderer "main.cpp" "math/matrix_functions.h")
+add_executable(SoftRenderer "main.cpp")
 
 target_link_libraries(SoftRenderer applicationLib gpuLib imguilib)

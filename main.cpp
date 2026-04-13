@@ -73,10 +73,6 @@ void transform()
 void on_render()
 {
 	MAI_SGL->clear();
-	MAI_SGL->set_texture(image01);
-
-	MAI_SGL->set_bilinear(MAI_TRUE);
-	MAI_SGL->draw_triangle(p1, p2, p3);
 }
 
 void prepare()
@@ -123,7 +119,7 @@ int APIENTRY wWinMain(
 	while (active)
 	{
 		active = MAI_APP->peek_message();
-		on_render();
+		//on_render();
 		transform();
 		MAI_APP->show();
 	}
