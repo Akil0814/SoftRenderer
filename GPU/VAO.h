@@ -16,6 +16,8 @@ public:
 
 	std::map<uint32_t, BindingDescription> get_binding_map() const;
 
+	void print();
+
 private:
 	//key:bindingId - value:bindingDescription
 	std::map<uint32_t, BindingDescription> _binding_map;
