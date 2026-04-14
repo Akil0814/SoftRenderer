@@ -4,6 +4,25 @@
 namespace mai
 {
 
+	void Raster::rasterize(
+		const uint32_t& draw_mode, const std::vector<VertexShaderOutput>& inputs,
+		std::vector<VertexShaderOutput>& results)
+	{
+		if (draw_mode == MAI_DRAW_LINES) {
+			for (uint32_t i = 0; i < inputs.size(); i += 2)
+			{
+				rasterize_line(inputs[i], inputs[i + 1], results);
+			}
+		}
+
+		if (draw_mode == MAI_DRAW_TRIANGLES) {
+			for (uint32_t i = 0; i < inputs.size(); i += 3)
+			{
+				rasterize_triangle(inputs[i], inputs[i + 1], inputs[i + 2], results);
+			}
+		}
+	}
+
 void Raster::rasterize_line(
 	const VertexShaderOutput& v0, const VertexShaderOutput& v1,
 	std::vector<VertexShaderOutput>& results

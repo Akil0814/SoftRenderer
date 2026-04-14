@@ -11,6 +11,13 @@ public:
 	Raster() {};
 	~Raster() {};
 
+public:
+	static void rasterize(
+		const uint32_t& draw_mode, const std::vector<VertexShaderOutput>& inputs,
+		std::vector<VertexShaderOutput>& results );
+
+private:
+
 	static void rasterize_line(
 		const VertexShaderOutput& v0,const VertexShaderOutput& v1,
 		std::vector<VertexShaderOutput>& results);

@@ -33,4 +33,9 @@ byte* BufferObject::get_buffer() const
 	return _buffer;
 }
 
+size_t BufferObject::get_size() const
+{
+	return _buffer_size;
+}
+
 }

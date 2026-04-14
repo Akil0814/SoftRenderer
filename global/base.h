@@ -20,6 +20,9 @@
 #define MAI_TRUE 1
 #define MAI_FALSE 0
 
+#define MAI_DRAW_LINES 0
+#define MAI_DRAW_TRIANGLES 1
+
 using byte = unsigned char;
 
 namespace mai

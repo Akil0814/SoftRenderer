@@ -1,12 +1,15 @@
 #pragma once
+#include "../application/application.h"
+#include "../application/image.h"
+
 #include "../global/base.h"
+
 #include "data_structures.h"
 #include "frame_buffer.h"
 #include "buffer_object.h"
 #include "VAO.h"
+#include "shader.h"
 
-#include "../application/application.h"
-#include "../application/image.h"
 
 #define MAI_SGL mai::GPU::instance()
 
@@ -36,12 +39,24 @@ public:
 
 	uint32_t gen_vertex_array();
 	void delete_vertex_array(const uint32_t& VAO_ID);
-
 	void bind_vertex_array(const uint32_t& vaoID);
 	void vertex_attribute_pointer(
 		const uint32_t& binding,const uint32_t& itemSize,
 		const uint32_t& stride,const uint32_t& offset);
 
+	void use_program(Shader* shader);
+
+	void draw_element(const uint32_t& drawMode, const uint32_t& first, const uint32_t& count);
+
+
+private:
+	void vertex_shader_stage(
+		const VertexArrayObject* vao, const BufferObject* ebo,
+		const uint32_t first, const uint32_t count,
+		std::vector<VsOutput>& vsOutputs);
+
+	void perspective_division(VsOutput& vsOutput);
+	void screen_mapping(VsOutput& vsOutput);
 
 private:
 	static GPU* _instance;
@@ -58,6 +73,8 @@ private:
 	uint32_t _current_VAO={ 0 };
 	std::map<uint32_t, VertexArrayObject*> _VAO_map;
 
+	Shader* _shader{ nullptr };
+	mat4f _screen_matrix;
 };
 
 }

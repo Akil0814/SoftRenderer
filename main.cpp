@@ -4,7 +4,10 @@
 #include "application/application.h"
 #include "application/image.h"
 
+#include "gpu/data_structures.h"
+#include "gpu/shader/default_shader.h"
 #include "gpu/gpu.h"
+
 #include "math/math.h"
 
 #pragma comment(linker, "/subsystem:console /entry:wWinMainCRTStartup" )//更改main入口
@@ -26,24 +29,44 @@ uint32_t ebo = 0;
 //本三角形专属vao
 uint32_t vao = 0;
 
+mai::DefaultShader* shader = nullptr;
+
 mai::mat4f modelMatrix;
 mai::mat4f viewMatrix;
 mai::mat4f perspectiveMatrix;
-mai::mat4f screenMatrix;
 
 float angle = 0.0f;
 float cameraPos = 5.0f;
-
 float speed = 0.01;
+
+void transform()
+{
+	angle += 0.01f;
+	//模型变换
+	modelMatrix = mai::rotate(mai::mat4f(1.0f), angle, mai::vec3f{ 0.0f, 1.0f, 0.0f });
+}
 
 void on_render()
 {
+	transform();
+	shader->_model_matrix = modelMatrix;
+	shader->_view_matrix = viewMatrix;
+	shader->_projection_matrix = perspectiveMatrix;
 	MAI_SGL->clear();
+	MAI_SGL->use_program(shader);
+	MAI_SGL->bind_vertex_array(vao);
+	MAI_SGL->bind_buffer(MAI_ELEMENT_ARRAY_BUFFER, ebo);
+	MAI_SGL->draw_element(MAI_DRAW_TRIANGLES, 0, 3);
 }
 
 void prepare()
 {
 	image01 = mai::Image::create_image("assets/textures/Arcueid_morning_low.png");
+	shader = new mai::DefaultShader();
+
+	perspectiveMatrix = mai::perspective(60.0f, (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
+	auto cameraModelMatrix = mai::translate(mai::mat4f(1.0f), mai::vec3f{ 0.0f, 0.0f, 3.0f });
+	viewMatrix = mai::inverse(cameraModelMatrix);
 
 	if (image01 == nullptr)
 		std::cerr << "false" << std::endl;
@@ -99,8 +122,7 @@ void prepare()
 
 	MAI_SGL->printVAO(vao);
 
-	perspectiveMatrix = mai::perspective(60.0f, (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
-	screenMatrix = mai::screen_matrix<float>(WIDTH, HEIGHT);
+
 }
 
 

@@ -37,6 +37,7 @@ GPU::~GPU() noexcept
 void GPU::init_surface(const uint32_t& width, const uint32_t& height, void* buffer)
 {
 	_frame_buffer = new FrameBuffer(width, height, buffer);
+	_screen_matrix= screen_matrix<float>(width - 1, height - 1);
 }
 
 void GPU::clear() noexcept
@@ -140,5 +141,157 @@ void GPU::vertex_attribute_pointer(
 	auto vao = iter->second;
 	vao->set(binding, _current_VBO, item_size, stride, offset);
 }
+
+void GPU::use_program(Shader* shader)
+{
+	_shader = shader;
+}
+
+void GPU::draw_element(const uint32_t& drawMode, const uint32_t& first, const uint32_t& count) {
+	if (_current_VAO == 0 || _shader == nullptr || count == 0)
+	{
+		return;
+	}
+
+	//1 get vao
+	auto vaoIter = _VAO_map.find(_current_VAO);
+
+	if (vaoIter == _VAO_map.end()) 
+	{
+		std::cerr << "Error: current vao is invalid!" << std::endl;
+		return;
+	}
+
+	const VertexArrayObject* vao = vaoIter->second;
+	auto bindingMap = vao->get_binding_map();
+
+	//2 get ebo
+	auto eboIter = _buffer_map.find(_current_EBO);
+
+	if (eboIter == _buffer_map.end())
+	{
+		std::cerr << "Error: current ebo is invalid!" << std::endl;
+		return;
+	}
+
+	const BufferObject* ebo = eboIter->second;
+
+	/*
+	* VertexShader处理阶段
+	* 作用：
+	*	按照输入的Ebo的index顺序来处理顶点，依次通过vsShader，
+		得到的输出结果按序放入vsOutputs中
+	*/
+	std::vector<VsOutput> vsOutputs{};
+	vertex_shader_stage(vao, ebo, first, count, vsOutputs);
+
+	if (vsOutputs.empty())
+		return;
+
+	/*
+	* NDC处理阶段
+	* 作用：
+	*	将顶点转化到NDC下
+	*/
+	for (auto& output : vsOutputs)
+	{
+		perspective_division(output);
+	}
+
+	/*
+	* 屏幕映射处理阶段
+	* 作用：
+	*	将NDC下的点，通过screenMatrix，转化到屏幕空间
+	*/
+	for (auto& output : vsOutputs) {
+		screen_mapping(output);
+	}
+
+	/*
+	* 光栅化处理阶段
+	* 作用：
+	*	离散出所有需要的Fragment
+	*/
+	std::vector<VsOutput> rasterOutputs;
+	Raster::rasterize(drawMode, vsOutputs, rasterOutputs);
+
+
+	if (rasterOutputs.empty())
+		return;
+
+	/*
+	* 颜色输出处理阶段
+	* 作用：
+	*	 将颜色进行输出
+	*/
+	FsOutput fsOutput;
+	uint32_t pixelPos = 0;
+	for (uint32_t i = 0; i < rasterOutputs.size(); ++i) {
+		_shader->fragment_shader(rasterOutputs[i], fsOutput);
+		pixelPos = fsOutput._pixel_pos.y * _frame_buffer->_width + fsOutput._pixel_pos.x;
+		_frame_buffer->_color_buffer[pixelPos] = fsOutput._color;
+	}
+
+}
+
+void GPU::vertex_shader_stage(
+	const VertexArrayObject* vao, const BufferObject* ebo,
+	const uint32_t first, const uint32_t count,
+	std::vector<VsOutput>& vsOutputs)
+{
+	auto bindingMap = vao->get_binding_map();
+	byte* indicesData = ebo->get_buffer();
+
+	uint32_t index = 0;
+	for (uint32_t i = first; i < first + count; ++i) {
+		//获取Ebo中第i个index
+		size_t indicesOffset = i * sizeof(uint32_t);
+		memcpy(&index, indicesData + indicesOffset, sizeof(uint32_t));
+
+		VsOutput output = _shader->vertex_shader(bindingMap, _buffer_map, index);
+		vsOutputs.push_back(output);
+	}
+}
+
+void GPU::perspective_division(VsOutput& vsOutput)
+{
+	float oneOverW = 1.0f / vsOutput._position.w;
+
+	vsOutput._position *= oneOverW;
+	vsOutput._position.w = 1.0f;
+
+	////修剪毛刺
+	//if (vsOutput.mPosition.x < -1.0f) {
+	//	vsOutput.mPosition.x = -1.0f;
+	//}
+
+	//if (vsOutput.mPosition.x > 1.0f) {
+	//	vsOutput.mPosition.x = 1.0f;
+	//}
+
+	//if (vsOutput.mPosition.y < -1.0f) {
+	//	vsOutput.mPosition.y = -1.0f;
+	//}
+
+	//if (vsOutput.mPosition.y > 1.0f) {
+	//	vsOutput.mPosition.y = 1.0f;
+	//}
+
+	//if (vsOutput.mPosition.z < -1.0f) {
+	//	vsOutput.mPosition.z = -1.0f;
+	//}
+
+	//if (vsOutput.mPosition.z > 1.0f) {
+	//	vsOutput.mPosition.z = 1.0f;
+	//}
+}
+
+
+void GPU::screen_mapping(VsOutput& vsOutput)
+{
+	vsOutput._position = _screen_matrix * vsOutput._position;
+}
+
+
 
 }
