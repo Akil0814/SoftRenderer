@@ -1,5 +1,7 @@
 #include "gpu.h"
 #include "raster.h"
+#include "clipper.h"
+
 #include <algorithm>
 
 namespace mai
@@ -147,7 +149,7 @@ void GPU::use_program(Shader* shader)
 	_shader = shader;
 }
 
-void GPU::draw_element(const uint32_t& drawMode, const uint32_t& first, const uint32_t& count) {
+void GPU::draw_element(const uint32_t& draw_mode, const uint32_t& first, const uint32_t& count) {
 	if (_current_VAO == 0 || _shader == nullptr || count == 0)
 	{
 		return;
@@ -189,11 +191,22 @@ void GPU::draw_element(const uint32_t& drawMode, const uint32_t& first, const ui
 		return;
 
 	/*
+	* Clip Space处理阶段
+	* 作用：
+	*	在剪裁空间，对所有输出的图元进行剪裁拼接等
+	*/
+	std::vector<VsOutput> clipOutputs{};
+	Clipper::do_clip_space(draw_mode, vsOutputs, clipOutputs);
+	if (clipOutputs.empty()) return;
+
+	vsOutputs.clear();
+
+	/*
 	* NDC处理阶段
 	* 作用：
 	*	将顶点转化到NDC下
 	*/
-	for (auto& output : vsOutputs)
+	for (auto& output : clipOutputs)
 	{
 		perspective_division(output);
 	}
@@ -203,7 +216,7 @@ void GPU::draw_element(const uint32_t& drawMode, const uint32_t& first, const ui
 	* 作用：
 	*	将NDC下的点，通过screenMatrix，转化到屏幕空间
 	*/
-	for (auto& output : vsOutputs) {
+	for (auto& output : clipOutputs) {
 		screen_mapping(output);
 	}
 
@@ -213,7 +226,7 @@ void GPU::draw_element(const uint32_t& drawMode, const uint32_t& first, const ui
 	*	离散出所有需要的Fragment
 	*/
 	std::vector<VsOutput> rasterOutputs;
-	Raster::rasterize(drawMode, vsOutputs, rasterOutputs);
+	Raster::rasterize(draw_mode, clipOutputs, rasterOutputs);
 
 
 	if (rasterOutputs.empty())

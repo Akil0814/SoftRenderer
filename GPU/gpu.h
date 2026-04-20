@@ -11,6 +11,7 @@
 #include "shader.h"
 
 
+//Software Graphics Library
 #define MAI_SGL mai::GPU::instance()
 
 namespace mai

@@ -39,11 +39,16 @@ float angle = 0.0f;
 float cameraPos = 5.0f;
 float speed = 0.01;
 
+float camera_z = 3.0f;
+
 void transform()
 {
 	angle += 0.01f;
+	camera_z -= 0.01f;
 	//模型变换
 	modelMatrix = mai::rotate(mai::mat4f(1.0f), angle, mai::vec3f{ 0.0f, 1.0f, 0.0f });
+	auto cameraModelMatrix = mai::translate(mai::mat4f(1.0f), mai::vec3f{ 0.0f, 0.0f, camera_z });
+	viewMatrix = mai::inverse(cameraModelMatrix);
 }
 
 void on_render()
@@ -71,19 +76,22 @@ void prepare()
 	if (image01 == nullptr)
 		std::cerr << "false" << std::endl;
 
-	float positions[] = {
+	float positions[] =
+	{
 		-0.5f, -0.5f, 0.0f,
 		-0.5f, 0.5f, 0.0f,
 		0.5f, -0.5f, 0.0f,
 	};
 
-	float colors[] = {
+	float colors[] =
+	{
 		1.0f, 0.0f, 0.0f, 1.0f,
 		0.0f, 1.0f, 0.0f, 1.0f,
 		0.0f, 0.0f, 1.0f, 1.0f,
 	};
 
-	float uvs[] = {
+	float uvs[] =
+	{
 		0.0f, 0.0f,
 		0.0f, 1.0f,
 		1.0f, 0.0f,
@@ -121,8 +129,6 @@ void prepare()
 	MAI_SGL->bind_vertex_array(0);
 
 	MAI_SGL->printVAO(vao);
-
-
 }
 
 
