@@ -15,6 +15,7 @@ namespace mai
 
 	struct VertexShaderOutput
 	{
+		float _inv_w{ 0 };
 		mai::vec4f _position{ 0.0f, 0.0f, 0.0f, 1.0f };
 		mai::vec4f _color;//此处颜色改为0.0-1.0之间表达0-255的量
 		mai::vec2f _UV;

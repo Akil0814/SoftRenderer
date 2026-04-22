@@ -57,7 +57,10 @@ private:
 		std::vector<VsOutput>& vsOutputs);
 
 	void perspective_division(VsOutput& vsOutput);
+	void perspective_recover(VsOutput& vsOutput);
 	void screen_mapping(VsOutput& vsOutput);
+
+	void trim(VsOutput& vsOutput);
 
 private:
 	static GPU* _instance;
@@ -75,7 +78,7 @@ private:
 	std::map<uint32_t, VertexArrayObject*> _VAO_map;
 
 	Shader* _shader{ nullptr };
-	mat4f _screen_matrix;
+	mai::mat4f _screen_matrix;
 };
 
 }

@@ -149,11 +149,10 @@ void GPU::use_program(Shader* shader)
 	_shader = shader;
 }
 
-void GPU::draw_element(const uint32_t& draw_mode, const uint32_t& first, const uint32_t& count) {
+void GPU::draw_element(const uint32_t& draw_mode, const uint32_t& first, const uint32_t& count)
+{
 	if (_current_VAO == 0 || _shader == nullptr || count == 0)
-	{
 		return;
-	}
 
 	//1 get vao
 	auto vaoIter = _VAO_map.find(_current_VAO);
@@ -197,7 +196,8 @@ void GPU::draw_element(const uint32_t& draw_mode, const uint32_t& first, const u
 	*/
 	std::vector<VsOutput> clipOutputs{};
 	Clipper::do_clip_space(draw_mode, vsOutputs, clipOutputs);
-	if (clipOutputs.empty()) return;
+	if (clipOutputs.empty())
+		return;
 
 	vsOutputs.clear();
 
@@ -231,6 +231,18 @@ void GPU::draw_element(const uint32_t& draw_mode, const uint32_t& first, const u
 
 	if (rasterOutputs.empty())
 		return;
+
+
+	/*
+	* 透视恢复处理阶段
+	* 作用：
+	*	离散出来的像素插值结果，需要乘以自身的w值恢复到正常态
+	*/
+	for (auto& output : rasterOutputs)
+	{
+		perspective_recover(output);
+	}
+
 
 	/*
 	* 颜色输出处理阶段
@@ -268,41 +280,49 @@ void GPU::vertex_shader_stage(
 
 void GPU::perspective_division(VsOutput& vsOutput)
 {
-	float oneOverW = 1.0f / vsOutput._position.w;
+	vsOutput._inv_w = 1.0f / vsOutput._position.w;
 
-	vsOutput._position *= oneOverW;
+	vsOutput._position *= vsOutput._inv_w;
 	vsOutput._position.w = 1.0f;
 
-	////修剪毛刺
-	//if (vsOutput.mPosition.x < -1.0f) {
-	//	vsOutput.mPosition.x = -1.0f;
-	//}
+	vsOutput._color *= vsOutput._inv_w;
+	vsOutput._UV *= vsOutput._inv_w;
 
-	//if (vsOutput.mPosition.x > 1.0f) {
-	//	vsOutput.mPosition.x = 1.0f;
-	//}
-
-	//if (vsOutput.mPosition.y < -1.0f) {
-	//	vsOutput.mPosition.y = -1.0f;
-	//}
-
-	//if (vsOutput.mPosition.y > 1.0f) {
-	//	vsOutput.mPosition.y = 1.0f;
-	//}
-
-	//if (vsOutput.mPosition.z < -1.0f) {
-	//	vsOutput.mPosition.z = -1.0f;
-	//}
-
-	//if (vsOutput.mPosition.z > 1.0f) {
-	//	vsOutput.mPosition.z = 1.0f;
-	//}
+	trim(vsOutput);
 }
 
+
+void GPU::perspective_recover(VsOutput& vsOutput)
+{
+	vsOutput._color /= vsOutput._inv_w;
+	vsOutput._UV /= vsOutput._inv_w;
+}
 
 void GPU::screen_mapping(VsOutput& vsOutput)
 {
 	vsOutput._position = _screen_matrix * vsOutput._position;
+}
+
+void GPU::trim(VsOutput& vsOutput)
+{
+	////修剪毛刺
+	if (vsOutput._position.x < -1.0f)
+		vsOutput._position.x = -1.0f;
+
+	if (vsOutput._position.x > 1.0f)
+		vsOutput._position.x = 1.0f;
+
+	if (vsOutput._position.y < -1.0f)
+		vsOutput._position.y = -1.0f;
+
+	if (vsOutput._position.y > 1.0f)
+		vsOutput._position.y = 1.0f;
+
+	if (vsOutput._position.z < -1.0f)
+		vsOutput._position.z = -1.0f;
+
+	if (vsOutput._position.z > 1.0f)
+		vsOutput._position.z = 1.0f;
 }
 
 

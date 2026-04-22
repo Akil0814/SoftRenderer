@@ -8,14 +8,16 @@ namespace mai
 		const uint32_t& draw_mode, const std::vector<VertexShaderOutput>& inputs,
 		std::vector<VertexShaderOutput>& results)
 	{
-		if (draw_mode == MAI_DRAW_LINES) {
+		if (draw_mode == MAI_DRAW_LINES)
+		{
 			for (uint32_t i = 0; i < inputs.size(); i += 2)
 			{
 				rasterize_line(inputs[i], inputs[i + 1], results);
 			}
 		}
 
-		if (draw_mode == MAI_DRAW_TRIANGLES) {
+		if (draw_mode == MAI_DRAW_TRIANGLES)
+		{
 			for (uint32_t i = 0; i < inputs.size(); i += 3)
 			{
 				rasterize_triangle(inputs[i], inputs[i + 1], inputs[i + 2], results);
@@ -194,6 +196,13 @@ void Raster::interpolant_triangle(const VertexShaderOutput& v0, const VertexShad
 	float weight0 = v0_area / area;
 	float weight1 = v1_area / area;
 	float weight2 = v2_area / area;
+
+
+	//插值1/w，用于透视恢复
+	target._inv_w = mai::lerp(v0._inv_w, v1._inv_w, v2._inv_w, weight0, weight1, weight2);
+
+	//插值深度值
+	target._position.z = mai::lerp(v0._position.z, v1._position.z, v2._position.z, weight0, weight1, weight2);
 
 	//对于颜色的插值
 	target._color = mai::lerp(v0._color, v1._color, v2._color, weight0, weight1, weight2);
