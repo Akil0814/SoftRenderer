@@ -56,6 +56,41 @@ void Clipper::do_clip_space(const uint32_t& draw_mode, const std::vector<VsOutpu
 }
 
 
+bool Clipper::cull_face(const uint32_t& front_face, const uint32_t& cull_face,
+	const VsOutput& v0, const VsOutput& v1, const VsOutput& v2)
+{
+	mai::vec3f p0{ v0._position.x, v0._position.y, v0._position.z };
+	mai::vec3f p1{ v1._position.x, v1._position.y, v1._position.z };
+	mai::vec3f p2{ v2._position.x, v2._position.y, v2._position.z };
+
+	mai::vec3f edge1 = p1 - p0;
+	mai::vec3f edge2 = p2 - p0;
+
+	mai::vec3f normal = mai::cross(edge1, edge2);
+
+	//注意，此时NDC坐标已经位于了左手坐标系下，叉乘需要用左手来比划
+	if (cull_face == MAI_BACK_FACE) 
+	{
+
+		//在逆时针情况下,使用左手示意，z>0为front，保留
+		if (front_face == MAI_FRONT_FACE_CCW) 
+			return normal.z > 0;
+		else
+			//在顺时针情况下,使用左手示意，z<0为front，保留
+			return normal.z < 0;
+	}
+	else
+	{
+		//在逆时针情况下,使用左手示意，z<0为back，保留
+		if (front_face == MAI_FRONT_FACE_CCW) 
+			return normal.z < 0;
+		else
+			//在顺时针情况下,使用左手示意，z>0为back，保留
+			return normal.z > 0;
+	}
+
+}
+
 void Clipper::sutherland_hodgman(const uint32_t& draw_mode, const std::vector<VsOutput>& primitive, std::vector<VsOutput>& outputs)
 {
 	assert(outputs.size() == 0);

@@ -23,6 +23,14 @@
 #define MAI_DRAW_LINES 0
 #define MAI_DRAW_TRIANGLES 1
 
+#define MAI_CULL_FACE 1
+
+#define MAI_FRONT_FACE_CW 0
+#define MAI_FRONT_FACE_CCW 1
+
+#define MAI_FRONT_FACE 0
+#define MAI_BACK_FACE 1
+
 using byte = unsigned char;
 
 namespace mai

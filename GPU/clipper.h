@@ -8,7 +8,8 @@ class Clipper
 {
 public:
 	static void do_clip_space(const uint32_t& draw_mode, const std::vector<VsOutput>& primitives, std::vector<VsOutput>& outputs);
-
+	static bool cull_face(const uint32_t& front_face, const uint32_t& call_face, 
+		const VsOutput& v0, const VsOutput& v1, const VsOutput& v2);
 private:
 	static void sutherland_hodgman(const uint32_t& draw_mode, const std::vector<VsOutput>& primitive, std::vector<VsOutput>& outputs);
 

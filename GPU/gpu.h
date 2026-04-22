@@ -47,6 +47,12 @@ public:
 
 	void use_program(Shader* shader);
 
+	void enable(const uint32_t& value);
+	void disable(const uint32_t& value);
+
+	void front_face(const uint32_t& value);
+	void cull_face(const uint32_t& value);
+
 	void draw_element(const uint32_t& drawMode, const uint32_t& first, const uint32_t& count);
 
 
@@ -73,12 +79,16 @@ private:
 	std::map<uint32_t, BufferObject*> _buffer_map;
 
 	//VAO相关
-	uint32_t _VAO_counter={ 0 };
-	uint32_t _current_VAO={ 0 };
+	uint32_t _VAO_counter = { 0 };
+	uint32_t _current_VAO = { 0 };
 	std::map<uint32_t, VertexArrayObject*> _VAO_map;
 
-	Shader* _shader{ nullptr };
+	Shader* _shader { nullptr };
 	mai::mat4f _screen_matrix;
+
+	bool _enable_cull_face{ true };
+	uint32_t _front_face{ MAI_FRONT_FACE_CCW };
+	uint32_t _cull_face{ MAI_BACK_FACE };
 };
 
 }
