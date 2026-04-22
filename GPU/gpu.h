@@ -72,6 +72,8 @@ private:
 
 	bool depth_test(const FsOutput& fsOutput);
 
+	RGBA blend(const FsOutput& output);
+
 private:
 	static GPU* _instance;
 	FrameBuffer* _frame_buffer = { nullptr };
@@ -96,6 +98,8 @@ private:
 
 	bool _enable_depth_test{ true };
 	uint32_t _depth_function{ MAI_DEPTH_LESS };
+
+	bool _enable_blending{ true };
 };
 
 }

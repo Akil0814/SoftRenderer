@@ -273,10 +273,13 @@ namespace mai
 			
 			if (_enable_depth_test && !depth_test(fsOutput))
 				continue;
+
+			RGBA color = fsOutput._color;
+			if (_enable_blending)
+				color = blend(fsOutput);
 			
 			_frame_buffer->_color_buffer[pixelPos] = fsOutput._color;
 		}
-
 	}
 
 	void GPU::vertex_shader_stage(
@@ -384,6 +387,10 @@ namespace mai
 			break;
 		case MAI_DEPTH_TEST:
 			_enable_depth_test = true;
+			break;
+		case MAI_BLENDING:
+			_enable_blending = false;
+			break;
 		default:
 			break;
 		}
@@ -398,10 +405,31 @@ namespace mai
 			break;
 		case MAI_DEPTH_TEST:
 			_enable_depth_test = false;
-
+			break;
+		case MAI_BLENDING:
+			_enable_blending = false;
+			break;
 		default:
 			break;
 		}
+	}
+
+	RGBA GPU::blend(const FsOutput& output)
+	{
+		RGBA result;
+
+		uint32_t pixelPos = output._pixel_pos.y * _frame_buffer->_width + output._pixel_pos.x;
+		RGBA dst = _frame_buffer->_color_buffer[pixelPos];
+		RGBA src = output._color;
+
+		float weight = static_cast<float>(src._A) / 255.0f;
+
+		result._R = static_cast<float>(src._R) * weight + static_cast<float>(dst._R) * (1.0f - weight);
+		result._G = static_cast<float>(src._G) * weight + static_cast<float>(dst._G) * (1.0f - weight);
+		result._B = static_cast<float>(src._B) * weight + static_cast<float>(dst._B) * (1.0f - weight);
+		result._A = static_cast<float>(src._A) * weight + static_cast<float>(dst._A) * (1.0f - weight);
+
+		return result;
 	}
 
 	void GPU::front_face(const uint32_t& value)
@@ -418,6 +446,7 @@ namespace mai
 	{
 		_depth_function = value;
 	}
+
 
 
 

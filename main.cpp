@@ -77,6 +77,7 @@ void prepare()
 		std::cerr << "false" << std::endl;
 
 	MAI_SGL->disable(MAI_CULL_FACE);
+	MAI_SGL->enable(MAI_BLENDING);
 	//MAI_SGL->disable(MAI_DEPTH_TEST);
 
 	float positions[] =
@@ -96,9 +97,9 @@ void prepare()
 		1.0f, 0.5f, 0.2f, 1.0f,
 		1.0f, 0.8f, 0.2f, 1.0f,
 
-		0.2f, 0.4f, 1.0f, 1.0f,
-		0.2f, 0.8f, 1.0f, 1.0f,
-		0.5f, 1.0f, 0.9f, 1.0f,
+		0.2f, 0.4f, 1.0f, 0.3f,
+		0.2f, 0.8f, 1.0f, 0.3f,
+		0.5f, 1.0f, 0.9f, 0.3f,
 	};
 
 	float uvs[] =

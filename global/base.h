@@ -25,6 +25,7 @@
 
 #define MAI_CULL_FACE 1
 #define MAI_DEPTH_TEST 2
+#define MAI_BLENDING 3
 
 #define MAI_FRONT_FACE_CW 0
 #define MAI_FRONT_FACE_CCW 1
