@@ -61,7 +61,7 @@ void on_render()
 	MAI_SGL->use_program(shader);
 	MAI_SGL->bind_vertex_array(vao);
 	MAI_SGL->bind_buffer(MAI_ELEMENT_ARRAY_BUFFER, ebo);
-	MAI_SGL->draw_element(MAI_DRAW_TRIANGLES, 0, 3);
+	MAI_SGL->draw_element(MAI_DRAW_TRIANGLES, 0, 6);
 }
 
 void prepare()
@@ -76,22 +76,29 @@ void prepare()
 	if (image01 == nullptr)
 		std::cerr << "false" << std::endl;
 
-	MAI_SGL->enable(MAI_CULL_FACE);
-	MAI_SGL->front_face(MAI_FRONT_FACE_CCW);
-	MAI_SGL->cull_face(MAI_FRONT_FACE);
+	MAI_SGL->disable(MAI_CULL_FACE);
+	//MAI_SGL->disable(MAI_DEPTH_TEST);
 
 	float positions[] =
 	{
-		-0.5f, -0.5f, 0.0f,
-		-0.5f, 0.5f, 0.0f,
-		0.5f, -0.5f, 0.0f,
+		-0.65f, -0.45f, 0.25f,
+		-0.10f, 0.55f, 0.25f,
+		0.45f, -0.35f, 0.25f,
+
+		-0.35f, -0.55f, -0.25f,
+		0.15f, 0.45f, -0.25f,
+		0.70f, -0.25f, -0.25f,
 	};
 
 	float colors[] =
 	{
-		1.0f, 0.0f, 0.0f, 1.0f,
-		0.0f, 1.0f, 0.0f, 1.0f,
-		0.0f, 0.0f, 1.0f, 1.0f,
+		1.0f, 0.2f, 0.2f, 1.0f,
+		1.0f, 0.5f, 0.2f, 1.0f,
+		1.0f, 0.8f, 0.2f, 1.0f,
+
+		0.2f, 0.4f, 1.0f, 1.0f,
+		0.2f, 0.8f, 1.0f, 1.0f,
+		0.5f, 1.0f, 0.9f, 1.0f,
 	};
 
 	float uvs[] =
@@ -99,14 +106,18 @@ void prepare()
 		0.0f, 0.0f,
 		0.0f, 1.0f,
 		1.0f, 0.0f,
+
+		0.0f, 0.0f,
+		0.0f, 1.0f,
+		1.0f, 0.0f,
 	};
 
-	uint32_t indices[] = { 0, 1, 2 };
+	uint32_t indices[] = { 0, 1, 2, 3, 4, 5 };
 
 	//生成indices对应ebo
 	ebo = MAI_SGL->gen_buffer();
 	MAI_SGL->bind_buffer(MAI_ELEMENT_ARRAY_BUFFER, ebo);
-	MAI_SGL->buffer_data(MAI_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * 3, indices);
+	MAI_SGL->buffer_data(MAI_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * 6, indices);
 	MAI_SGL->bind_buffer(MAI_ELEMENT_ARRAY_BUFFER, 0);
 
 	//生成vao并且绑定
@@ -116,17 +127,17 @@ void prepare()
 	//生成每个vbo，绑定后，设置属性ID及读取参数
 	positionVbo = MAI_SGL->gen_buffer();
 	MAI_SGL->bind_buffer(MAI_ARRAY_BUFFER, positionVbo);
-	MAI_SGL->buffer_data(MAI_ARRAY_BUFFER, sizeof(float) * 9, positions);
+	MAI_SGL->buffer_data(MAI_ARRAY_BUFFER, sizeof(float) * 18, positions);
 	MAI_SGL->vertex_attribute_pointer(0, 3, 3 * sizeof(float), 0);
 
 	colorVbo = MAI_SGL->gen_buffer();
 	MAI_SGL->bind_buffer(MAI_ARRAY_BUFFER, colorVbo);
-	MAI_SGL->buffer_data(MAI_ARRAY_BUFFER, sizeof(float) * 12, colors);
+	MAI_SGL->buffer_data(MAI_ARRAY_BUFFER, sizeof(float) * 24, colors);
 	MAI_SGL->vertex_attribute_pointer(1, 4, 4 * sizeof(float), 0);
 
 	uvVbo = MAI_SGL->gen_buffer();
 	MAI_SGL->bind_buffer(MAI_ARRAY_BUFFER, uvVbo);
-	MAI_SGL->buffer_data(MAI_ARRAY_BUFFER, sizeof(float) * 6, uvs);
+	MAI_SGL->buffer_data(MAI_ARRAY_BUFFER, sizeof(float) * 12, uvs);
 	MAI_SGL->vertex_attribute_pointer(2, 2, 2 * sizeof(float), 0);
 
 	MAI_SGL->bind_buffer(MAI_ARRAY_BUFFER, 0);
