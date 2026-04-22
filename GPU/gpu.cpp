@@ -278,7 +278,7 @@ namespace mai
 			if (_enable_blending)
 				color = blend(fsOutput);
 			
-			_frame_buffer->_color_buffer[pixelPos] = fsOutput._color;
+			_frame_buffer->_color_buffer[pixelPos] = color;
 		}
 	}
 
@@ -389,7 +389,7 @@ namespace mai
 			_enable_depth_test = true;
 			break;
 		case MAI_BLENDING:
-			_enable_blending = false;
+			_enable_blending = true;
 			break;
 		default:
 			break;
