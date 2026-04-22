@@ -268,7 +268,7 @@ namespace mai
 		FsOutput fsOutput;
 		uint32_t pixelPos = 0;
 		for (uint32_t i = 0; i < rasterOutputs.size(); ++i) {
-			_shader->fragment_shader(rasterOutputs[i], fsOutput);
+			_shader->fragment_shader(rasterOutputs[i], fsOutput, _texture_map);
 			pixelPos = fsOutput._pixel_pos.y * _frame_buffer->_width + fsOutput._pixel_pos.x;
 			
 			if (_enable_depth_test && !depth_test(fsOutput))
@@ -447,7 +447,53 @@ namespace mai
 		_depth_function = value;
 	}
 
+	uint32_t GPU::get_texture()
+	{
+		_texture_counter++;
+		_texture_map.insert(std::make_pair(_texture_counter, new Texture()));
 
+		return _texture_counter;
+	}
 
+	void GPU::delete_texture(const uint32_t& tex_id)
+	{
+		auto iter = _texture_map.find(tex_id);
+		if (iter != _texture_map.end())
+			delete iter->second;
+		else
+			return;
 
+		_texture_map.erase(iter);
+	}
+
+	void GPU::bind_texture(const uint32_t& tex_id)
+	{
+		_current_texture = tex_id;
+	}
+
+	void GPU::tex_image_2D(const uint32_t& width, const uint32_t& height, void* data)
+	{
+		if (!_current_texture)
+			return;
+
+		auto iter = _texture_map.find(_current_texture);
+		if (iter == _texture_map.end()) {
+			return;
+		}
+		auto texture = iter->second;
+		texture->set_buffer_data(width, height, data);
+	}
+
+	void GPU::tex_parameter(const uint32_t& param, const uint32_t& value)
+	{
+		if (!_current_texture) 
+			return;
+
+		auto iter = _texture_map.find(_current_texture);
+		if (iter == _texture_map.end())
+			return;
+
+		Texture* texture = iter->second;
+		texture->set_parameter(param, value);
+	}
 }

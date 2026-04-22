@@ -16,7 +16,9 @@ public:
 		const uint32_t& index
 	)override;
 
-	void fragment_shader(const VsOutput& input, FsOutput& output)override;
+	void fragment_shader(
+		const VsOutput& input, FsOutput& output,
+		const std::map<uint32_t, Texture*>& textures)override;
 
 public:
 	//uniforms

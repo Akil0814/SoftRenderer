@@ -9,6 +9,7 @@
 #include "buffer_object.h"
 #include "VAO.h"
 #include "shader.h"
+#include "texture.h"
 
 
 //Software Graphics Library
@@ -45,14 +46,22 @@ public:
 		const uint32_t& binding,const uint32_t& itemSize,
 		const uint32_t& stride,const uint32_t& offset);
 
+	uint32_t get_texture();
+	void delete_texture(const uint32_t& tex_id);
+	void bind_texture(const uint32_t& tex_id);
+	void tex_image_2D(const uint32_t& width,const uint32_t& height, void* data);
+	void tex_parameter(const uint32_t& param, const uint32_t& value);
+
 	void use_program(Shader* shader);
 
 	void enable(const uint32_t& value);
 	void disable(const uint32_t& value);
 
+	//cull face
 	void front_face(const uint32_t& value);
 	void cull_face(const uint32_t& value);
 
+	//depth test
 	void depth_function(const uint32_t& value);
 
 	void draw_element(const uint32_t& drawMode, const uint32_t& first, const uint32_t& count);
@@ -100,6 +109,10 @@ private:
 	uint32_t _depth_function{ MAI_DEPTH_LESS };
 
 	bool _enable_blending{ true };
+
+	uint32_t _current_texture{ 0 };
+	uint32_t _texture_counter{ 0 };
+	std::map<uint32_t, Texture*> _texture_map;
 };
 
 }

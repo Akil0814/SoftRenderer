@@ -2,6 +2,7 @@
 #include "../global/base.h"
 #include "data_structures.h"
 #include "buffer_object.h"
+#include "texture.h"
 
 namespace mai {
 
@@ -20,7 +21,8 @@ public:
 		const uint32_t& index
 	) = 0;
 
-	virtual void fragment_shader(const VsOutput& input, FsOutput& output) = 0;
+	virtual void fragment_shader(const VsOutput& input, FsOutput& output,
+		const std::map<uint32_t,Texture*>& textures) = 0;
 
 public:
 

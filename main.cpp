@@ -6,7 +6,9 @@
 
 #include "gpu/data_structures.h"
 #include "gpu/shader/default_shader.h"
+#include "gpu/shader/texture_shader.h"
 #include "gpu/gpu.h"
+#include "gpu/texture.h"
 
 #include "math/math.h"
 
@@ -16,7 +18,8 @@
 uint32_t WIDTH = 1080;
 uint32_t HEIGHT = 720;
 
-mai::Image* image01 = nullptr;
+mai::Image* image = nullptr;
+uint32_t texture = 0;
 
 //三个属性对应vbo
 uint32_t positionVbo = 0;
@@ -29,7 +32,8 @@ uint32_t ebo = 0;
 //本三角形专属vao
 uint32_t vao = 0;
 
-mai::DefaultShader* shader = nullptr;
+mai::TextureShader* textureShader = nullptr;
+mai::DefaultShader* defaultShader = nullptr;
 
 mai::mat4f modelMatrix;
 mai::mat4f viewMatrix;
@@ -47,34 +51,61 @@ void transform()
 	camera_z -= 0.01f;
 	//模型变换
 	modelMatrix = mai::rotate(mai::mat4f(1.0f), angle, mai::vec3f{ 0.0f, 1.0f, 0.0f });
-	//auto cameraModelMatrix = mai::translate(mai::mat4f(1.0f), mai::vec3f{ 0.0f, 0.0f, camera_z });
-	//viewMatrix = mai::inverse(cameraModelMatrix);
 }
 
 void on_render()
 {
 	transform();
-	shader->_model_matrix = modelMatrix;
-	shader->_view_matrix = viewMatrix;
-	shader->_projection_matrix = perspectiveMatrix;
+
+	textureShader->_model_matrix = modelMatrix;
+	textureShader->_view_matrix = viewMatrix;
+	textureShader->_projection_matrix = perspectiveMatrix;
+	textureShader->_diffuse_texture = texture;
+
+	defaultShader->_model_matrix = modelMatrix;
+	defaultShader->_view_matrix = viewMatrix;
+	defaultShader->_projection_matrix = perspectiveMatrix;
+
 	MAI_SGL->clear();
-	MAI_SGL->use_program(shader);
+
 	MAI_SGL->bind_vertex_array(vao);
 	MAI_SGL->bind_buffer(MAI_ELEMENT_ARRAY_BUFFER, ebo);
+
+	MAI_SGL->use_program(textureShader);
 	MAI_SGL->draw_element(MAI_DRAW_TRIANGLES, 0, 6);
+
+	MAI_SGL->use_program(defaultShader);
+	MAI_SGL->draw_element(MAI_DRAW_TRIANGLES, 6, 3);
 }
 
 void prepare()
 {
-	image01 = mai::Image::create_image("assets/textures/Arcueid_morning_low.png");
-	shader = new mai::DefaultShader();
+	textureShader = new mai::TextureShader();
+	defaultShader = new mai::DefaultShader();
+
+
+	image = mai::Image::create_image("assets/textures/mai.png");
+	if (image == nullptr)
+		std::cerr << "false" << std::endl;
+
+	if (image != nullptr)
+	{
+		texture = MAI_SGL->get_texture();
+		MAI_SGL->bind_texture(texture);
+		MAI_SGL->tex_image_2D(image->_width, image->_height, image->_data);
+		MAI_SGL->tex_parameter(MAI_TEXTURE_FILTER, MAI_TEXTURE_FILTER_LINEAR);
+		MAI_SGL->tex_parameter(MAI_TEXTURE_WRAP_U, MAI_TEXTURE_WRAP_REPEAT);
+		MAI_SGL->tex_parameter(MAI_TEXTURE_WRAP_V, MAI_TEXTURE_WRAP_REPEAT);
+		MAI_SGL->bind_texture(0);
+	}
+
 
 	perspectiveMatrix = mai::perspective(60.0f, (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
+
 	auto cameraModelMatrix = mai::translate(mai::mat4f(1.0f), mai::vec3f{ 0.0f, 0.0f, 3.0f });
 	viewMatrix = mai::inverse(cameraModelMatrix);
 
-	if (image01 == nullptr)
-		std::cerr << "false" << std::endl;
+
 
 	MAI_SGL->disable(MAI_CULL_FACE);
 	MAI_SGL->enable(MAI_BLENDING);
@@ -82,9 +113,10 @@ void prepare()
 
 	float positions[] =
 	{
-		-0.65f, -0.45f, 0.25f,
-		-0.10f, 0.55f, 0.25f,
-		0.45f, -0.35f, 0.25f,
+		-0.70f, -0.60f, 0.25f,
+		-0.70f,  0.60f, 0.25f,
+		 0.50f,  0.60f, 0.25f,
+		 0.50f, -0.60f, 0.25f,
 
 		-0.35f, -0.55f, -0.25f,
 		0.15f, 0.45f, -0.25f,
@@ -93,9 +125,10 @@ void prepare()
 
 	float colors[] =
 	{
-		1.0f, 0.2f, 0.2f, 1.0f,
-		1.0f, 0.5f, 0.2f, 1.0f,
-		1.0f, 0.8f, 0.2f, 1.0f,
+		1.0f, 1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f, 1.0f,
 
 		0.2f, 0.4f, 1.0f, 0.3f,
 		0.2f, 0.8f, 1.0f, 0.3f,
@@ -106,6 +139,7 @@ void prepare()
 	{
 		0.0f, 0.0f,
 		0.0f, 1.0f,
+		1.0f, 1.0f,
 		1.0f, 0.0f,
 
 		0.0f, 0.0f,
@@ -113,12 +147,12 @@ void prepare()
 		1.0f, 0.0f,
 	};
 
-	uint32_t indices[] = { 0, 1, 2, 3, 4, 5 };
+	uint32_t indices[] = { 0, 1, 2, 0, 2, 3, 4, 5, 6 };
 
 	//生成indices对应ebo
 	ebo = MAI_SGL->gen_buffer();
 	MAI_SGL->bind_buffer(MAI_ELEMENT_ARRAY_BUFFER, ebo);
-	MAI_SGL->buffer_data(MAI_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * 6, indices);
+	MAI_SGL->buffer_data(MAI_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * 9, indices);
 	MAI_SGL->bind_buffer(MAI_ELEMENT_ARRAY_BUFFER, 0);
 
 	//生成vao并且绑定
@@ -128,17 +162,17 @@ void prepare()
 	//生成每个vbo，绑定后，设置属性ID及读取参数
 	positionVbo = MAI_SGL->gen_buffer();
 	MAI_SGL->bind_buffer(MAI_ARRAY_BUFFER, positionVbo);
-	MAI_SGL->buffer_data(MAI_ARRAY_BUFFER, sizeof(float) * 18, positions);
+	MAI_SGL->buffer_data(MAI_ARRAY_BUFFER, sizeof(float) * 21, positions);
 	MAI_SGL->vertex_attribute_pointer(0, 3, 3 * sizeof(float), 0);
 
 	colorVbo = MAI_SGL->gen_buffer();
 	MAI_SGL->bind_buffer(MAI_ARRAY_BUFFER, colorVbo);
-	MAI_SGL->buffer_data(MAI_ARRAY_BUFFER, sizeof(float) * 24, colors);
+	MAI_SGL->buffer_data(MAI_ARRAY_BUFFER, sizeof(float) * 28, colors);
 	MAI_SGL->vertex_attribute_pointer(1, 4, 4 * sizeof(float), 0);
 
 	uvVbo = MAI_SGL->gen_buffer();
 	MAI_SGL->bind_buffer(MAI_ARRAY_BUFFER, uvVbo);
-	MAI_SGL->buffer_data(MAI_ARRAY_BUFFER, sizeof(float) * 12, uvs);
+	MAI_SGL->buffer_data(MAI_ARRAY_BUFFER, sizeof(float) * 14, uvs);
 	MAI_SGL->vertex_attribute_pointer(2, 2, 2 * sizeof(float), 0);
 
 	MAI_SGL->bind_buffer(MAI_ARRAY_BUFFER, 0);
@@ -171,7 +205,8 @@ int APIENTRY wWinMain(
 		MAI_APP->show();
 	}
 
-	mai::Image::destroy_image(image01);
+	MAI_SGL->delete_texture(texture);
+	mai::Image::destroy_image(image);
 
 	return 0;
 }
