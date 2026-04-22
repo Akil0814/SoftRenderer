@@ -4,11 +4,11 @@
 #include "application/application.h"
 #include "application/image.h"
 
-#include "gpu/data_structures.h"
-#include "gpu/shader/default_shader.h"
-#include "gpu/shader/texture_shader.h"
-#include "gpu/gpu.h"
-#include "gpu/texture.h"
+#include "GPU/data_structures.h"
+#include "GPU/shader/default_shader.h"
+#include "GPU/shader/texture_shader.h"
+#include "GPU/gpu.h"
+#include "GPU/texture.h"
 
 #include "math/math.h"
 
