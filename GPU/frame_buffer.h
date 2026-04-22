@@ -18,6 +18,7 @@ public:
 	uint32_t _width = { 0 };
 	uint32_t _height = { 0 };
 	RGBA* _color_buffer = { nullptr }; //真正指向像素数据
+	float* _depth_buffer = { nullptr };
 	bool _extern_buffer = { false }; //表示这块内存是不是外部的
 };
 }

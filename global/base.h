@@ -24,12 +24,16 @@
 #define MAI_DRAW_TRIANGLES 1
 
 #define MAI_CULL_FACE 1
+#define MAI_DEPTH_TEST 2
 
 #define MAI_FRONT_FACE_CW 0
 #define MAI_FRONT_FACE_CCW 1
 
 #define MAI_FRONT_FACE 0
 #define MAI_BACK_FACE 1
+
+#define MAI_DEPTH_LESS 0
+#define MAI_DEPTH_GREATER 1
 
 using byte = unsigned char;
 

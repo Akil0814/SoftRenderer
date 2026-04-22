@@ -78,7 +78,7 @@ void prepare()
 
 	MAI_SGL->enable(MAI_CULL_FACE);
 	MAI_SGL->front_face(MAI_FRONT_FACE_CCW);
-	MAI_SGL->cull_face(MAI_BACK_FACE);
+	MAI_SGL->cull_face(MAI_FRONT_FACE);
 
 	float positions[] =
 	{

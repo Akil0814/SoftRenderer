@@ -46,6 +46,7 @@ namespace mai
 	{
 		size_t pixelSize = _frame_buffer->_width * _frame_buffer->_height;
 		std::fill_n(_frame_buffer->_color_buffer, pixelSize, RGBA(0, 0, 0, 0));
+		std::fill_n(_frame_buffer->_depth_buffer, pixelSize, 1.0f);
 	}
 
 	void GPU::printVAO(const uint32_t& vaoID)
@@ -269,6 +270,10 @@ namespace mai
 		for (uint32_t i = 0; i < rasterOutputs.size(); ++i) {
 			_shader->fragment_shader(rasterOutputs[i], fsOutput);
 			pixelPos = fsOutput._pixel_pos.y * _frame_buffer->_width + fsOutput._pixel_pos.x;
+			
+			if (_enable_depth_test && !depth_test(fsOutput))
+				continue;
+			
 			_frame_buffer->_color_buffer[pixelPos] = fsOutput._color;
 		}
 
@@ -340,6 +345,35 @@ namespace mai
 			vsOutput._position.z = 1.0f;
 	}
 
+	bool GPU::depth_test(const FsOutput& output)
+	{
+		uint32_t pixelPos = output._pixel_pos.y * _frame_buffer->_width + output._pixel_pos.x;
+		float oldDepth = _frame_buffer->_depth_buffer[pixelPos];
+		switch (_depth_function)
+		{
+		case MAI_DEPTH_LESS:
+			if (output._depth < oldDepth) {
+				_frame_buffer->_depth_buffer[pixelPos] = output._depth;
+				return true;
+			}
+			else {
+				return false;
+			}
+			break;
+		case MAI_DEPTH_GREATER:
+			if (output._depth > oldDepth) {
+				_frame_buffer->_depth_buffer[pixelPos] = output._depth;
+				return true;
+			}
+			else {
+				return false;
+			}
+			break;
+		default:
+			return false;
+			break;
+		}
+	}
 
 	void GPU::enable(const uint32_t& value)
 	{
@@ -348,7 +382,8 @@ namespace mai
 		case MAI_CULL_FACE:
 			_enable_cull_face = true;
 			break;
-
+		case MAI_DEPTH_TEST:
+			_enable_depth_test = true;
 		default:
 			break;
 		}
@@ -361,6 +396,8 @@ namespace mai
 		case MAI_CULL_FACE:
 			_enable_cull_face = false;
 			break;
+		case MAI_DEPTH_TEST:
+			_enable_depth_test = false;
 
 		default:
 			break;
@@ -375,6 +412,11 @@ namespace mai
 	void GPU::cull_face(const uint32_t& value)
 	{
 		_cull_face = value;
+	}
+
+	void GPU::depth_function(const uint32_t& value)
+	{
+		_depth_function = value;
 	}
 
 

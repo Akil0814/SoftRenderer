@@ -53,6 +53,8 @@ public:
 	void front_face(const uint32_t& value);
 	void cull_face(const uint32_t& value);
 
+	void depth_function(const uint32_t& value);
+
 	void draw_element(const uint32_t& drawMode, const uint32_t& first, const uint32_t& count);
 
 
@@ -67,6 +69,8 @@ private:
 	void screen_mapping(VsOutput& vsOutput);
 
 	void trim(VsOutput& vsOutput);
+
+	bool depth_test(const FsOutput& fsOutput);
 
 private:
 	static GPU* _instance;
@@ -89,6 +93,9 @@ private:
 	bool _enable_cull_face{ true };
 	uint32_t _front_face{ MAI_FRONT_FACE_CCW };
 	uint32_t _cull_face{ MAI_BACK_FACE };
+
+	bool _enable_depth_test{ true };
+	uint32_t _depth_function{ MAI_DEPTH_LESS };
 };
 
 }
