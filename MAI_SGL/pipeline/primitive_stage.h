@@ -17,6 +17,13 @@ public:
 		const std::vector<VsOutput>& vs_outputs, std::vector<VsOutput>& raster_outputs) const;
 
 private:
+	void run_3D(const DrawContext& context, uint8_t draw_mode,
+		const std::vector<VsOutput>& vs_outputs, std::vector<VsOutput>& raster_outputs) const;
+
+	void run_2D(const DrawContext& context, uint8_t draw_mode,
+		const std::vector<VsOutput>& vs_outputs, std::vector<VsOutput>& raster_outputs) const;
+
+private:
 	void perspective_division(VsOutput& vs_output) const;
 	void perspective_recover(VsOutput& vs_output) const;
 	void screen_mapping(const DrawContext& context, VsOutput& vs_output) const;

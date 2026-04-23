@@ -10,6 +10,17 @@ namespace mai
 		const DrawContext& context, uint8_t draw_mode,
 		const std::vector<VsOutput>& vs_outputs, std::vector<VsOutput>& raster_outputs) const
 	{
+		if (context._state._draw_mode == MAI_DRAW_3D)
+			run_3D(context, draw_mode, vs_outputs, raster_outputs);
+		else if (context._state._draw_mode == MAI_DRAW_2D)
+			run_2D(context, draw_mode, vs_outputs, raster_outputs);
+		else
+			return;
+	}
+
+	void  PrimitiveStage::run_3D(const DrawContext& context, uint8_t draw_mode,
+		const std::vector<VsOutput>& vs_outputs, std::vector<VsOutput>& raster_outputs) const
+	{
 		std::vector<VsOutput> clip_outputs{};
 		Clipper::do_clip_space(draw_mode, vs_outputs, clip_outputs);
 		if (clip_outputs.empty())
@@ -54,6 +65,14 @@ namespace mai
 			perspective_recover(output);
 		}
 	}
+
+	void  PrimitiveStage::run_2D(const DrawContext& context, uint8_t draw_mode,
+		const std::vector<VsOutput>& vs_outputs, std::vector<VsOutput>& raster_outputs) const
+	{
+
+	}
+
+
 
 	void PrimitiveStage::perspective_division(VsOutput& vs_output) const
 	{

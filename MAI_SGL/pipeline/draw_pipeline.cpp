@@ -21,5 +21,4 @@ namespace mai
 
 		_fragment_stage.run(context, raster_outputs);
 	}
-
 }
