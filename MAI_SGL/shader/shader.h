@@ -1,10 +1,13 @@
 #pragma once
-#include "../global/base.h"
-#include "data_structures.h"
-#include "buffer_object.h"
-#include "texture.h"
+#include<map>
 
-namespace mai {
+#include "../base.h"
+#include "../data_structures.h"
+#include "../resource/buffer_object.h"
+#include "../resource/texture.h"
+
+namespace mai
+{
 
 
 class Shader

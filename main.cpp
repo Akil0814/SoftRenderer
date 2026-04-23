@@ -4,13 +4,12 @@
 #include "application/application.h"
 #include "application/image.h"
 
-#include "GPU/data_structures.h"
-#include "GPU/shader/default_shader.h"
-#include "GPU/shader/texture_shader.h"
-#include "GPU/gpu.h"
-#include "GPU/texture.h"
-
-#include "math/math.h"
+#include "MAI_SGL/data_structures.h"
+#include "MAI_SGL/shader/default_shader.h"
+#include "MAI_SGL/shader/texture_shader.h"
+#include "MAI_SGL/core/gpu.h"
+#include "MAI_SGL/resource/texture.h"
+#include "MAI_SGL/math/math.h"
 
 #pragma comment(linker, "/subsystem:console /entry:wWinMainCRTStartup" )//更改main入口
 

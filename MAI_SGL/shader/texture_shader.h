@@ -1,6 +1,6 @@
 #pragma once
-#include "../shader.h"
-#include "../../math/math.h"
+#include "shader.h"
+#include "../math/math.h"
 
 namespace mai
 {

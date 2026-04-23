@@ -1,6 +1,6 @@
 #pragma once
-#include "../global/base.h"
-#include "../math/math.h"
+#include "base.h"
+#include "math/math.h"
 
 namespace mai
 {

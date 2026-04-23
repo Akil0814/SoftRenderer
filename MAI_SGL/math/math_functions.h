@@ -1,4 +1,4 @@
-#include "../global/base.h"
+#include "../base.h"
 
 namespace mai
 {

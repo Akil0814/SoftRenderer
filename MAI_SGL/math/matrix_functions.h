@@ -2,7 +2,7 @@
 #include "vector.h"
 #include "vector_functions.h"
 #include "matrix.h"
-#include "../global/base.h"
+#include "../base.h"
 #include <cmath>
 #include <iostream>
 

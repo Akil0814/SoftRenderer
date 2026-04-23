@@ -1,5 +1,5 @@
 #pragma once
-#include "../global/base.h"
+#include "../MAI_SGL/base.h"
 #include<Windows.h>
 
 #define MAI_APP mai::Application::instance()

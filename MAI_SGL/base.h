@@ -1,13 +1,9 @@
 #pragma once
+#include <cstdint>
+#include <cassert>
+#include "math/vector.h"
 
-#include<iostream>
-#include<vector>
-#include<map>
-#include<cmath>
-#include<assert.h>
-#include "../math/vector.h"
-
-#define MAI_PI					3.14159265358979323
+#define MAI_PI					3.14159265358979323f
 #define MAI_DEG2RAD(theta)		(0.01745329251994329 * (theta))
 #define MAI_FRACTION(v)			((v) - (int)(v))//返回小数部分
 
@@ -51,7 +47,7 @@
 #define MAI_DEPTH_LESS 0
 #define MAI_DEPTH_GREATER 1
 
-using byte = unsigned char;
+using byte = std::uint8_t;
 
 namespace mai
 {
@@ -64,16 +60,7 @@ struct RGBA
 	byte _A;
 
 	constexpr RGBA(byte r = 255,byte g = 255,byte b = 255,byte a = 255) 
-		: _R(r), _G(g), _B(b), _A(a)
-	{}
-};
-
-struct Point
-{
-	int32_t x = { 0 };
-	int32_t y = { 0 };
-	RGBA color= { 255, 255, 255, 255 };
-	vec2f uv;
+		: _R(r), _G(g), _B(b), _A(a) {}
 };
 
 namespace Color

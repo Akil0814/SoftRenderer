@@ -1,15 +1,13 @@
 #pragma once
-#include "../application/application.h"
-#include "../application/image.h"
+#include <vector>
 
-#include "../global/base.h"
-
-#include "data_structures.h"
-#include "frame_buffer.h"
-#include "buffer_object.h"
-#include "VAO.h"
-#include "shader.h"
-#include "texture.h"
+#include "../base.h"
+#include "../data_structures.h"
+#include "../resource/frame_buffer.h"
+#include "../resource/buffer_object.h"
+#include "../resource/VAO.h"
+#include "../shader/shader.h"
+#include "../resource/texture.h"
 
 
 //Software Graphics Library

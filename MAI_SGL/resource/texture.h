@@ -1,5 +1,5 @@
 #pragma once
-#include "../global/base.h"
+#include "../base.h"
 #include "../math/math.h"
 
 namespace mai {

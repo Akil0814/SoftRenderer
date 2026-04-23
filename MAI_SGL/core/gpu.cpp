@@ -1,6 +1,6 @@
 #include "gpu.h"
-#include "raster.h"
-#include "clipper.h"
+#include "../pipeline/raster.h"
+#include "../pipeline/clipper.h"
 
 #include <algorithm>
 
