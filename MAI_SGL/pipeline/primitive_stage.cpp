@@ -7,7 +7,7 @@ namespace mai
 {
 
 	void PrimitiveStage::run(
-		const DrawContext& context, uint32_t draw_mode,
+		const DrawContext& context, uint8_t draw_mode,
 		const std::vector<VsOutput>& vs_outputs, std::vector<VsOutput>& raster_outputs) const
 	{
 		std::vector<VsOutput> clip_outputs{};

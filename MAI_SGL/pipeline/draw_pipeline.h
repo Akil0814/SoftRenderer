@@ -12,7 +12,7 @@ namespace mai
 class DrawPipeline
 {
 public:
-	void draw_elements(const DrawContext& context, uint32_t draw_mode,
+	void draw_elements(const DrawContext& context, uint8_t draw_mode,
 		size_t first, size_t count) const;
 
 private:

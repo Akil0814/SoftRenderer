@@ -6,7 +6,7 @@ namespace mai
 {
 
 	void DrawPipeline::draw_elements(
-		const DrawContext& context, uint32_t draw_mode,
+		const DrawContext& context, uint8_t draw_mode,
 		size_t first, size_t count) const
 	{
 		std::vector<VsOutput> vs_outputs{};

@@ -73,7 +73,7 @@ namespace mai
 		_buffer_map.erase(iter);
 	}
 
-	void GPU::bind_buffer(uint32_t buffer_type, uint32_t buffer_ID)
+	void GPU::bind_buffer(uint8_t buffer_type, uint32_t buffer_ID)
 	{
 		if (buffer_type == MAI_ARRAY_BUFFER)
 			_current_VBO = buffer_ID;
@@ -82,7 +82,7 @@ namespace mai
 			_current_EBO = buffer_ID;
 	}
 
-	void GPU::buffer_data(uint32_t buffer_type, size_t data_size, void* data)
+	void GPU::buffer_data(uint8_t buffer_type, size_t data_size, void* data)
 	{
 		uint32_t buffer_ID = 0;
 
@@ -147,7 +147,7 @@ namespace mai
 		_shader = shader;
 	}
 
-	void GPU::draw_element(uint32_t draw_mode, size_t first, size_t count)
+	void GPU::draw_element(uint8_t draw_mode, size_t first, size_t count)
 	{
 		if (_current_VAO == 0 || _shader == nullptr || count == 0)
 			return;
@@ -186,7 +186,7 @@ namespace mai
 		_draw_pipeline.draw_elements(context, draw_mode, first, count);
 	}
 
-	void GPU::enable(uint32_t value)
+	void GPU::enable(uint8_t value)
 	{
 		switch (value)
 		{
@@ -204,7 +204,7 @@ namespace mai
 		}
 	}
 
-	void GPU::disable(uint32_t value)
+	void GPU::disable(uint8_t value)
 	{
 		switch (value)
 		{
@@ -222,17 +222,17 @@ namespace mai
 		}
 	}
 
-	void GPU::front_face(uint32_t value)
+	void GPU::front_face(uint8_t value)
 	{
 		_render_state._front_face = static_cast<uint8_t>(value);
 	}
 
-	void GPU::cull_face(uint32_t value)
+	void GPU::cull_face(uint8_t value)
 	{
 		_render_state._cull_face = static_cast<uint8_t>(value);
 	}
 
-	void GPU::depth_function(uint32_t value)
+	void GPU::depth_function(uint8_t value)
 	{
 		_render_state._depth_function = static_cast<uint8_t>(value);
 	}
@@ -274,7 +274,7 @@ namespace mai
 		texture->set_buffer_data(width, height, data);
 	}
 
-	void GPU::tex_parameter(uint32_t param, uint32_t value)
+	void GPU::tex_parameter(uint8_t param, uint32_t value)
 	{
 		if (!_current_texture)
 			return;
@@ -287,8 +287,8 @@ namespace mai
 		texture->set_parameter(param, value);
 	}
 
-	void GPU::draw_mode(uint32_t value)
+	void GPU::draw_mode(uint8_t value)
 	{
-		_render_state._draw_mode = static_cast<uint8_t>(value);
+		_render_state._draw_mode = value;
 	}
 }

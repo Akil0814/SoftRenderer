@@ -13,7 +13,7 @@ namespace mai
 class PrimitiveStage
 {
 public:
-	void run(const DrawContext& context, uint32_t draw_mode,
+	void run(const DrawContext& context, uint8_t draw_mode,
 		const std::vector<VsOutput>& vs_outputs, std::vector<VsOutput>& raster_outputs) const;
 
 private:

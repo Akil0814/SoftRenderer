@@ -4,7 +4,7 @@
 namespace mai
 {
 
-void Clipper::do_clip_space(uint32_t draw_mode, const std::vector<VsOutput>& primitives, std::vector<VsOutput>& outputs)
+void Clipper::do_clip_space(uint8_t draw_mode, const std::vector<VsOutput>& primitives, std::vector<VsOutput>& outputs)
 {
 	outputs.clear();
 
@@ -56,7 +56,7 @@ void Clipper::do_clip_space(uint32_t draw_mode, const std::vector<VsOutput>& pri
 }
 
 
-bool Clipper::cull_face(uint32_t front_face, uint32_t cull_face,
+bool Clipper::cull_face(uint8_t front_face, uint8_t cull_face,
 	const VsOutput& v0, const VsOutput& v1, const VsOutput& v2)
 {
 	mai::vec3f p0{ v0._position.x, v0._position.y, v0._position.z };
@@ -91,7 +91,7 @@ bool Clipper::cull_face(uint32_t front_face, uint32_t cull_face,
 
 }
 
-void Clipper::sutherland_hodgman(uint32_t draw_mode, const std::vector<VsOutput>& primitive, std::vector<VsOutput>& outputs)
+void Clipper::sutherland_hodgman(uint8_t draw_mode, const std::vector<VsOutput>& primitive, std::vector<VsOutput>& outputs)
 {
 	assert(outputs.size() == 0);
 

@@ -35,8 +35,8 @@ public:
 
 	uint32_t gen_buffer();
 	void delete_buffer(uint32_t buffer_ID);
-	void bind_buffer(uint32_t buffer_type, uint32_t buffer_ID);
-	void buffer_data(uint32_t buffer_type, size_t data_size, void* data);
+	void bind_buffer(uint8_t buffer_type, uint32_t buffer_ID);
+	void buffer_data(uint8_t buffer_type, size_t data_size, void* data);
 
 	uint32_t gen_vertex_array();
 	void delete_vertex_array(uint32_t VAO_ID);
@@ -49,23 +49,23 @@ public:
 	void delete_texture(uint32_t tex_ID);
 	void bind_texture(uint32_t tex_ID);
 	void tex_image_2D(uint32_t width, uint32_t height, void* data);
-	void tex_parameter(uint32_t param, uint32_t value);
+	void tex_parameter(uint8_t param, uint32_t value);
 
 	void use_program(Shader* shader);
 
-	void enable(uint32_t value);
-	void disable(uint32_t value);
+	void enable(uint8_t value);
+	void disable(uint8_t value);
 
-	void draw_mode(uint32_t value);
+	void draw_mode(uint8_t value);
 
 	// Cull face
-	void front_face(uint32_t value);
-	void cull_face(uint32_t value);
+	void front_face(uint8_t value);
+	void cull_face(uint8_t value);
 
 	// Depth test
-	void depth_function(uint32_t value);
+	void depth_function(uint8_t value);
 
-	void draw_element(uint32_t draw_mode, size_t first, size_t count);
+	void draw_element(uint8_t draw_mode, size_t first, size_t count);
 
 private:
 	static GPU* _instance;

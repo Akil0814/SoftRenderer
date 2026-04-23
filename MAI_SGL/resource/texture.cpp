@@ -92,7 +92,7 @@ mai::vec4f Texture::get_color(float u, float v)
 	return result;
 }
 
-void Texture::check_wrap(float& n, uint32_t type)
+void Texture::check_wrap(float& n, uint8_t type)
 {
 	if (n > 1.0f || n < 0.0f)
 	{
@@ -113,7 +113,7 @@ void Texture::check_wrap(float& n, uint32_t type)
 
 }
 
-void Texture::set_parameter(uint32_t type, uint32_t value)
+void Texture::set_parameter(uint8_t type, uint32_t value)
 {
 	switch (type)
 	{
