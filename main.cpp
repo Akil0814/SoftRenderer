@@ -24,6 +24,8 @@ uint32_t WIDTH = 1080;
 uint32_t HEIGHT = 720;
 
 mai::Image* image = nullptr;
+mai::Geometry* test_geometry= nullptr;
+
 uint32_t texture = 0;
 
 //三个属性对应vbo
@@ -81,6 +83,12 @@ void on_render()
 
 	MAI_SGL->use_program(defaultShader);
 	MAI_SGL->draw_element(MAI_DRAW_TRIANGLES, 6, 3);
+
+	//MAI_SGL->bind_vertex_array(test_geometry->get_VAO());
+	//MAI_SGL->bind_buffer(MAI_ELEMENT_ARRAY_BUFFER, test_geometry->get_EBO());
+	//MAI_SGL->use_program(defaultShader);
+	//MAI_SGL->draw_element(MAI_DRAW_TRIANGLES, 0, test_geometry->get_indices_count());
+
 }
 
 void prepare()
@@ -88,7 +96,7 @@ void prepare()
 	textureShader = new mai::TextureShader();
 	defaultShader = new mai::DefaultShader();
 
-	//mai::Geometry g = mai::Geometry::create_box(1.0f);
+	test_geometry = mai::Geometry::create_box(1.0f);
 
 	image = mai::Image::create_image("assets/textures/mai.png");
 	if (image == nullptr)

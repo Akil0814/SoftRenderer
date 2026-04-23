@@ -287,7 +287,7 @@ namespace mai
 		texture->set_parameter(param, value);
 	}
 
-	void GPU::draw_mod(uint32_t value)
+	void GPU::draw_mode(uint32_t value)
 	{
 		_render_state._draw_mode = static_cast<uint8_t>(value);
 	}

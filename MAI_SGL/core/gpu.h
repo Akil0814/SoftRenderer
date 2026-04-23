@@ -56,7 +56,7 @@ public:
 	void enable(uint32_t value);
 	void disable(uint32_t value);
 
-	void draw_mod(uint32_t value);
+	void draw_mode(uint32_t value);
 
 	// Cull face
 	void front_face(uint32_t value);
