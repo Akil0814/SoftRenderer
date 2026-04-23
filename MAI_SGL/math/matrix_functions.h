@@ -246,7 +246,7 @@ namespace mai
 
 	//正交投影函数
 	template<typename T>
-	[[nodiscard]] Matrix4x4<T> orthographic(T left, T right, T bottom, T top, T near, T far)noexcept
+	[[nodiscard]] Matrix4x4<T> orthographic(T left, T right, T bottom, T top, T n, T f)noexcept
 	{
 		Matrix4x4<T> result(static_cast<T>(1));
 
@@ -254,8 +254,8 @@ namespace mai
 		result.set(0, 3, -(right + left) / (right - left));
 		result.set(1, 1, static_cast<T>(2) / (top - bottom));
 		result.set(1, 3, -(top + bottom) / (top - bottom));
-		result.set(2, 2, -static_cast<T>(2) / (far - near));
-		result.set(2, 3, -(far + near) / (far - near));
+		result.set(2, 2, -static_cast<T>(2) / (f - n));
+		result.set(2, 3, -(f + n) / (f - n));
 
 		return result;
 	}

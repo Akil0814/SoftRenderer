@@ -81,6 +81,8 @@ void on_render(float delta_time)
 	color_shader->_projection_matrix = projection_matrix;
 
 	MAI_SGL->clear();
+	MAI_SGL->draw_dimension(MAI_DRAW_3D);
+	MAI_SGL->enable(MAI_DEPTH_TEST);
 
 	MAI_SGL->bind_vertex_array(vao);
 	MAI_SGL->bind_buffer(MAI_ELEMENT_ARRAY_BUFFER, ebo);
@@ -88,9 +90,12 @@ void on_render(float delta_time)
 	MAI_SGL->use_program(texture_shader);
 	MAI_SGL->draw_element(MAI_DRAW_TRIANGLES, 0, 6);
 
-	//MAI_SGL->use_program(color_shader);
+	MAI_SGL->disable(MAI_DEPTH_TEST);
+	MAI_SGL->draw_dimension(MAI_DRAW_2D);
 	MAI_SGL->use_program(color_shader_2d);
 	MAI_SGL->draw_element(MAI_DRAW_TRIANGLES, 6, 3);
+	MAI_SGL->draw_dimension(MAI_DRAW_3D);
+	MAI_SGL->enable(MAI_DEPTH_TEST);
 
 }
 
@@ -105,6 +110,8 @@ void prepare()
 	texture_shader = new mai::TextureShader();
 	color_shader = new mai::ColorShader();
 	color_shader_2d = new mai::ColorShader2D();
+	color_shader_2d->_transform_matrix = mai::orthographic(0.0f,static_cast<float>(window_width - 1),
+		0.0f,static_cast<float>(window_height - 1),-1.0f,1.0f);
 
 	image = mai::Image::create_image("assets/textures/mai.png");
 	if (image == nullptr)
@@ -132,9 +139,9 @@ void prepare()
 		 0.65f,  0.75f, 0.25f,
 		 0.65f, -0.75f, 0.25f,
 
-		-0.35f, -0.55f, -0.25f,
-		0.15f, 0.45f, -0.25f,
-		0.70f, -0.25f, -0.25f,
+		80.0f, 80.0f, 0.0f,
+		220.0f, 260.0f, 0.0f,
+		360.0f, 110.0f, 0.0f,
 	};
 
 	float colors[] =
@@ -144,9 +151,9 @@ void prepare()
 		1.0f, 1.0f, 1.0f, 1.0f,
 		1.0f, 1.0f, 1.0f, 1.0f,
 
-		0.2f, 0.4f, 1.0f, 0.3f,
-		0.2f, 0.8f, 1.0f, 0.3f,
-		0.5f, 1.0f, 0.9f, 0.3f,
+		0.2f, 0.4f, 1.0f, 0.9f,
+		0.2f, 0.8f, 1.0f, 0.9f,
+		0.5f, 1.0f, 0.9f, 0.9f,
 	};
 
 	float uvs[] =

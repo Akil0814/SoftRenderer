@@ -3,16 +3,6 @@
 namespace mai
 {
 
-namespace
-{
-	bool has_attribute(
-		const std::map<uint32_t, BindingDescription>& binding_map,
-		uint32_t attribute_location)
-	{
-		return binding_map.find(attribute_location) != binding_map.end();
-	}
-}
-
 ColorShader2D::ColorShader2D() {}
 ColorShader2D::~ColorShader2D() {}
 
