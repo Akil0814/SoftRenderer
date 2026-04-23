@@ -46,9 +46,9 @@ namespace mai
 		std::fill_n(_frame_buffer->_depth_buffer, pixelSize, 1.0f);
 	}
 
-	void GPU::printVAO(uint32_t vaoID)
+	void GPU::printVAO(uint32_t VAO_ID)
 	{
-		auto iter = _VAO_map.find(vaoID);
+		auto iter = _VAO_map.find(VAO_ID);
 		if (iter != _VAO_map.end())
 			iter->second->print();
 	}
@@ -73,27 +73,27 @@ namespace mai
 		_buffer_map.erase(iter);
 	}
 
-	void GPU::bind_buffer(uint32_t buffer_type, uint32_t bufferID)
+	void GPU::bind_buffer(uint32_t buffer_type, uint32_t buffer_ID)
 	{
 		if (buffer_type == MAI_ARRAY_BUFFER)
-			_current_VBO = bufferID;
+			_current_VBO = buffer_ID;
 
 		else if (buffer_type == MAI_ELEMENT_ARRAY_BUFFER)
-			_current_EBO = bufferID;
+			_current_EBO = buffer_ID;
 	}
 
 	void GPU::buffer_data(uint32_t buffer_type, size_t data_size, void* data)
 	{
-		uint32_t bufferID = 0;
+		uint32_t buffer_ID = 0;
 
 		if (buffer_type == MAI_ARRAY_BUFFER)
-			bufferID = _current_VBO;
+			buffer_ID = _current_VBO;
 		else if (buffer_type == MAI_ELEMENT_ARRAY_BUFFER)
-			bufferID = _current_EBO;
+			buffer_ID = _current_EBO;
 		else
 			assert(false);
 
-		auto iter = _buffer_map.find(bufferID);
+		auto iter = _buffer_map.find(buffer_ID);
 		if (iter == _buffer_map.end())
 			assert(false);
 
@@ -134,8 +134,8 @@ namespace mai
 		if (iter == _VAO_map.end())
 			assert(false);
 
-		auto vboIter = _buffer_map.find(_current_VBO);
-		if (vboIter == _buffer_map.end())
+		auto VBO_iter = _buffer_map.find(_current_VBO);
+		if (VBO_iter == _buffer_map.end())
 			assert(false);
 
 		auto vao = iter->second;
@@ -152,25 +152,25 @@ namespace mai
 		if (_current_VAO == 0 || _shader == nullptr || count == 0)
 			return;
 
-		auto vaoIter = _VAO_map.find(_current_VAO);
+		auto VAO_iter = _VAO_map.find(_current_VAO);
 
-		if (vaoIter == _VAO_map.end())
+		if (VAO_iter == _VAO_map.end())
 		{
 			std::cerr << "Error: current vao is invalid!" << std::endl;
 			return;
 		}
 
-		const VertexArrayObject* vao = vaoIter->second;
+		const VertexArrayObject* vao = VAO_iter->second;
 
-		auto eboIter = _buffer_map.find(_current_EBO);
+		auto EBO_iter = _buffer_map.find(_current_EBO);
 
-		if (eboIter == _buffer_map.end())
+		if (EBO_iter == _buffer_map.end())
 		{
 			std::cerr << "Error: current ebo is invalid!" << std::endl;
 			return;
 		}
 
-		const BufferObject* ebo = eboIter->second;
+		const BufferObject* ebo = EBO_iter->second;
 
 		DrawContext context{
 			*_frame_buffer,
@@ -245,9 +245,9 @@ namespace mai
 		return _texture_counter;
 	}
 
-	void GPU::delete_texture(uint32_t tex_id)
+	void GPU::delete_texture(uint32_t tex_ID)
 	{
-		auto iter = _texture_map.find(tex_id);
+		auto iter = _texture_map.find(tex_ID);
 		if (iter != _texture_map.end())
 			delete iter->second;
 		else
@@ -256,9 +256,9 @@ namespace mai
 		_texture_map.erase(iter);
 	}
 
-	void GPU::bind_texture(uint32_t tex_id)
+	void GPU::bind_texture(uint32_t tex_ID)
 	{
-		_current_texture = tex_id;
+		_current_texture = tex_ID;
 	}
 
 	void GPU::tex_image_2D(uint32_t width, uint32_t height, void* data)

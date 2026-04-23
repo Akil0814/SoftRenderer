@@ -7,7 +7,7 @@ namespace mai
 	//VAO之中，用于描述属性读取方式的Description
 	struct BindingDescription
 	{
-		uint32_t	_VBO_id{ 0 };
+		uint32_t	_VBO_ID{ 0 };
 		size_t		_item_size{ 0 };
 		size_t		_stride{ 0 };
 		size_t		_offset{ 0 };

@@ -14,11 +14,11 @@ namespace mai
 		if (iter == _binding_map.end())
 			iter = _binding_map.insert(std::make_pair(binding, BindingDescription())).first;
 
-		BindingDescription& des = iter->second;
-		des._VBO_id = VBO_ID;
-		des._item_size = item_size;
-		des._stride = stride;
-		des._offset = offset;
+		BindingDescription& description = iter->second;
+		description._VBO_ID = VBO_ID;
+		description._item_size = item_size;
+		description._stride = stride;
+		description._offset = offset;
 	}
 
 	std::map<uint32_t, BindingDescription> VertexArrayObject::get_binding_map() const
@@ -32,7 +32,7 @@ namespace mai
 		for (auto& item : _binding_map)
 		{
 			std::cout << "Binding ID:" << item.first << std::endl;
-			std::cout << "----VBO ID:" << item.second._VBO_id << std::endl;
+			std::cout << "----VBO ID:" << item.second._VBO_ID << std::endl;
 			std::cout << "----ItemSize:" << item.second._item_size << std::endl;
 			std::cout << "----Stride:" << item.second._stride << std::endl;
 			std::cout << "----Offset:" << item.second._offset << std::endl;

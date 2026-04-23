@@ -11,9 +11,9 @@ BufferObject::~BufferObject()
 		delete[] _buffer;
 }
 
-void BufferObject::set_buffer_data(size_t dataSize, void* data)
+void BufferObject::set_buffer_data(size_t data_size, void* data)
 {
-	if (_buffer != nullptr && _buffer_size < dataSize)
+	if (_buffer != nullptr && _buffer_size < data_size)
 	{
 		delete[] _buffer;
 		_buffer = nullptr;
@@ -21,11 +21,11 @@ void BufferObject::set_buffer_data(size_t dataSize, void* data)
 
 	if (_buffer == nullptr)
 	{
-		_buffer = new byte[dataSize];
-		_buffer_size = dataSize;
+		_buffer = new byte[data_size];
+		_buffer_size = data_size;
 	}
 
-	memcpy(_buffer, data, dataSize);
+	memcpy(_buffer, data, data_size);
 }
 
 byte* BufferObject::get_buffer() const

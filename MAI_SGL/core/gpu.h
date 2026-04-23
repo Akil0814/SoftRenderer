@@ -31,23 +31,23 @@ public:
 	void clear() noexcept;
 
 	// Debug helper.
-	void printVAO(uint32_t vaoID);
+	void printVAO(uint32_t VAO_ID);
 
 	uint32_t gen_buffer();
 	void delete_buffer(uint32_t buffer_ID);
-	void bind_buffer(uint32_t bufferType, uint32_t bufferID);
-	void buffer_data(uint32_t bufferType, size_t dataSize, void* data);
+	void bind_buffer(uint32_t buffer_type, uint32_t buffer_ID);
+	void buffer_data(uint32_t buffer_type, size_t data_size, void* data);
 
 	uint32_t gen_vertex_array();
 	void delete_vertex_array(uint32_t VAO_ID);
-	void bind_vertex_array(uint32_t vaoID);
+	void bind_vertex_array(uint32_t VAO_ID);
 	void vertex_attribute_pointer(
-		uint32_t binding, size_t itemSize,
+		uint32_t binding, size_t item_size,
 		size_t stride, size_t offset);
 
 	uint32_t get_texture();
-	void delete_texture(uint32_t tex_id);
-	void bind_texture(uint32_t tex_id);
+	void delete_texture(uint32_t tex_ID);
+	void bind_texture(uint32_t tex_ID);
 	void tex_image_2D(uint32_t width, uint32_t height, void* data);
 	void tex_parameter(uint32_t param, uint32_t value);
 
@@ -65,7 +65,7 @@ public:
 	// Depth test
 	void depth_function(uint32_t value);
 
-	void draw_element(uint32_t drawMode, size_t first, size_t count);
+	void draw_element(uint32_t draw_mode, size_t first, size_t count);
 
 private:
 	static GPU* _instance;

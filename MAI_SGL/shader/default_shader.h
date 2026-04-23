@@ -11,8 +11,8 @@ public:
 	~DefaultShader();
 
 	VsOutput vertex_shader(
-		const std::map<uint32_t, BindingDescription>& bindingMap,
-		const std::map<uint32_t, BufferObject*>& bufferMap,
+		const std::map<uint32_t, BindingDescription>& binding_map,
+		const std::map<uint32_t, BufferObject*>& buffer_map,
 		size_t index
 	)override;
 
