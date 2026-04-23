@@ -31,6 +31,7 @@ public:
 	void on_key_up(uint32_t key);
 
 	void update();
+	void set_position(const mai::vec3f& position);
 
 	const mai::mat4f& get_view_matrix() const { return _view_matrix; }
 

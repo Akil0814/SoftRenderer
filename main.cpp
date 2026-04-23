@@ -2,8 +2,6 @@
 #include <chrono>
 #include <Windows.h>
 
-#include "MAIframework/geometry.h"
-
 #include "application/application.h"
 #include "application/camera.h"
 
@@ -27,7 +25,6 @@ uint32_t window_width = 1080;
 uint32_t window_height = 720;
 
 mai::Image* image = nullptr;
-mai::Geometry* test_geometry= nullptr;
 
 uint32_t texture = 0;
 
@@ -46,27 +43,19 @@ mai::TextureShader* texture_shader = nullptr;
 mai::ColorShader* color_shader = nullptr;
 
 mai::mat4f model_matrix;
-mai::mat4f view_matrix;
-mai::mat4f perspective_matrix;
 
 float angle = 0.0f;
-float camera_pos = 5.0f;
-float speed = 0.01;
-
-float camera_z = 3.0f;
 float delta_time = 0.0f;
 float current_fps = 0.0f;
 float smoothed_fps = 0.0f;
 
 constexpr float rotation_speed = 0.6f;
-constexpr float camera_speed = 0.6f;
 constexpr float max_delta_time = 0.1f;
 constexpr float fps_smoothing = 0.1f;
 
 void transform(float delta_time)
 {
 	angle += rotation_speed * delta_time;
-	camera_z -= camera_speed * delta_time;
 	//模型变换
 	model_matrix = mai::rotate(mai::mat4f(1.0f), angle, mai::vec3f{ 0.0f, 1.0f, 0.0f });
 }
@@ -75,14 +64,17 @@ void on_render(float delta_time)
 {
 	transform(delta_time);
 
+	const mai::mat4f& view_matrix = camera->get_view_matrix();
+	const mai::mat4f& projection_matrix = camera->get_projection_matrix();
+
 	texture_shader->_model_matrix = model_matrix;
 	texture_shader->_view_matrix = view_matrix;
-	texture_shader->_projection_matrix = perspective_matrix;
+	texture_shader->_projection_matrix = projection_matrix;
 	texture_shader->_diffuse_texture = texture;
 
 	color_shader->_model_matrix = model_matrix;
 	color_shader->_view_matrix = view_matrix;
-	color_shader->_projection_matrix = perspective_matrix;
+	color_shader->_projection_matrix = projection_matrix;
 
 	MAI_SGL->clear();
 
@@ -95,23 +87,17 @@ void on_render(float delta_time)
 	MAI_SGL->use_program(color_shader);
 	MAI_SGL->draw_element(MAI_DRAW_TRIANGLES, 6, 3);
 
-	//MAI_SGL->bind_vertex_array(test_geometry->get_VAO());
-	//MAI_SGL->bind_buffer(MAI_ELEMENT_ARRAY_BUFFER, test_geometry->get_EBO());
-	//MAI_SGL->use_program(color_shader);
-	//MAI_SGL->draw_element(MAI_DRAW_TRIANGLES, 0, test_geometry->get_indices_count());
-
 }
 
 void prepare()
 {
 
 	camera = new Camera(60.0f, (float)window_width / (float)window_height, 0.1f, 100.0f, { 0.0f, 1.0f, 0.0f });
+	camera->set_position({ 0.0f, 0.0f, 3.0f });
 	MAI_APP->set_camera(camera);
 
 	texture_shader = new mai::TextureShader();
 	color_shader = new mai::ColorShader();
-
-	test_geometry = mai::Geometry::create_box(1.0f);
 
 	image = mai::Image::create_image("assets/textures/mai.png");
 	if (image == nullptr)
@@ -127,14 +113,6 @@ void prepare()
 		MAI_SGL->tex_parameter(MAI_TEXTURE_WRAP_V, MAI_TEXTURE_WRAP_REPEAT);
 		MAI_SGL->bind_texture(0);
 	}
-
-
-	perspective_matrix = mai::perspective(60.0f, (float)window_width / (float)window_height, 0.1f, 100.0f);
-
-	auto camera_model_matrix = mai::translate(mai::mat4f(1.0f), mai::vec3f{ 0.0f, 0.0f, 3.0f });
-	view_matrix = mai::inverse(camera_model_matrix);
-
-
 
 	MAI_SGL->disable(MAI_CULL_FACE);
 	MAI_SGL->enable(MAI_BLENDING);

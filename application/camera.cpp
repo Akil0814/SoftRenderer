@@ -88,6 +88,12 @@ void Camera::on_key_up(uint32_t key)
 	}
 }
 
+void Camera::set_position(const mai::vec3f& position)
+{
+	_position = position;
+	update_view_matrix();
+}
+
 void Camera::update_front()
 {
 	_front.y = static_cast<float>(std::sin(MAI_DEG2RAD(_pitch)));
