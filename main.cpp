@@ -17,6 +17,8 @@
 
 #include "MAI_SGL/math/math.h"
 
+#include "ui/imgui_layer.h"
+
 #pragma comment(linker, "/subsystem:console /entry:wWinMainCRTStartup" )//更改main入口
 
 Camera* camera = nullptr;
@@ -62,8 +64,9 @@ void transform(float delta_time)
 
 void on_render(float delta_time)
 {
+	rend_imgui();
 	transform(delta_time);
-
+	
 	const mai::mat4f& view_matrix = camera->get_view_matrix();
 	const mai::mat4f& projection_matrix = camera->get_projection_matrix();
 
@@ -91,6 +94,7 @@ void on_render(float delta_time)
 
 void prepare()
 {
+	init_imgui_for_MAI_SGL();
 
 	camera = new Camera(60.0f, (float)window_width / (float)window_height, 0.1f, 100.0f, { 0.0f, 1.0f, 0.0f });
 	camera->set_position({ 0.0f, 0.0f, 3.0f });

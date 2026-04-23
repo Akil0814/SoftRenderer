@@ -15,8 +15,9 @@ add_subdirectory(application)
 add_subdirectory(MAI_SGL)
 add_subdirectory(MAIframework)
 add_subdirectory(imgui)
+add_subdirectory(ui)
 
 #本工程所有cpp文件编译链接，生成exe
 add_executable(SoftRenderer "main.cpp")
 
-target_link_libraries(SoftRenderer applicationLib fw MAI_SGL_Lib imguilib)
+target_link_libraries(SoftRenderer applicationLib fw ui MAI_SGL_Lib imguilib)
