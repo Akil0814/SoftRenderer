@@ -1,6 +1,16 @@
-#include "resource/frame_buffer.h"
-#include "shader/shader.h"
+#pragma once
 
+#include <map>
+
+#include "../core/render_state.h"
+#include "../resource/buffer_object.h"
+#include "../resource/frame_buffer.h"
+#include "../resource/texture.h"
+#include "../resource/VAO.h"
+#include "../shader/shader.h"
+
+namespace mai
+{
 
 struct DrawContext
 {
@@ -13,3 +23,5 @@ struct DrawContext
 	const BufferObject& _ebo;
 	const mat4f& _screen_matrix;
 };
+
+}

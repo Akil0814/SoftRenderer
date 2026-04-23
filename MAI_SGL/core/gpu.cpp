@@ -1,6 +1,4 @@
 #include "gpu.h"
-#include "../pipeline/raster.h"
-#include "../pipeline/clipper.h"
 
 #include <algorithm>
 
@@ -33,7 +31,6 @@ namespace mai
 			delete iter.second;
 		}
 		_VAO_map.clear();
-
 	}
 
 	void GPU::init_surface(const uint32_t& width, const uint32_t& height, void* buffer)
@@ -155,7 +152,6 @@ namespace mai
 		if (_current_VAO == 0 || _shader == nullptr || count == 0)
 			return;
 
-		//1 get vao
 		auto vaoIter = _VAO_map.find(_current_VAO);
 
 		if (vaoIter == _VAO_map.end())
@@ -165,9 +161,7 @@ namespace mai
 		}
 
 		const VertexArrayObject* vao = vaoIter->second;
-		auto bindingMap = vao->get_binding_map();
 
-		//2 get ebo
 		auto eboIter = _buffer_map.find(_current_EBO);
 
 		if (eboIter == _buffer_map.end())
@@ -178,203 +172,18 @@ namespace mai
 
 		const BufferObject* ebo = eboIter->second;
 
-		/*
-		* VertexShader处理阶段
-		* 作用：
-		*	按照输入的Ebo的index顺序来处理顶点，依次通过vsShader，
-			得到的输出结果按序放入vsOutputs中
-		*/
-		std::vector<VsOutput> vsOutputs{};
-		vertex_shader_stage(vao, ebo, first, count, vsOutputs);
+		DrawContext context{
+			*_frame_buffer,
+			*_shader,
+			_render_state,
+			_buffer_map,
+			_texture_map,
+			*vao,
+			*ebo,
+			_screen_matrix
+		};
 
-		if (vsOutputs.empty())
-			return;
-
-		/*
-		* Clip Space处理阶段
-		* 作用：
-		*	在剪裁空间，对所有输出的图元进行剪裁拼接等
-		*/
-		std::vector<VsOutput> clipOutputs{};
-		Clipper::do_clip_space(draw_mode, vsOutputs, clipOutputs);
-		if (clipOutputs.empty())
-			return;
-
-		vsOutputs.clear();
-
-		/*
-		* NDC处理阶段
-		* 作用：
-		*	将顶点转化到NDC下
-		*/
-		for (auto& output : clipOutputs)
-		{
-			perspective_division(output);
-		}
-
-		std::vector<VsOutput> cull_outputs = clipOutputs;
-		if (draw_mode == MAI_DRAW_TRIANGLES && _enable_cull_face)
-		{
-			cull_outputs.clear();
-			for (uint32_t i = 0; i < clipOutputs.size() - 2; i += 3)
-			{
-				if (Clipper::cull_face(_front_face, _cull_face, clipOutputs[i], clipOutputs[i + 1], clipOutputs[i + 2]))
-				{
-					auto start = clipOutputs.begin() + i;
-					auto end = clipOutputs.begin() + i + 3;
-					cull_outputs.insert(cull_outputs.end(), start, end);
-				}
-			}
-		}
-
-		/*
-		* 屏幕映射处理阶段
-		* 作用：
-		*	将NDC下的点，通过screenMatrix，转化到屏幕空间
-		*/
-		for (auto& output : cull_outputs)
-		{
-			screen_mapping(output);
-		}
-
-		/*
-		* 光栅化处理阶段
-		* 作用：
-		*	离散出所有需要的Fragment
-		*/
-		std::vector<VsOutput> rasterOutputs;
-		Raster::rasterize(draw_mode, cull_outputs, rasterOutputs);
-
-
-		if (rasterOutputs.empty())
-			return;
-		/*
-		* 透视恢复处理阶段
-		* 作用：
-		*	离散出来的像素插值结果，需要乘以自身的w值恢复到正常态
-		*/
-		for (auto& output : rasterOutputs)
-		{
-			perspective_recover(output);
-		}
-
-
-		/*
-		* 颜色输出处理阶段
-		* 作用：
-		*	 将颜色进行输出
-		*/
-		FsOutput fsOutput;
-		uint32_t pixelPos = 0;
-		for (uint32_t i = 0; i < rasterOutputs.size(); ++i) {
-			_shader->fragment_shader(rasterOutputs[i], fsOutput, _texture_map);
-			pixelPos = fsOutput._pixel_pos.y * _frame_buffer->_width + fsOutput._pixel_pos.x;
-			
-			if (_enable_depth_test && !depth_test(fsOutput))
-				continue;
-
-			RGBA color = fsOutput._color;
-			if (_enable_blending)
-				color = blend(fsOutput);
-			
-			_frame_buffer->_color_buffer[pixelPos] = color;
-		}
-	}
-
-	void GPU::vertex_shader_stage(
-		const VertexArrayObject* vao, const BufferObject* ebo,
-		const uint32_t first, const uint32_t count,
-		std::vector<VsOutput>& vsOutputs)
-	{
-		auto bindingMap = vao->get_binding_map();
-		byte* indicesData = ebo->get_buffer();
-
-		uint32_t index = 0;
-		for (uint32_t i = first; i < first + count; ++i) {
-			//获取Ebo中第i个index
-			size_t indicesOffset = i * sizeof(uint32_t);
-			memcpy(&index, indicesData + indicesOffset, sizeof(uint32_t));
-
-			VsOutput output = _shader->vertex_shader(bindingMap, _buffer_map, index);
-			vsOutputs.push_back(output);
-		}
-	}
-
-	void GPU::perspective_division(VsOutput& vsOutput)
-	{
-		vsOutput._inv_w = 1.0f / vsOutput._position.w;
-
-		vsOutput._position *= vsOutput._inv_w;
-		vsOutput._position.w = 1.0f;
-
-		vsOutput._color *= vsOutput._inv_w;
-		vsOutput._UV *= vsOutput._inv_w;
-
-		trim(vsOutput);
-	}
-
-
-	void GPU::perspective_recover(VsOutput& vsOutput)
-	{
-		vsOutput._color /= vsOutput._inv_w;
-		vsOutput._UV /= vsOutput._inv_w;
-	}
-
-	void GPU::screen_mapping(VsOutput& vsOutput)
-	{
-		vsOutput._position = _screen_matrix * vsOutput._position;
-	}
-
-	void GPU::trim(VsOutput& vsOutput)
-	{
-		////修剪毛刺
-		if (vsOutput._position.x < -1.0f)
-			vsOutput._position.x = -1.0f;
-
-		if (vsOutput._position.x > 1.0f)
-			vsOutput._position.x = 1.0f;
-
-		if (vsOutput._position.y < -1.0f)
-			vsOutput._position.y = -1.0f;
-
-		if (vsOutput._position.y > 1.0f)
-			vsOutput._position.y = 1.0f;
-
-		if (vsOutput._position.z < -1.0f)
-			vsOutput._position.z = -1.0f;
-
-		if (vsOutput._position.z > 1.0f)
-			vsOutput._position.z = 1.0f;
-	}
-
-	bool GPU::depth_test(const FsOutput& output)
-	{
-		uint32_t pixelPos = output._pixel_pos.y * _frame_buffer->_width + output._pixel_pos.x;
-		float oldDepth = _frame_buffer->_depth_buffer[pixelPos];
-		switch (_depth_function)
-		{
-		case MAI_DEPTH_LESS:
-			if (output._depth < oldDepth) {
-				_frame_buffer->_depth_buffer[pixelPos] = output._depth;
-				return true;
-			}
-			else {
-				return false;
-			}
-			break;
-		case MAI_DEPTH_GREATER:
-			if (output._depth > oldDepth) {
-				_frame_buffer->_depth_buffer[pixelPos] = output._depth;
-				return true;
-			}
-			else {
-				return false;
-			}
-			break;
-		default:
-			return false;
-			break;
-		}
+		_draw_pipeline.draw_elements(context, draw_mode, first, count);
 	}
 
 	void GPU::enable(const uint32_t& value)
@@ -382,13 +191,13 @@ namespace mai
 		switch (value)
 		{
 		case MAI_CULL_FACE:
-			_enable_cull_face = true;
+			_render_state._enable_cull_face = true;
 			break;
 		case MAI_DEPTH_TEST:
-			_enable_depth_test = true;
+			_render_state._enable_depth_test = true;
 			break;
 		case MAI_BLENDING:
-			_enable_blending = true;
+			_render_state._enable_blending = true;
 			break;
 		default:
 			break;
@@ -400,50 +209,32 @@ namespace mai
 		switch (value)
 		{
 		case MAI_CULL_FACE:
-			_enable_cull_face = false;
+			_render_state._enable_cull_face = false;
 			break;
 		case MAI_DEPTH_TEST:
-			_enable_depth_test = false;
+			_render_state._enable_depth_test = false;
 			break;
 		case MAI_BLENDING:
-			_enable_blending = false;
+			_render_state._enable_blending = false;
 			break;
 		default:
 			break;
 		}
 	}
 
-	RGBA GPU::blend(const FsOutput& output)
-	{
-		RGBA result;
-
-		uint32_t pixelPos = output._pixel_pos.y * _frame_buffer->_width + output._pixel_pos.x;
-		RGBA dst = _frame_buffer->_color_buffer[pixelPos];
-		RGBA src = output._color;
-
-		float weight = static_cast<float>(src._A) / 255.0f;
-
-		result._R = static_cast<float>(src._R) * weight + static_cast<float>(dst._R) * (1.0f - weight);
-		result._G = static_cast<float>(src._G) * weight + static_cast<float>(dst._G) * (1.0f - weight);
-		result._B = static_cast<float>(src._B) * weight + static_cast<float>(dst._B) * (1.0f - weight);
-		result._A = static_cast<float>(src._A) * weight + static_cast<float>(dst._A) * (1.0f - weight);
-
-		return result;
-	}
-
 	void GPU::front_face(const uint32_t& value)
 	{
-		_front_face = value;
+		_render_state._front_face = static_cast<uint8_t>(value);
 	}
 
 	void GPU::cull_face(const uint32_t& value)
 	{
-		_cull_face = value;
+		_render_state._cull_face = static_cast<uint8_t>(value);
 	}
 
 	void GPU::depth_function(const uint32_t& value)
 	{
-		_depth_function = value;
+		_render_state._depth_function = static_cast<uint8_t>(value);
 	}
 
 	uint32_t GPU::get_texture()
@@ -485,7 +276,7 @@ namespace mai
 
 	void GPU::tex_parameter(const uint32_t& param, const uint32_t& value)
 	{
-		if (!_current_texture) 
+		if (!_current_texture)
 			return;
 
 		auto iter = _texture_map.find(_current_texture);
@@ -498,6 +289,6 @@ namespace mai
 
 	void GPU::draw_mod(const uint32_t& value)
 	{
-		_draw_mod = value;
+		_render_state._draw_mode = static_cast<uint8_t>(value);
 	}
 }
