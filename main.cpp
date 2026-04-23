@@ -1,14 +1,20 @@
 #include <iostream>
 #include <Windows.h>
 
+#include "MAIframework/geometry.h"
+
 #include "application/application.h"
-#include "application/image.h"
 
 #include "MAI_SGL/data_structures.h"
+
 #include "MAI_SGL/shader/default_shader.h"
 #include "MAI_SGL/shader/texture_shader.h"
+
 #include "MAI_SGL/core/gpu.h"
+
 #include "MAI_SGL/resource/texture.h"
+#include "MAI_SGL/resource/image.h"
+
 #include "MAI_SGL/math/math.h"
 
 #pragma comment(linker, "/subsystem:console /entry:wWinMainCRTStartup" )//更改main入口
@@ -82,6 +88,7 @@ void prepare()
 	textureShader = new mai::TextureShader();
 	defaultShader = new mai::DefaultShader();
 
+	//mai::Geometry g = mai::Geometry::create_box(1.0f);
 
 	image = mai::Image::create_image("assets/textures/mai.png");
 	if (image == nullptr)

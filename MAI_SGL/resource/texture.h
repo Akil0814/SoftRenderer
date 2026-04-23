@@ -11,12 +11,12 @@ public:
 	~Texture();
 
 	//默认都是rgba格式
-	void set_buffer_data(const uint32_t& width, const uint32_t& height, void* data);
+	void set_buffer_data(uint32_t width, uint32_t height, void* data);
 	mai::vec4f get_color(float u, float v);
-	void set_parameter(const uint32_t& type, const uint32_t& value);
+	void set_parameter(uint32_t type, uint32_t value);
 
 private:
-	void check_wrap(float& n, const uint32_t& type);
+	void check_wrap(float& n, uint32_t type);
 
 private:
 	RGBA* _buffer{ nullptr };

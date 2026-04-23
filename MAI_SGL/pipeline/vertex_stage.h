@@ -13,7 +13,7 @@ namespace mai
 class VertexStage
 {
 public:
-	void run(const DrawContext& context, const uint32_t& first, const uint32_t& count,
+	void run(const DrawContext& context, size_t first, size_t count,
 		std::vector<VsOutput>& vs_outputs) const;
 };
 

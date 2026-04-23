@@ -5,7 +5,7 @@ namespace mai
 {
 
 	void Raster::rasterize(
-		const uint32_t& draw_mode, const std::vector<VertexShaderOutput>& inputs,
+		uint32_t draw_mode, const std::vector<VertexShaderOutput>& inputs,
 		std::vector<VertexShaderOutput>& results)
 	{
 		if (draw_mode == MAI_DRAW_LINES)

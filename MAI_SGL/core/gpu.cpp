@@ -33,7 +33,7 @@ namespace mai
 		_VAO_map.clear();
 	}
 
-	void GPU::init_surface(const uint32_t& width, const uint32_t& height, void* buffer)
+	void GPU::init_surface(uint32_t width, uint32_t height, void* buffer)
 	{
 		_frame_buffer = new FrameBuffer(width, height, buffer);
 		_screen_matrix = screen_matrix<float>(width - 1, height - 1);
@@ -46,7 +46,7 @@ namespace mai
 		std::fill_n(_frame_buffer->_depth_buffer, pixelSize, 1.0f);
 	}
 
-	void GPU::printVAO(const uint32_t& vaoID)
+	void GPU::printVAO(uint32_t vaoID)
 	{
 		auto iter = _VAO_map.find(vaoID);
 		if (iter != _VAO_map.end())
@@ -61,7 +61,7 @@ namespace mai
 		return _buffer_counter;
 	}
 
-	void GPU::delete_buffer(const uint32_t& buffer_ID)
+	void GPU::delete_buffer(uint32_t buffer_ID)
 	{
 		auto iter = _buffer_map.find(buffer_ID);
 
@@ -73,7 +73,7 @@ namespace mai
 		_buffer_map.erase(iter);
 	}
 
-	void GPU::bind_buffer(const uint32_t& buffer_type, const uint32_t& bufferID)
+	void GPU::bind_buffer(uint32_t buffer_type, uint32_t bufferID)
 	{
 		if (buffer_type == MAI_ARRAY_BUFFER)
 			_current_VBO = bufferID;
@@ -82,7 +82,7 @@ namespace mai
 			_current_EBO = bufferID;
 	}
 
-	void GPU::buffer_data(const uint32_t& buffer_type, size_t data_size, void* data)
+	void GPU::buffer_data(uint32_t buffer_type, size_t data_size, void* data)
 	{
 		uint32_t bufferID = 0;
 
@@ -109,7 +109,7 @@ namespace mai
 		return _VAO_counter;
 	}
 
-	void GPU::delete_vertex_array(const uint32_t& VAO_ID)
+	void GPU::delete_vertex_array(uint32_t VAO_ID)
 	{
 		auto iter = _VAO_map.find(VAO_ID);
 
@@ -121,14 +121,14 @@ namespace mai
 		_VAO_map.erase(iter);
 	}
 
-	void GPU::bind_vertex_array(const uint32_t& VAO_ID)
+	void GPU::bind_vertex_array(uint32_t VAO_ID)
 	{
 		_current_VAO = VAO_ID;
 	}
 
 	void GPU::vertex_attribute_pointer(
-		const uint32_t& binding, const uint32_t& item_size,
-		const uint32_t& stride, const uint32_t& offset)
+		uint32_t binding, size_t item_size,
+		size_t stride, size_t offset)
 	{
 		auto iter = _VAO_map.find(_current_VAO);
 		if (iter == _VAO_map.end())
@@ -147,7 +147,7 @@ namespace mai
 		_shader = shader;
 	}
 
-	void GPU::draw_element(const uint32_t& draw_mode, const uint32_t& first, const uint32_t& count)
+	void GPU::draw_element(uint32_t draw_mode, size_t first, size_t count)
 	{
 		if (_current_VAO == 0 || _shader == nullptr || count == 0)
 			return;
@@ -186,7 +186,7 @@ namespace mai
 		_draw_pipeline.draw_elements(context, draw_mode, first, count);
 	}
 
-	void GPU::enable(const uint32_t& value)
+	void GPU::enable(uint32_t value)
 	{
 		switch (value)
 		{
@@ -204,7 +204,7 @@ namespace mai
 		}
 	}
 
-	void GPU::disable(const uint32_t& value)
+	void GPU::disable(uint32_t value)
 	{
 		switch (value)
 		{
@@ -222,17 +222,17 @@ namespace mai
 		}
 	}
 
-	void GPU::front_face(const uint32_t& value)
+	void GPU::front_face(uint32_t value)
 	{
 		_render_state._front_face = static_cast<uint8_t>(value);
 	}
 
-	void GPU::cull_face(const uint32_t& value)
+	void GPU::cull_face(uint32_t value)
 	{
 		_render_state._cull_face = static_cast<uint8_t>(value);
 	}
 
-	void GPU::depth_function(const uint32_t& value)
+	void GPU::depth_function(uint32_t value)
 	{
 		_render_state._depth_function = static_cast<uint8_t>(value);
 	}
@@ -245,7 +245,7 @@ namespace mai
 		return _texture_counter;
 	}
 
-	void GPU::delete_texture(const uint32_t& tex_id)
+	void GPU::delete_texture(uint32_t tex_id)
 	{
 		auto iter = _texture_map.find(tex_id);
 		if (iter != _texture_map.end())
@@ -256,12 +256,12 @@ namespace mai
 		_texture_map.erase(iter);
 	}
 
-	void GPU::bind_texture(const uint32_t& tex_id)
+	void GPU::bind_texture(uint32_t tex_id)
 	{
 		_current_texture = tex_id;
 	}
 
-	void GPU::tex_image_2D(const uint32_t& width, const uint32_t& height, void* data)
+	void GPU::tex_image_2D(uint32_t width, uint32_t height, void* data)
 	{
 		if (!_current_texture)
 			return;
@@ -274,7 +274,7 @@ namespace mai
 		texture->set_buffer_data(width, height, data);
 	}
 
-	void GPU::tex_parameter(const uint32_t& param, const uint32_t& value)
+	void GPU::tex_parameter(uint32_t param, uint32_t value)
 	{
 		if (!_current_texture)
 			return;
@@ -287,7 +287,7 @@ namespace mai
 		texture->set_parameter(param, value);
 	}
 
-	void GPU::draw_mod(const uint32_t& value)
+	void GPU::draw_mod(uint32_t value)
 	{
 		_render_state._draw_mode = static_cast<uint8_t>(value);
 	}

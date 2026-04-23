@@ -16,12 +16,12 @@ public:
 	Shader() {}
 	~Shader() {}
 	virtual VsOutput vertex_shader(
-		//VAO当中的bindingMap
+		//VAO褰撲腑鐨刡indingMap
 		const std::map<uint32_t, BindingDescription>& bindingMap,
-		//VBO当中的bindingMap
+		//VBO褰撲腑鐨刡indingMap
 		const std::map<uint32_t, BufferObject*>& bufferMap,
-		//当前要处理的顶点的index
-		const uint32_t& index
+		//褰撳墠瑕佸鐞嗙殑椤剁偣鐨刬ndex
+		size_t index
 	) = 0;
 
 	virtual void fragment_shader(const VsOutput& input, FsOutput& output,
@@ -32,8 +32,8 @@ public:
 	vec4f get_vector(
 		const std::map<uint32_t, BindingDescription>& bindingMap,
 		const std::map<uint32_t, BufferObject*>& bufferMap,
-		const uint32_t& attributeLocation,//当前属性的编号
-		const uint32_t& index);//当前顶点编号
+		uint32_t attributeLocation,//褰撳墠灞炴€х殑缂栧彿
+		size_t index);//褰撳墠椤剁偣缂栧彿
 
 	RGBA vector_to_RGBA(const vec4f& v) {
 		RGBA color;
@@ -47,4 +47,3 @@ public:
 };
 
 }
-

@@ -6,8 +6,8 @@ namespace mai
 {
 
 	void DrawPipeline::draw_elements(
-		const DrawContext& context, const uint32_t& draw_mode,
-		const uint32_t& first, const uint32_t& count) const
+		const DrawContext& context, uint32_t draw_mode,
+		size_t first, size_t count) const
 	{
 		std::vector<VsOutput> vs_outputs{};
 		_vertex_stage.run(context, first, count, vs_outputs);

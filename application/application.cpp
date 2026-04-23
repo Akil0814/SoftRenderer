@@ -28,7 +28,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)/
 {	return Application::instance()->handle_message(hWnd, message, wParam, lParam);	}
 
 //HINSTANCE hInstance 本应用程序实例句柄，唯一指代当前程序
-bool Application::init(HINSTANCE hInstance, const uint32_t& width, const uint32_t& height)
+bool Application::init(HINSTANCE hInstance, uint32_t width, uint32_t height)
 {
 	_width = width;
 	_height = height;

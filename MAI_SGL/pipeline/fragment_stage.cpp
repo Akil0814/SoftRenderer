@@ -6,11 +6,11 @@ namespace mai
 	void FragmentStage::run(const DrawContext& context, const std::vector<VsOutput>& raster_outputs) const
 	{
 		FsOutput fs_output;
-		uint32_t pixel_pos = 0;
-		for (uint32_t i = 0; i < raster_outputs.size(); ++i)
+		size_t pixel_pos = 0;
+		for (size_t i = 0; i < raster_outputs.size(); ++i)
 		{
 			context._shader.fragment_shader(raster_outputs[i], fs_output, context._texture_map);
-			pixel_pos = fs_output._pixel_pos.y * context._frame_buffer._width + fs_output._pixel_pos.x;
+			pixel_pos = static_cast<size_t>(fs_output._pixel_pos.y) * context._frame_buffer._width + static_cast<size_t>(fs_output._pixel_pos.x);
 
 			if (context._state._enable_depth_test && !depth_test(context, fs_output))
 				continue;
@@ -25,7 +25,7 @@ namespace mai
 
 	bool FragmentStage::depth_test(const DrawContext& context, const FsOutput& output) const
 	{
-		uint32_t pixel_pos = output._pixel_pos.y * context._frame_buffer._width + output._pixel_pos.x;
+		size_t pixel_pos = static_cast<size_t>(output._pixel_pos.y) * context._frame_buffer._width + static_cast<size_t>(output._pixel_pos.x);
 		float old_depth = context._frame_buffer._depth_buffer[pixel_pos];
 		switch (context._state._depth_function)
 		{
@@ -52,7 +52,7 @@ namespace mai
 	{
 		RGBA result;
 
-		uint32_t pixel_pos = output._pixel_pos.y * context._frame_buffer._width + output._pixel_pos.x;
+		size_t pixel_pos = static_cast<size_t>(output._pixel_pos.y) * context._frame_buffer._width + static_cast<size_t>(output._pixel_pos.x);
 		RGBA dst = context._frame_buffer._color_buffer[pixel_pos];
 		RGBA src = output._color;
 

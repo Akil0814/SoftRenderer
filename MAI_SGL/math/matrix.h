@@ -73,13 +73,13 @@ namespace mai
 			);
 		}
 
-		[[nodiscard]] inline T get(uint32_t row, uint32_t col) const noexcept
+		[[nodiscard]] inline T get(size_t row, size_t col) const noexcept
 		{
 			assert(row < 3 && col < 3);
 			return m[col * 3 + row];
 		}
 
-		inline void set(uint32_t row, uint32_t col, T t) noexcept
+		inline void set(size_t row, size_t col, T t) noexcept
 		{
 			assert(row < 3 && col < 3);
 			m[col * 3 + row] = t;
@@ -116,13 +116,13 @@ namespace mai
 			);
 		}
 
-		[[nodiscard]] Vector3<T> get_column(uint32_t col) const noexcept
+		[[nodiscard]] Vector3<T> get_column(size_t col) const noexcept
 		{
 			assert(col < 3);
 			return Vector3<T>(m[col * 3], m[col * 3 + 1], m[col * 3 + 2]);
 		}
 
-		inline void set_column(const Vector3<T>& c_value, uint32_t col) noexcept
+		inline void set_column(const Vector3<T>& c_value, size_t col) noexcept
 		{
 			assert(col < 3);
 			m[col * 3] = c_value.x; m[col * 3 + 1] = c_value.y; m[col * 3 + 2] = c_value.z;
@@ -198,13 +198,13 @@ namespace mai
 			);
 		}
 
-		[[nodiscard]] inline T get(uint32_t row, uint32_t col) const noexcept
+		[[nodiscard]] inline T get(size_t row, size_t col) const noexcept
 		{
 			assert(row < 4 && col < 4);
 			return m[col * 4 + row];
 		}
 
-		inline void set(uint32_t row,uint32_t col, T t) noexcept
+		inline void set(size_t row, size_t col, T t) noexcept
 		{
 			assert(row < 4 && col < 4);
 			m[col * 4 + row] = t;
@@ -244,7 +244,7 @@ namespace mai
 			);
 		}
 
-		[[nodiscard]] inline Vector4<T> get_column(uint32_t col) const noexcept
+		[[nodiscard]] inline Vector4<T> get_column(size_t col) const noexcept
 		{
 			assert(col < 4);
 			return Vector4<T>(
@@ -254,7 +254,7 @@ namespace mai
 				m[col * 4 + 3]);
 		}
 
-		inline void set_column(const Vector4<T>& cvalue, uint32_t col) noexcept
+		inline void set_column(const Vector4<T>& cvalue, size_t col) noexcept
 		{
 			assert(col < 4);
 			m[col * 4] = cvalue.x;

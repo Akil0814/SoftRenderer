@@ -5,7 +5,7 @@
 namespace mai
 {
 
-	Image::Image(const uint32_t& width, const uint32_t& height, RGBA* data)
+	Image::Image(uint32_t width, uint32_t height, RGBA* data)
 		:_width(width),_height(height), _data(nullptr)
 	{
 		if (data)

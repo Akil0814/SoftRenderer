@@ -279,7 +279,7 @@ namespace mai
 
 	//屏幕空间变换函数
 	template<typename T>
-	[[nodiscard]] Matrix4x4<T> screen_matrix(const uint32_t& width, const uint32_t& height)noexcept
+	[[nodiscard]] Matrix4x4<T> screen_matrix(uint32_t width, uint32_t height)noexcept
 	{
 		Matrix4x4<T> result(static_cast<T>(1));
 

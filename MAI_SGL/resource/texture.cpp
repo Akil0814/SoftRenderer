@@ -14,7 +14,7 @@ Texture::~Texture()
 	}
 }
 
-void Texture::set_buffer_data(const uint32_t& width,const uint32_t& height,void* data)
+void Texture::set_buffer_data(uint32_t width, uint32_t height, void* data)
 {
 	if (_buffer != nullptr)
 	{
@@ -92,7 +92,7 @@ mai::vec4f Texture::get_color(float u, float v)
 	return result;
 }
 
-void Texture::check_wrap(float& n, const uint32_t& type)
+void Texture::check_wrap(float& n, uint32_t type)
 {
 	if (n > 1.0f || n < 0.0f)
 	{
@@ -113,7 +113,7 @@ void Texture::check_wrap(float& n, const uint32_t& type)
 
 }
 
-void Texture::set_parameter(const uint32_t& type, const uint32_t& value)
+void Texture::set_parameter(uint32_t type, uint32_t value)
 {
 	switch (type)
 	{

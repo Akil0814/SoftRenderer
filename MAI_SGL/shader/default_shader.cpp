@@ -8,15 +8,15 @@ namespace mai {
 	VsOutput DefaultShader::vertex_shader(
 		const std::map<uint32_t, BindingDescription>& bindingMap,
 		const std::map<uint32_t, BufferObject*>& bufferMap,
-		const uint32_t& index
+		size_t index
 	)
 	{
 		VsOutput output;
 
-		//取出Attribute数值
+		//鍙栧嚭Attribute鏁板€?
 		vec4f position = get_vector(bindingMap, bufferMap, 0, index);
 
-		//变化为齐次坐标 
+		//鍙樺寲涓洪綈娆″潗鏍?
 		position.w = 1.0f;
 
 		vec4f color = get_vector(bindingMap, bufferMap, 1, index);

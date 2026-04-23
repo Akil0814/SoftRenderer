@@ -12,8 +12,8 @@ namespace mai
 class DrawPipeline
 {
 public:
-	void draw_elements(const DrawContext& context, const uint32_t& draw_mode,
-		const uint32_t& first, const uint32_t& count) const;
+	void draw_elements(const DrawContext& context, uint32_t draw_mode,
+		size_t first, size_t count) const;
 
 private:
 	VertexStage _vertex_stage;

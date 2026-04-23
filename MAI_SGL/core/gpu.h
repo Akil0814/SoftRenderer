@@ -25,47 +25,47 @@ public:
 	~GPU() noexcept;
 
 	// Initialize the framebuffer surface.
-	void init_surface(const uint32_t& width, const uint32_t& height, void* buffer = nullptr);
+	void init_surface(uint32_t width, uint32_t height, void* buffer = nullptr);
 
 	// Clear color and depth buffers.
 	void clear() noexcept;
 
 	// Debug helper.
-	void printVAO(const uint32_t& vaoID);
+	void printVAO(uint32_t vaoID);
 
 	uint32_t gen_buffer();
-	void delete_buffer(const uint32_t& buffer_ID);
-	void bind_buffer(const uint32_t& bufferType, const uint32_t& bufferID);
-	void buffer_data(const uint32_t& bufferType, size_t dataSize, void* data);
+	void delete_buffer(uint32_t buffer_ID);
+	void bind_buffer(uint32_t bufferType, uint32_t bufferID);
+	void buffer_data(uint32_t bufferType, size_t dataSize, void* data);
 
 	uint32_t gen_vertex_array();
-	void delete_vertex_array(const uint32_t& VAO_ID);
-	void bind_vertex_array(const uint32_t& vaoID);
+	void delete_vertex_array(uint32_t VAO_ID);
+	void bind_vertex_array(uint32_t vaoID);
 	void vertex_attribute_pointer(
-		const uint32_t& binding, const uint32_t& itemSize,
-		const uint32_t& stride, const uint32_t& offset);
+		uint32_t binding, size_t itemSize,
+		size_t stride, size_t offset);
 
 	uint32_t get_texture();
-	void delete_texture(const uint32_t& tex_id);
-	void bind_texture(const uint32_t& tex_id);
-	void tex_image_2D(const uint32_t& width, const uint32_t& height, void* data);
-	void tex_parameter(const uint32_t& param, const uint32_t& value);
+	void delete_texture(uint32_t tex_id);
+	void bind_texture(uint32_t tex_id);
+	void tex_image_2D(uint32_t width, uint32_t height, void* data);
+	void tex_parameter(uint32_t param, uint32_t value);
 
 	void use_program(Shader* shader);
 
-	void enable(const uint32_t& value);
-	void disable(const uint32_t& value);
+	void enable(uint32_t value);
+	void disable(uint32_t value);
 
-	void draw_mod(const uint32_t& value);
+	void draw_mod(uint32_t value);
 
 	// Cull face
-	void front_face(const uint32_t& value);
-	void cull_face(const uint32_t& value);
+	void front_face(uint32_t value);
+	void cull_face(uint32_t value);
 
 	// Depth test
-	void depth_function(const uint32_t& value);
+	void depth_function(uint32_t value);
 
-	void draw_element(const uint32_t& drawMode, const uint32_t& first, const uint32_t& count);
+	void draw_element(uint32_t drawMode, size_t first, size_t count);
 
 private:
 	static GPU* _instance;

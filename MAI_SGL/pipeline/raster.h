@@ -14,7 +14,7 @@ public:
 
 public:
 	static void rasterize(
-		const uint32_t& draw_mode, const std::vector<VertexShaderOutput>& inputs,
+		uint32_t draw_mode, const std::vector<VertexShaderOutput>& inputs,
 		std::vector<VertexShaderOutput>& results );
 
 private:

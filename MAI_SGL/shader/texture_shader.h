@@ -14,7 +14,7 @@ public:
 	VsOutput vertex_shader(
 		const std::map<uint32_t, BindingDescription>& bindingMap,
 		const std::map<uint32_t, BufferObject*>& bufferMap,
-		const uint32_t& index
+		size_t index
 	)override;
 
 	void fragment_shader(const VsOutput& input, FsOutput& output, const std::map<uint32_t, Texture*>& textures)override;
