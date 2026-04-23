@@ -57,6 +57,8 @@ public:
 	void enable(const uint32_t& value);
 	void disable(const uint32_t& value);
 
+	void draw_mod(const uint32_t& value);
+
 	//cull face
 	void front_face(const uint32_t& value);
 	void cull_face(const uint32_t& value);
@@ -68,6 +70,7 @@ public:
 
 
 private:
+
 	void vertex_shader_stage(
 		const VertexArrayObject* vao, const BufferObject* ebo,
 		const uint32_t first, const uint32_t count,
@@ -82,6 +85,17 @@ private:
 	bool depth_test(const FsOutput& fsOutput);
 
 	RGBA blend(const FsOutput& output);
+
+private:
+	//状态
+	bool _enable_cull_face{ true };
+	bool _enable_blending{ true };
+	bool _enable_depth_test{ true };
+
+	uint32_t _front_face{ MAI_FRONT_FACE_CCW };
+	uint32_t _cull_face{ MAI_BACK_FACE };
+	uint32_t _depth_function{ MAI_DEPTH_LESS };
+	uint32_t _draw_mod{ MAI_DRAW_3D };
 
 private:
 	static GPU* _instance;
@@ -100,15 +114,6 @@ private:
 
 	Shader* _shader { nullptr };
 	mai::mat4f _screen_matrix;
-
-	bool _enable_cull_face{ true };
-	uint32_t _front_face{ MAI_FRONT_FACE_CCW };
-	uint32_t _cull_face{ MAI_BACK_FACE };
-
-	bool _enable_depth_test{ true };
-	uint32_t _depth_function{ MAI_DEPTH_LESS };
-
-	bool _enable_blending{ true };
 
 	uint32_t _current_texture{ 0 };
 	uint32_t _texture_counter{ 0 };

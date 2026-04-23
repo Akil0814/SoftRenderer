@@ -14,6 +14,9 @@
 #define MAI_TRUE 1
 #define MAI_FALSE 0
 
+#define MAI_DRAW_2D 0
+#define MAI_DRAW_3D 1
+
 //纹理属性
 #define MAI_TEXTURE_WRAP_REPEAT 0
 #define MAI_TEXTURE_WRAP_MIRROR 1

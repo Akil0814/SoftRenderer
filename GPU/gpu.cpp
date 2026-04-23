@@ -232,7 +232,8 @@ namespace mai
 		* 作用：
 		*	将NDC下的点，通过screenMatrix，转化到屏幕空间
 		*/
-		for (auto& output : cull_outputs) {
+		for (auto& output : cull_outputs)
+		{
 			screen_mapping(output);
 		}
 
@@ -247,8 +248,6 @@ namespace mai
 
 		if (rasterOutputs.empty())
 			return;
-
-
 		/*
 		* 透视恢复处理阶段
 		* 作用：
@@ -495,5 +494,10 @@ namespace mai
 
 		Texture* texture = iter->second;
 		texture->set_parameter(param, value);
+	}
+
+	void GPU::draw_mod(const uint32_t& value)
+	{
+		_draw_mod = value;
 	}
 }
