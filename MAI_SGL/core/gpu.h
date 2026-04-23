@@ -56,7 +56,7 @@ public:
 	void enable(uint8_t value);
 	void disable(uint8_t value);
 
-	void draw_mode(uint8_t value);
+	void draw_dimension(uint8_t value);
 
 	// Cull face
 	void front_face(uint8_t value);

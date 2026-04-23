@@ -1,4 +1,5 @@
 #include <iostream>
+#include <chrono>
 #include <Windows.h>
 
 #include "MAIframework/geometry.h"
@@ -51,18 +52,26 @@ float cameraPos = 5.0f;
 float speed = 0.01;
 
 float camera_z = 3.0f;
+float deltaTime = 0.0f;
+float currentFPS = 0.0f;
+float smoothedFPS = 0.0f;
 
-void transform()
+constexpr float kRotationSpeed = 0.6f;
+constexpr float kCameraSpeed = 0.6f;
+constexpr float kMaxDeltaTime = 0.1f;
+constexpr float kFpsSmoothing = 0.1f;
+
+void transform(float delta_time)
 {
-	angle += 0.01f;
-	camera_z -= 0.01f;
+	angle += kRotationSpeed * delta_time;
+	camera_z -= kCameraSpeed * delta_time;
 	//模型变换
 	modelMatrix = mai::rotate(mai::mat4f(1.0f), angle, mai::vec3f{ 0.0f, 1.0f, 0.0f });
 }
 
-void on_render()
+void on_render(float delta_time)
 {
-	transform();
+	transform(delta_time);
 
 	textureShader->_model_matrix = modelMatrix;
 	textureShader->_view_matrix = viewMatrix;
@@ -212,10 +221,29 @@ int APIENTRY wWinMain(
 
 
 	bool active = true;
+	using Clock = std::chrono::steady_clock;
+	auto previous_frame_time = Clock::now();
 	while (active)
 	{
+		auto current_frame_time = Clock::now();
+		std::chrono::duration<float> frame_duration = current_frame_time - previous_frame_time;
+		previous_frame_time = current_frame_time;
+
+		deltaTime = frame_duration.count();
+		if (deltaTime > kMaxDeltaTime)
+			deltaTime = kMaxDeltaTime;
+
+		if (deltaTime > 0.0f)
+		{
+			currentFPS = 1.0f / deltaTime;
+			if (smoothedFPS <= 0.0f)
+				smoothedFPS = currentFPS;
+			else
+				smoothedFPS += (currentFPS - smoothedFPS) * kFpsSmoothing;
+		}
+
 		active = MAI_APP->peek_message();
-		on_render();
+		on_render(deltaTime);
 		MAI_APP->show();
 	}
 

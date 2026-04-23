@@ -10,9 +10,9 @@ namespace mai
 		const DrawContext& context, uint8_t draw_mode,
 		const std::vector<VsOutput>& vs_outputs, std::vector<VsOutput>& raster_outputs) const
 	{
-		if (context._state._draw_mode == MAI_DRAW_3D)
+		if (context._state._draw_dimension == MAI_DRAW_3D)
 			run_3D(context, draw_mode, vs_outputs, raster_outputs);
-		else if (context._state._draw_mode == MAI_DRAW_2D)
+		else if (context._state._draw_dimension == MAI_DRAW_2D)
 			run_2D(context, draw_mode, vs_outputs, raster_outputs);
 		else
 			return;
@@ -69,6 +69,20 @@ namespace mai
 	void  PrimitiveStage::run_2D(const DrawContext& context, uint8_t draw_mode,
 		const std::vector<VsOutput>& vs_outputs, std::vector<VsOutput>& raster_outputs) const
 	{
+		std::vector<VsOutput> clip_outputs{};
+		Clipper::do_clip_space(draw_mode, vs_outputs, clip_outputs);
+		if (clip_outputs.empty())
+			return;
+
+		for (auto& output : clip_outputs)
+		{
+			screen_mapping(context, output);
+		}
+
+		Raster::rasterize(draw_mode, clip_outputs, raster_outputs);
+
+		if (raster_outputs.empty())
+			return;
 
 	}
 

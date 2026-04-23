@@ -287,8 +287,8 @@ namespace mai
 		texture->set_parameter(param, value);
 	}
 
-	void GPU::draw_mode(uint8_t value)
+	void GPU::draw_dimension(uint8_t value)
 	{
-		_render_state._draw_mode = value;
+		_render_state._draw_dimension = value;
 	}
 }

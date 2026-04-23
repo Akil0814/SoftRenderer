@@ -49,6 +49,9 @@ void Clipper::do_clip_space(uint8_t draw_mode, const std::vector<VsOutput>& prim
 			primitive.assign(start, end);
 			Clipper::sutherland_hodgman(draw_mode, primitive, results);
 
+			if (results.size() < 2)
+				continue;
+
 			outputs.push_back(results[0]);
 			outputs.push_back(results[1]);
 		}
