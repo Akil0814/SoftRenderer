@@ -5,6 +5,7 @@
 #include "MAIframework/geometry.h"
 
 #include "application/application.h"
+#include "application/camera.h"
 
 #include "MAI_SGL/data_structures.h"
 
@@ -20,6 +21,7 @@
 
 #pragma comment(linker, "/subsystem:console /entry:wWinMainCRTStartup" )//更改main入口
 
+Camera* camera = nullptr;
 
 uint32_t window_width = 1080;
 uint32_t window_height = 720;
@@ -102,6 +104,9 @@ void on_render(float delta_time)
 
 void prepare()
 {
+
+	camera = new Camera(60.0f, (float)window_width / (float)window_height, 0.1f, 100.0f, { 0.0f, 1.0f, 0.0f });
+
 	texture_shader = new mai::TextureShader();
 	color_shader = new mai::ColorShader();
 
@@ -243,6 +248,7 @@ int APIENTRY wWinMain(
 		}
 
 		active = MAI_APP->peek_message();
+		camera->update();
 		on_render(delta_time);
 		MAI_APP->show();
 	}

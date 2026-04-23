@@ -1,5 +1,6 @@
 #pragma once
 #include "../MAI_SGL/base.h"
+#include "camera.h"
 #include<Windows.h>
 
 #define MAI_APP mai::Application::instance()
@@ -28,6 +29,8 @@ public:
 	uint32_t get_height() const { return _height; }
 	void* get_canvas() const { return _canvas_buffer; }
 
+	void set_camera(Camera* camera);
+
 private:
 	Application() = default;
 	~Application();
@@ -52,6 +55,8 @@ private:
 	HDC	_CanvasDC;//创建的于mhDC相兼容的绘图用的dc
 	HBITMAP _hBmp;//_CanvasDC内部生成的bitmap
 	void* _canvas_buffer{ nullptr };//_hBmp对应的内存起始位置指针
+
+	Camera* _camera = nullptr;
 
 };
 

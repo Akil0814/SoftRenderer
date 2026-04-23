@@ -1,4 +1,5 @@
 #include "application.h"
+#include<windowsx.h>
 
 namespace mai
 {
@@ -177,6 +178,39 @@ LRESULT Application::handle_message(HWND hWnd, UINT message, WPARAM wParam, LPAR
 {
 	switch (message)
 	{
+	case WM_KEYDOWN:
+	{
+		if (_camera)
+		{
+			_camera->onKeyDown(wParam);
+		}
+		break;
+	}
+	case WM_KEYUP: {
+		if (_camera) {
+			_camera->onKeyUp(wParam);
+		}
+		break;
+	}
+	case WM_RBUTTONDOWN: {
+		if (_camera) {
+			_camera->onRMouseDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		}
+		break;
+	}
+	case WM_RBUTTONUP: {
+		if (_camera) {
+			_camera->onRMouseUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		}
+		break;
+	}
+
+	case WM_MOUSEMOVE: {
+		if (_camera) {
+			_camera->onMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		}
+		break;
+	}
 	case WM_CLOSE:
 		DestroyWindow(hWnd);//销毁窗口 -> WM_DESTROY
 		return 0;
@@ -185,9 +219,7 @@ LRESULT Application::handle_message(HWND hWnd, UINT message, WPARAM wParam, LPAR
 	{
 		PAINTSTRUCT ps;
 		HDC hdc = BeginPaint(hWnd, &ps);
-
 		// 在这里绘制
-
 		EndPaint(hWnd, &ps);
 		return 0;
 	}
@@ -205,5 +237,11 @@ void Application::show()
 {
 	BitBlt(_hDC, 0, 0, _width, _height, _CanvasDC, 0, 0, SRCCOPY);
 }
+
+void Application::set_camera(Camera* camera)
+{
+	_camera = camera;
+}
+
 
 }
