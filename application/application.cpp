@@ -182,32 +182,32 @@ LRESULT Application::handle_message(HWND hWnd, UINT message, WPARAM wParam, LPAR
 	{
 		if (_camera)
 		{
-			_camera->onKeyDown(wParam);
+			_camera->on_key_down(static_cast<uint32_t>(wParam));
 		}
 		break;
 	}
 	case WM_KEYUP: {
 		if (_camera) {
-			_camera->onKeyUp(wParam);
+			_camera->on_key_up(static_cast<uint32_t>(wParam));
 		}
 		break;
 	}
 	case WM_RBUTTONDOWN: {
 		if (_camera) {
-			_camera->onRMouseDown(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+			_camera->on_r_mouse_down(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 		}
 		break;
 	}
 	case WM_RBUTTONUP: {
 		if (_camera) {
-			_camera->onRMouseUp(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+			_camera->on_r_mouse_up(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 		}
 		break;
 	}
 
 	case WM_MOUSEMOVE: {
 		if (_camera) {
-			_camera->onMouseMove(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+			_camera->on_mouse_move(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 		}
 		break;
 	}

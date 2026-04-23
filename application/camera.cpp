@@ -1,132 +1,194 @@
 #include "camera.h"
 
-Camera::Camera(float fovy, float aspect, float n, float f, const mai::vec3f& top) {
-	mTop = top;
-	mProjectionMatrix = mai::perspective(fovy, aspect, n, f);
+#include <cmath>
+
+namespace
+{
+	constexpr float k_parallel_threshold = 1e-6f;
+}
+
+Camera::Camera(float fovy, float aspect, float near_clip, float far_clip, const mai::vec3f& top)
+{
+	if (mai::length_squared(top) > k_parallel_threshold)
+		_top = mai::normalize(top);
+
+	_projection_matrix = mai::perspective(fovy, aspect, near_clip, far_clip);
+	update_front();
 	update();
 }
 
-Camera::~Camera() {}
-
-void Camera::onRMouseDown(const int& x, const int& y) {
-	mMouseMoving = true;
-	mCurrentMouseX = x;
-	mCurrentMouseY = y;
+void Camera::on_r_mouse_down(int x, int y)
+{
+	_mouse_moving = true;
+	_current_mouse_x = x;
+	_current_mouse_y = y;
 }
 
-void Camera::onRMouseUp(const int& x, const int& y) {
-	mMouseMoving = false;
+void Camera::on_r_mouse_up(int x, int y)
+{
+	(void)x;
+	(void)y;
+	_mouse_moving = false;
 }
 
-void Camera::onMouseMove(const int& x, const int& y) {
-	if (mMouseMoving) {
-		int xOffset = x - mCurrentMouseX;
-		int yOffset = y - mCurrentMouseY;
+void Camera::on_mouse_move(int x, int y)
+{
+	if (_mouse_moving)
+	{
+		const int x_offset = x - _current_mouse_x;
+		const int y_offset = y - _current_mouse_y;
 
-		mCurrentMouseX = x;
-		mCurrentMouseY = y;
+		_current_mouse_x = x;
+		_current_mouse_y = y;
 
-		pitch(-yOffset);
-		yaw(xOffset);
+		pitch(-y_offset);
+		yaw(x_offset);
 	}
 }
 
-void Camera::onKeyDown(const uint32_t& key) {
-	switch (key) {
+void Camera::on_key_down(uint32_t key)
+{
+	switch (key)
+	{
 	case KEY_W:
-		mMoveState |= MOVE_FRONT;
+		_move_state |= MOVE_FRONT;
 		break;
 	case KEY_A:
-		mMoveState |= MOVE_LEFT;
+		_move_state |= MOVE_LEFT;
 		break;
 	case KEY_S:
-		mMoveState |= MOVE_BACK;
+		_move_state |= MOVE_BACK;
 		break;
 	case KEY_D:
-		mMoveState |= MOVE_RIGHT;
+		_move_state |= MOVE_RIGHT;
 		break;
 	default:
 		break;
 	}
 }
 
-void Camera::onKeyUp(const uint32_t& key) {
-	switch (key) {
+void Camera::on_key_up(uint32_t key)
+{
+	switch (key)
+	{
 	case KEY_W:
-		mMoveState &= ~MOVE_FRONT;
+		_move_state &= ~MOVE_FRONT;
 		break;
 	case KEY_A:
-		mMoveState &= ~MOVE_LEFT;
+		_move_state &= ~MOVE_LEFT;
 		break;
 	case KEY_S:
-		mMoveState &= ~MOVE_BACK;
+		_move_state &= ~MOVE_BACK;
 		break;
 	case KEY_D:
-		mMoveState &= ~MOVE_RIGHT;
+		_move_state &= ~MOVE_RIGHT;
 		break;
 	default:
 		break;
 	}
 }
 
-void Camera::pitch(int yoffset) {
-	mPitch += yoffset * mSensitivity;
+void Camera::update_front()
+{
+	_front.y = static_cast<float>(std::sin(MAI_DEG2RAD(_pitch)));
+	_front.x = static_cast<float>(std::cos(MAI_DEG2RAD(_yaw)) * std::cos(MAI_DEG2RAD(_pitch)));
+	_front.z = static_cast<float>(std::sin(MAI_DEG2RAD(_yaw)) * std::cos(MAI_DEG2RAD(_pitch)));
+	_front = mai::normalize(_front);
+}
 
-	if (mPitch >= 89.0f)
+void Camera::update_view_matrix()
+{
+	const mai::vec3f forward = mai::normalize(_front);
+	mai::vec3f right = mai::cross(forward, _top);
+
+	if (mai::length_squared(right) <= k_parallel_threshold)
 	{
-		mPitch = 89.0f;
+		const mai::vec3f fallback_up = std::fabs(forward.y) > 0.99f
+			? mai::vec3f{ 0.0f, 0.0f, 1.0f }
+			: mai::vec3f{ 0.0f, 1.0f, 0.0f };
+		right = mai::cross(forward, fallback_up);
 	}
 
-	if (mPitch <= -89.0f)
+	right = mai::normalize(right);
+	const mai::vec3f up = mai::normalize(mai::cross(right, forward));
+
+	_view_matrix = mai::mat4f(1.0f);
+	_view_matrix.set(0, 0, right.x);
+	_view_matrix.set(0, 1, right.y);
+	_view_matrix.set(0, 2, right.z);
+	_view_matrix.set(0, 3, -mai::dot(right, _position));
+
+	_view_matrix.set(1, 0, up.x);
+	_view_matrix.set(1, 1, up.y);
+	_view_matrix.set(1, 2, up.z);
+	_view_matrix.set(1, 3, -mai::dot(up, _position));
+
+	_view_matrix.set(2, 0, -forward.x);
+	_view_matrix.set(2, 1, -forward.y);
+	_view_matrix.set(2, 2, -forward.z);
+	_view_matrix.set(2, 3, mai::dot(forward, _position));
+}
+
+void Camera::pitch(int yoffset)
+{
+	_pitch += yoffset * _sensitivity;
+
+	if (_pitch >= 89.0f)
 	{
-		mPitch = -89.0f;
+		_pitch = 89.0f;
 	}
 
-	mFront.y = sin(MAI_DEG2RAD(mPitch));
-	mFront.x = cos(MAI_DEG2RAD(mYaw)) * cos(MAI_DEG2RAD(mPitch));
-	mFront.z = sin(MAI_DEG2RAD(mYaw)) * cos(MAI_DEG2RAD(mPitch));
+	if (_pitch <= -89.0f)
+	{
+		_pitch = -89.0f;
+	}
 
-	mFront = mai::normalize(mFront);
+	update_front();
 }
 
-void Camera::yaw(int xoffset) {
-	mYaw += xoffset * mSensitivity;
-
-	mFront.y = sin(MAI_DEG2RAD(mPitch));
-	mFront.x = cos(MAI_DEG2RAD(mYaw)) * cos(MAI_DEG2RAD(mPitch));
-	mFront.z = sin(MAI_DEG2RAD(mYaw)) * cos(MAI_DEG2RAD(mPitch));
-
-	mFront = mai::normalize(mFront);
+void Camera::yaw(int xoffset)
+{
+	_yaw += xoffset * _sensitivity;
+	update_front();
 }
 
-void Camera::update() {
-	//将各个方向的可能进行汇总，得到一个最终移动方向
-	mai::vec3f moveDirection = {0.0f, 0.0f, 0.0f};
+void Camera::update()
+{
+	// Combine active input flags into a single movement direction.
+	mai::vec3f move_direction = { 0.0f, 0.0f, 0.0f };
 
-	mai::vec3f front = mFront;
-	mai::vec3f right = mai::normalize(cross(mFront, mTop));
+	const mai::vec3f front = _front;
+	mai::vec3f right = mai::cross(_front, _top);
+	if (mai::length_squared(right) > k_parallel_threshold)
+		right = mai::normalize(right);
+	else
+		right = mai::vec3f{ 1.0f, 0.0f, 0.0f };
 
-	if (mMoveState & MOVE_FRONT) {
-		moveDirection += front;
+	if (_move_state & MOVE_FRONT)
+	{
+		move_direction += front;
 	}
 
-	if (mMoveState & MOVE_BACK) {
-		moveDirection += -front;
+	if (_move_state & MOVE_BACK)
+	{
+		move_direction += -front;
 	}
 
-	if (mMoveState & MOVE_LEFT) {
-		moveDirection += -right;
+	if (_move_state & MOVE_LEFT)
+	{
+		move_direction += -right;
 	}
 
-	if (mMoveState & MOVE_RIGHT) {
-		moveDirection += right;
+	if (_move_state & MOVE_RIGHT)
+	{
+		move_direction += right;
 	}
 
-	if (mai::length_squared(moveDirection) != 0) {
-		moveDirection = mai::normalize(moveDirection);
-		mPosition += mSpeed * moveDirection;
+	if (mai::length_squared(move_direction) > 0.0f)
+	{
+		move_direction = mai::normalize(move_direction);
+		_position += _speed * move_direction;
 	}
 
-	mViewMatrix = mai::look_at<float>(mPosition, mPosition + mFront, mTop);
+	update_view_matrix();
 }
-

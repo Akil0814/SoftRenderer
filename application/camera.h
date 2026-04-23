@@ -15,48 +15,49 @@
 
 class Camera {
 public:
-	Camera(float fovy, float aspect, float n, float f, const mai::vec3f& top);
+	Camera(float fovy, float aspect, float near_clip, float far_clip, const mai::vec3f& top);
 
-	~Camera();
+	~Camera() = default;
 
 public:
-	void onRMouseDown(const int& x, const int& y);
+	void on_r_mouse_down(int x, int y);
 
-	void onRMouseUp(const int& x, const int& y);
+	void on_r_mouse_up(int x, int y);
 
-	void onMouseMove(const int& x, const int& y);
+	void on_mouse_move(int x, int y);
 
-	void onKeyDown(const uint32_t& key);
+	void on_key_down(uint32_t key);
 
-	void onKeyUp(const uint32_t& key);
+	void on_key_up(uint32_t key);
 
 	void update();
 
-	mai::mat4f getViewMatrix()const { return mViewMatrix; }
+	const mai::mat4f& get_view_matrix() const { return _view_matrix; }
 
-	mai::mat4f getProjectionMatrix()const { return mProjectionMatrix; }
+	const mai::mat4f& get_projection_matrix() const { return _projection_matrix; }
 
 private:
+	void update_front();
+	void update_view_matrix();
 	void pitch(int yoffset);
-
 	void yaw(int xoffset);
 
 private:
-	mai::mat4f mViewMatrix;
-	mai::mat4f mProjectionMatrix;
+	mai::mat4f _view_matrix;
+	mai::mat4f _projection_matrix;
 
-	mai::vec3f	mPosition{ 0.0f,0.0f,0.0f };
-	mai::vec3f	mFront{ 0.0f,0.0f,-1.0f };
-	mai::vec3f	mTop{ 0.0f,1.0f,0.0f };
-	float		mSpeed = { 0.01f };
+	mai::vec3f _position{ 0.0f, 0.0f, 0.0f };
+	mai::vec3f _front{ 0.0f, 0.0f, -1.0f };
+	mai::vec3f _top{ 0.0f, 1.0f, 0.0f };
+	float _speed = 0.01f;
 
-	float		mPitch{ 0.0f };
-	float		mYaw{ -90.0f };
-	float		mSensitivity{ 0.1f };
+	float _pitch{ 0.0f };
+	float _yaw{ -90.0f };
+	float _sensitivity{ 0.1f };
 
-	uint32_t	mMoveState{ NO_MOVE };
-	bool		mMouseMoving{ false };
-	int			mCurrentMouseX{ 0 };
-	int			mCurrentMouseY{ 0 };
+	uint32_t _move_state{ NO_MOVE };
+	bool _mouse_moving{ false };
+	int _current_mouse_x{ 0 };
+	int _current_mouse_y{ 0 };
 
 };

@@ -106,6 +106,7 @@ void prepare()
 {
 
 	camera = new Camera(60.0f, (float)window_width / (float)window_height, 0.1f, 100.0f, { 0.0f, 1.0f, 0.0f });
+	MAI_APP->set_camera(camera);
 
 	texture_shader = new mai::TextureShader();
 	color_shader = new mai::ColorShader();
