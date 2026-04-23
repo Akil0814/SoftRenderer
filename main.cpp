@@ -9,6 +9,7 @@
 
 #include "MAI_SGL/shader/color_shader.h"
 #include "MAI_SGL/shader/texture_shader.h"
+#include "MAI_SGL/shader/color_shader_2D.h"
 
 #include "MAI_SGL/core/gpu.h"
 
@@ -43,6 +44,7 @@ uint32_t vao = 0;
 
 mai::TextureShader* texture_shader = nullptr;
 mai::ColorShader* color_shader = nullptr;
+mai::ColorShader2D* color_shader_2d = nullptr;
 
 mai::mat4f model_matrix;
 
@@ -64,7 +66,6 @@ void transform(float delta_time)
 
 void on_render(float delta_time)
 {
-	rend_imgui();
 	transform(delta_time);
 	
 	const mai::mat4f& view_matrix = camera->get_view_matrix();
@@ -87,7 +88,8 @@ void on_render(float delta_time)
 	MAI_SGL->use_program(texture_shader);
 	MAI_SGL->draw_element(MAI_DRAW_TRIANGLES, 0, 6);
 
-	MAI_SGL->use_program(color_shader);
+	//MAI_SGL->use_program(color_shader);
+	MAI_SGL->use_program(color_shader_2d);
 	MAI_SGL->draw_element(MAI_DRAW_TRIANGLES, 6, 3);
 
 }
@@ -102,6 +104,7 @@ void prepare()
 
 	texture_shader = new mai::TextureShader();
 	color_shader = new mai::ColorShader();
+	color_shader_2d = new mai::ColorShader2D();
 
 	image = mai::Image::create_image("assets/textures/mai.png");
 	if (image == nullptr)

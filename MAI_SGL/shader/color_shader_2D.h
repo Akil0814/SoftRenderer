@@ -5,11 +5,11 @@
 namespace mai
 {
 
-	class Shader2D :public Shader
+	class ColorShader2D :public Shader
 	{
 	public:
-		Shader2D();
-		~Shader2D();
+		ColorShader2D();
+		~ColorShader2D();
 
 		VsOutput vertex_shader(
 			const std::map<uint32_t, BindingDescription>& binding_map,
@@ -21,6 +21,7 @@ namespace mai
 
 	public:
 		//uniforms
+		mai::mat4f _transform_matrix;
 
 	};
 
