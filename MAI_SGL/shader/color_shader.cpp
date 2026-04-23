@@ -1,11 +1,11 @@
-#include "default_shader.h"
+#include "color_shader.h"
 
 namespace mai {
 
-	DefaultShader::DefaultShader() {}
-	DefaultShader::~DefaultShader() {}
+	ColorShader::ColorShader() {}
+	ColorShader::~ColorShader() {}
 
-	VsOutput DefaultShader::vertex_shader(
+	VsOutput ColorShader::vertex_shader(
 		const std::map<uint32_t, BindingDescription>& binding_map,
 		const std::map<uint32_t, BufferObject*>& buffer_map,
 		size_t index
@@ -27,7 +27,7 @@ namespace mai {
 		return output;
 	}
 
-	void DefaultShader::fragment_shader(
+	void ColorShader::fragment_shader(
 		const VsOutput& input, FsOutput& output,
 		const std::map<uint32_t, Texture*>& textures)
 	{

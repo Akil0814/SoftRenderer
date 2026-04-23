@@ -4,11 +4,11 @@
 
 namespace mai{
 
-class DefaultShader :public Shader
+class ColorShader :public Shader
 {
 public:
-	DefaultShader();
-	~DefaultShader();
+	ColorShader();
+	~ColorShader();
 
 	VsOutput vertex_shader(
 		const std::map<uint32_t, BindingDescription>& binding_map,
