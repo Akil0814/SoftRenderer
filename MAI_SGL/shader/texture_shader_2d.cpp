@@ -16,18 +16,8 @@ namespace mai
 	vec4f position = get_vector(binding_map, buffer_map, 0, index);
 	position.z = 0.0f;
 	position.w = 1.0f;
-
-	vec4f color{ 1.0f, 1.0f, 1.0f, 1.0f };
-	if (has_attribute(binding_map, 1))
-	{
-		color = get_vector(binding_map, buffer_map, 1, index);
-	}
-
-	vec4f UV{ 0.0f, 0.0f, 0.0f, 0.0f };
-	if (has_attribute(binding_map, 2))
-	{
-		UV = get_vector(binding_map, buffer_map, 2, index);
-	}
+	mai::vec4f color = get_vector(binding_map, buffer_map, 1, index);
+	mai::vec2f UV(get_vector(binding_map, buffer_map, 2, index));
 
 	output._position = _transform_matrix * position;
 	output._color = color;
