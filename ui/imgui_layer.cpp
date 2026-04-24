@@ -72,24 +72,7 @@ void rend_imgui()
     ImGui::Text("Platform: %s", io.BackendPlatformName ? io.BackendPlatformName : "none");
     ImGui::Text("Renderer: %s", io.BackendRendererName ? io.BackendRendererName : "none");
 
-    ImGui::Separator();
-    ImGui::Checkbox("Demo Window", &show_demo_window);
-    ImGui::Checkbox("Metrics Window", &show_metrics_window);
-    ImGui::Checkbox("Style Editor", &show_style_editor);
     ImGui::End();
-
-    if (show_demo_window)
-        ImGui::ShowDemoWindow(&show_demo_window);
-
-    if (show_metrics_window)
-        ImGui::ShowMetricsWindow(&show_metrics_window);
-
-    if (show_style_editor)
-    {
-        ImGui::Begin("Style Editor", &show_style_editor);
-        ImGui::ShowStyleEditor();
-        ImGui::End();
-    }
 
     ImGui::Render();
     ImGui_Impl_MAI_SGL_RenderDrawData(ImGui::GetDrawData());

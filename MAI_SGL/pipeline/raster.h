@@ -33,7 +33,7 @@ private:
 		VertexShaderOutput& target) noexcept;
 
 	static void interpolant_triangle(const VertexShaderOutput& v0, const VertexShaderOutput& v1, const VertexShaderOutput& v2,
-		VertexShaderOutput& target) noexcept;
+		float sample_x, float sample_y, VertexShaderOutput& target) noexcept;
 
 };
 
