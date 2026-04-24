@@ -23,7 +23,7 @@ VsOutput ColorShader2D::vertex_shader(
 		color = get_vector(binding_map, buffer_map, 1, index);
 	}
 
-	vec4f UV{ 0.0f, 0.0f, 0.0f, 0.0f };
+	vec2f UV{ 0.0f, 0.0f };
 	if (has_attribute(binding_map, 2))
 	{
 		UV = get_vector(binding_map, buffer_map, 2, index);
