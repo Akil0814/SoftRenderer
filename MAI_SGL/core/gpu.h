@@ -22,6 +22,9 @@ struct RenderStats
 	uint64_t _frame_draw_calls{ 0 };
 	uint64_t _frame_triangles{ 0 };
 	uint64_t _frame_vertices{ 0 };
+	uint64_t _frame_rasterized_pixels{ 0 };
+	uint64_t _frame_fragments{ 0 };
+	uint64_t _frame_texture_samples{ 0 };
 };
 
 class GPU
@@ -82,6 +85,9 @@ public:
 	uint32_t get_bound_array_buffer() const;
 	uint32_t get_bound_element_array_buffer() const;
 	RenderStats get_render_stats() const;
+	void add_rasterized_pixels(uint64_t count) noexcept;
+	void add_fragments(uint64_t count) noexcept;
+	void add_texture_samples(uint64_t count) noexcept;
 
 	void draw_element(uint8_t draw_mode, size_t first, size_t count);
 

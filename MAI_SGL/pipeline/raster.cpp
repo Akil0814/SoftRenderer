@@ -1,5 +1,6 @@
 #include "raster.h"
 #include "../math/math.h"
+#include "../core/gpu.h"
 
 #include <cmath>
 
@@ -45,6 +46,7 @@ namespace mai
         const DrawContext& context, const VertexShaderOutput& v0, const VertexShaderOutput& v1,
         std::vector<VertexShaderOutput>& results)
     {
+        uint64_t rasterized_pixels = 0;
         VsOutput start = v0;
         VsOutput end = v1;
 
@@ -63,7 +65,10 @@ namespace mai
         };
 
         if (in_scissor_rect(start))
+        {
             results.push_back(start);
+            ++rasterized_pixels;
+        }
 
         bool flip_y = false;
         if (start._position.y > end._position.y)
@@ -119,8 +124,13 @@ namespace mai
             interpolant_line(v0, v1, current_point);
 
             if (in_scissor_rect(current_point))
+            {
                 results.push_back(current_point);
+                ++rasterized_pixels;
+            }
         }
+
+        MAI_SGL->add_rasterized_pixels(rasterized_pixels);
     }
 
     void Raster::rasterize_triangle(
@@ -128,6 +138,7 @@ namespace mai
         std::vector<VertexShaderOutput>& results)
     {
         constexpr float edge_epsilon = 1e-6f;
+        uint64_t rasterized_pixels = 0;
 
         int max_X = static_cast<int>(std::max(v0._position.x, std::max(v1._position.x, v2._position.x)));
         int min_X = static_cast<int>(std::min(v0._position.x, std::min(v1._position.x, v2._position.x)));
@@ -185,8 +196,11 @@ namespace mai
                 result._position.x = i;
                 result._position.y = j;
                 results.push_back(result);
+                ++rasterized_pixels;
             }
         }
+
+        MAI_SGL->add_rasterized_pixels(rasterized_pixels);
     }
 
     void Raster::interpolant_line(const VertexShaderOutput& v0, const VertexShaderOutput& v1,

@@ -52,6 +52,8 @@ void rend_imgui()
     static bool show_demo_window = false;
     static bool show_metrics_window = false;
     static bool show_style_editor = false;
+    static mai::RenderStats last_completed_frame_stats{};
+    static ImGuiSubmittedStats last_imgui_submitted_stats{};
 
     ImGui_Impl_MAI_SGL_NewFrame();
     ImGui_ImplWin32_NewFrame();
@@ -73,15 +75,27 @@ void rend_imgui()
     ImGui::Text("Platform: %s", io.BackendPlatformName ? io.BackendPlatformName : "none");
     ImGui::Text("Renderer: %s", io.BackendRendererName ? io.BackendRendererName : "none");
 
-    const mai::RenderStats stats = MAI_SGL->get_render_stats();
     ImGui::Separator();
-    ImGui::Text("Renderer Stats");
-    ImGui::Text("Draw Calls: %llu", static_cast<unsigned long long>(stats._frame_draw_calls));
-    ImGui::Text("Triangles: %llu", static_cast<unsigned long long>(stats._frame_triangles));
-    ImGui::Text("Vertices: %llu", static_cast<unsigned long long>(stats._frame_vertices));
+    ImGui::Text("Completed Frame Stats (Prev Frame)");
+    ImGui::Text("Draw Calls: %llu", static_cast<unsigned long long>(last_completed_frame_stats._frame_draw_calls));
+    ImGui::Text("Triangles: %llu", static_cast<unsigned long long>(last_completed_frame_stats._frame_triangles));
+    ImGui::Text("Vertices: %llu", static_cast<unsigned long long>(last_completed_frame_stats._frame_vertices));
+    ImGui::Text("Rasterized Pixels: %llu", static_cast<unsigned long long>(last_completed_frame_stats._frame_rasterized_pixels));
+    ImGui::Text("Fragments: %llu", static_cast<unsigned long long>(last_completed_frame_stats._frame_fragments));
+    ImGui::Text("Texture Samples: %llu", static_cast<unsigned long long>(last_completed_frame_stats._frame_texture_samples));
+
+    ImGui::Separator();
+    ImGui::Text("ImGui Submitted (Prev Frame)");
+    ImGui::Text("Draw Lists: %llu", static_cast<unsigned long long>(last_imgui_submitted_stats._draw_lists));
+    ImGui::Text("Draw Calls: %llu", static_cast<unsigned long long>(last_imgui_submitted_stats._draw_calls));
+    ImGui::Text("Vertices: %llu", static_cast<unsigned long long>(last_imgui_submitted_stats._vertices));
+    ImGui::Text("Indices: %llu", static_cast<unsigned long long>(last_imgui_submitted_stats._indices));
+    ImGui::Text("Triangles: %llu", static_cast<unsigned long long>(last_imgui_submitted_stats._triangles));
 
     ImGui::End();
 
     ImGui::Render();
     ImGui_Impl_MAI_SGL_RenderDrawData(ImGui::GetDrawData());
+    last_imgui_submitted_stats = ImGui_Impl_MAI_SGL_GetSubmittedStats();
+    last_completed_frame_stats = MAI_SGL->get_render_stats();
 }

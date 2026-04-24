@@ -1,10 +1,13 @@
 #include "fragment_stage.h"
+#include "../core/gpu.h"
 
 namespace mai
 {
 
 	void FragmentStage::run(const DrawContext& context, const std::vector<VsOutput>& raster_outputs) const
 	{
+		MAI_SGL->add_fragments(raster_outputs.size());
+
 		FsOutput fs_output;
 		size_t pixel_pos = 0;
 		for (size_t i = 0; i < raster_outputs.size(); ++i)

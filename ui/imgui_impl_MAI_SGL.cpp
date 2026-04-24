@@ -20,6 +20,7 @@ struct ImGuiMaiSglBackendData
     uint32_t vertex_vbo{ 0 };
     uint32_t index_ebo{ 0 };
     uint32_t font_texture{ 0 };
+    ImGuiSubmittedStats last_submitted_stats{};
 };
 
 struct SavedGpuState
@@ -60,6 +61,31 @@ ImTextureID make_texture_id(uint32_t id)
 uint32_t get_texture_id(ImTextureID id)
 {
     return static_cast<uint32_t>(static_cast<uintptr_t>(id));
+}
+
+ImGuiSubmittedStats collect_submitted_stats(const ImDrawData* draw_data)
+{
+    ImGuiSubmittedStats stats{};
+    if (draw_data == nullptr)
+        return stats;
+
+    stats._draw_lists = static_cast<uint64_t>(draw_data->CmdListsCount);
+    stats._vertices = static_cast<uint64_t>(draw_data->TotalVtxCount);
+    stats._indices = static_cast<uint64_t>(draw_data->TotalIdxCount);
+    stats._triangles = static_cast<uint64_t>(draw_data->TotalIdxCount / 3);
+
+    for (int list_index = 0; list_index < draw_data->CmdListsCount; ++list_index)
+    {
+        const ImDrawList* draw_list = draw_data->CmdLists[list_index];
+        for (int cmd_index = 0; cmd_index < draw_list->CmdBuffer.Size; ++cmd_index)
+        {
+            const ImDrawCmd& draw_cmd = draw_list->CmdBuffer[cmd_index];
+            if (draw_cmd.UserCallback == nullptr && draw_cmd.ElemCount > 0)
+                ++stats._draw_calls;
+        }
+    }
+
+    return stats;
 }
 
 bool create_fonts_texture(ImGuiMaiSglBackendData* backend_data)
@@ -278,6 +304,11 @@ void ImGui_Impl_MAI_SGL_NewFrame()
 
 void ImGui_Impl_MAI_SGL_RenderDrawData(ImDrawData* draw_data)
 {
+    ImGuiMaiSglBackendData* backend_data = get_backend_data();
+    IM_ASSERT(backend_data != nullptr && "Context or backend not initialized! Did you call ImGui_Impl_MAI_SGL_Init()?");
+
+    backend_data->last_submitted_stats = collect_submitted_stats(draw_data);
+
     if (draw_data == nullptr || draw_data->TotalVtxCount == 0)
         return;
 
@@ -287,8 +318,6 @@ void ImGui_Impl_MAI_SGL_RenderDrawData(ImDrawData* draw_data)
         return;
 
     SavedGpuState old_state = save_gpu_state();
-    ImGuiMaiSglBackendData* backend_data = get_backend_data();
-    IM_ASSERT(backend_data != nullptr && "Context or backend not initialized! Did you call ImGui_Impl_MAI_SGL_Init()?");
 
     setup_render_state(backend_data, draw_data, framebuffer_width, framebuffer_height);
 
@@ -330,4 +359,13 @@ void ImGui_Impl_MAI_SGL_RenderDrawData(ImDrawData* draw_data)
     }
 
     restore_gpu_state(old_state);
+}
+
+ImGuiSubmittedStats ImGui_Impl_MAI_SGL_GetSubmittedStats()
+{
+    ImGuiMaiSglBackendData* backend_data = get_backend_data();
+    if (backend_data == nullptr)
+        return ImGuiSubmittedStats{};
+
+    return backend_data->last_submitted_stats;
 }

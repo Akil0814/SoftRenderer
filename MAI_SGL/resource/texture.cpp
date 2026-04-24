@@ -1,4 +1,5 @@
 #include "texture.h"
+#include "../core/gpu.h"
 #include "../math/math.h"
 
 namespace mai {
@@ -42,6 +43,7 @@ mai::vec4f Texture::get_color(float u, float v)
 
 	if (_filter == MAI_TEXTURE_FILTER_NEAREST)
 	{
+		MAI_SGL->add_texture_samples(1);
 		int x = std::round(u * (_width - 1));
 		int y = std::round(v * (_height - 1));
 
@@ -50,6 +52,7 @@ mai::vec4f Texture::get_color(float u, float v)
 	}
 	else if (_filter == MAI_TEXTURE_FILTER_LINEAR)
 	{
+		MAI_SGL->add_texture_samples(4);
 		float x = u * static_cast<float>(_width - 1);
 		float y = v * static_cast<float>(_height - 1);
 

@@ -340,6 +340,21 @@ namespace mai
 		return _render_stats;
 	}
 
+	void GPU::add_rasterized_pixels(uint64_t count) noexcept
+	{
+		_render_stats._frame_rasterized_pixels += count;
+	}
+
+	void GPU::add_fragments(uint64_t count) noexcept
+	{
+		_render_stats._frame_fragments += count;
+	}
+
+	void GPU::add_texture_samples(uint64_t count) noexcept
+	{
+		_render_stats._frame_texture_samples += count;
+	}
+
 	void GPU::reset_render_stats() noexcept
 	{
 		_render_stats = RenderStats{};
