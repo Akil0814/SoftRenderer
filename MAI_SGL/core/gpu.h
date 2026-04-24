@@ -67,6 +67,10 @@ public:
 	// Depth test
 	void depth_function(uint8_t value);
 
+
+	RenderState get_render_state() const;
+	void set_render_state(const RenderState& state);
+
 	void draw_element(uint8_t draw_mode, size_t first, size_t count);
 
 private:

@@ -30,7 +30,7 @@ public:
 
 	void on_key_up(uint32_t key);
 
-	void update();
+	void update(float delta_time = 1.0f / 60.0f);
 	void set_position(const mai::vec3f& position);
 
 	const mai::mat4f& get_view_matrix() const { return _view_matrix; }
@@ -50,7 +50,7 @@ private:
 	mai::vec3f _position{ 0.0f, 0.0f, 0.0f };
 	mai::vec3f _front{ 0.0f, 0.0f, -1.0f };
 	mai::vec3f _top{ 0.0f, 1.0f, 0.0f };
-	float _speed = 0.01f;
+	float _speed = 0.6f;
 
 	float _pitch{ 0.0f };
 	float _yaw{ -90.0f };

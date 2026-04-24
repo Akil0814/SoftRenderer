@@ -241,7 +241,7 @@ int APIENTRY wWinMain(
 		}
 
 		active = MAI_APP->peek_message();
-		camera->update();
+		camera->update(delta_time);
 		on_render(delta_time);
 		rend_imgui();
 		MAI_APP->show();

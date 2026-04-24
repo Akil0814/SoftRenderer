@@ -158,7 +158,7 @@ void Camera::yaw(int xoffset)
 	update_front();
 }
 
-void Camera::update()
+void Camera::update(float delta_time)
 {
 	// Combine active input flags into a single movement direction.
 	mai::vec3f move_direction = { 0.0f, 0.0f, 0.0f };
@@ -193,7 +193,7 @@ void Camera::update()
 	if (mai::length_squared(move_direction) > 0.0f)
 	{
 		move_direction = mai::normalize(move_direction);
-		_position += _speed * move_direction;
+		_position += _speed * delta_time * move_direction;
 	}
 
 	update_view_matrix();

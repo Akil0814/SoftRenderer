@@ -99,6 +99,39 @@ void update_texture(ImTextureData* texture)
     }
 }
 
+ImTextureID make_texture_id(uint32_t id)
+{
+    return static_cast<ImTextureID>(static_cast<uintptr_t>(id));
+}
+
+uint32_t get_texture_id(ImTextureID id)
+{
+    return static_cast<uint32_t>(static_cast<uintptr_t>(id));
+}
+
+bool create_fonts_texture(ImGuiMaiSglBackendData* backend_data)
+{
+    ImGuiIO& io = ImGui::GetIO();
+
+    unsigned char* pixels = nullptr;
+    int width = 0;
+    int height = 0;
+
+    io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
+
+    uint32_t tex = MAI_SGL->get_texture();
+    MAI_SGL->bind_texture(tex);
+    MAI_SGL->tex_image_2D(width, height, pixels);
+    MAI_SGL->tex_parameter(MAI_TEXTURE_FILTER, MAI_TEXTURE_FILTER_LINEAR);
+    MAI_SGL->tex_parameter(MAI_TEXTURE_WRAP_U, MAI_TEXTURE_WRAP_REPEAT);
+    MAI_SGL->tex_parameter(MAI_TEXTURE_WRAP_V, MAI_TEXTURE_WRAP_REPEAT);
+    MAI_SGL->bind_texture(0);
+
+    io.Fonts->SetTexID(make_texture_id(tex));
+    return true;
+}
+
+
 mai::vec4f unpack_color(ImU32 color)
 {
     constexpr float inv_255 = 1.0f / 255.0f;
@@ -212,11 +245,8 @@ bool ImGui_Impl_MAI_SGL_Init()
     io.BackendRendererUserData = backend_data;
     io.BackendRendererName = "imgui_impl_MAI_SGL";
     io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset;
-    io.BackendFlags |= ImGuiBackendFlags_RendererHasTextures;
 
-    ImGuiPlatformIO& platform_io = ImGui::GetPlatformIO();
-    platform_io.Renderer_TextureMaxWidth = 4096;
-    platform_io.Renderer_TextureMaxHeight = 4096;
+    create_fonts_texture(backend_data);
 
     return true;
 }
@@ -251,6 +281,8 @@ void ImGui_Impl_MAI_SGL_RenderDrawData(ImDrawData* draw_data)
     const int framebuffer_height = static_cast<int>(draw_data->DisplaySize.y * draw_data->FramebufferScale.y);
     if (framebuffer_width <= 0 || framebuffer_height <= 0)
         return;
+
+    mai::RenderState old_state = MAI_SGL->get_render_state();
 
     ImGuiMaiSglBackendData* backend_data = get_backend_data();
     IM_ASSERT(backend_data != nullptr && "Context or backend not initialized! Did you call ImGui_Impl_MAI_SGL_Init()?");
@@ -310,5 +342,6 @@ void ImGui_Impl_MAI_SGL_RenderDrawData(ImDrawData* draw_data)
     MAI_SGL->bind_vertex_array(0);
     MAI_SGL->bind_buffer(MAI_ARRAY_BUFFER, 0);
     MAI_SGL->bind_buffer(MAI_ELEMENT_ARRAY_BUFFER, 0);
-    MAI_SGL->disable(MAI_SCISSOR_TEST);
+
+    MAI_SGL->set_render_state(old_state);
 }

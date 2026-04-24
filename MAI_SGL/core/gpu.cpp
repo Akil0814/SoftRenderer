@@ -303,4 +303,13 @@ namespace mai
 		_render_state._scissor_clip_rect = rect;
 	}
 
+	RenderState  GPU::get_render_state() const
+	{
+		return _render_state;
+	}
+
+	void  GPU::set_render_state(const RenderState& state)
+	{
+		_render_state = state;
+	}
 }
