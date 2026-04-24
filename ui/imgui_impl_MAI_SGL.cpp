@@ -228,7 +228,7 @@ void setup_render_state(ImGuiMaiSglBackendData* backend_data, const ImDrawData* 
     MAI_SGL->disable(MAI_DEPTH_TEST);
     MAI_SGL->disable(MAI_CULL_FACE);
     MAI_SGL->enable(MAI_BLENDING);
-    MAI_SGL->enable(MAI_SCISSOR_TEST);
+    //MAI_SGL->enable(MAI_SCISSOR_TEST);
     MAI_SGL->use_program(backend_data->shader);
     MAI_SGL->bind_vertex_array(backend_data->vao);
     MAI_SGL->bind_buffer(MAI_ARRAY_BUFFER, backend_data->vertex_vbo);
