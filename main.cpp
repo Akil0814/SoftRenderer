@@ -199,7 +199,7 @@ void prepare()
 	MAI_SGL->bind_buffer(MAI_ARRAY_BUFFER, 0);
 	MAI_SGL->bind_vertex_array(0);
 
-	MAI_SGL->printVAO(vao);
+	MAI_SGL->print_VAO(vao);
 }
 
 

@@ -46,7 +46,7 @@ namespace mai
 		std::fill_n(_frame_buffer->_depth_buffer, pixelSize, 1.0f);
 	}
 
-	void GPU::printVAO(uint32_t VAO_ID)
+	void GPU::print_VAO(uint32_t VAO_ID)
 	{
 		auto iter = _VAO_map.find(VAO_ID);
 		if (iter != _VAO_map.end())
@@ -199,6 +199,9 @@ namespace mai
 		case MAI_BLENDING:
 			_render_state._enable_blending = true;
 			break;
+		case MAI_SCISSOR_TEST:
+			_render_state._enable_scissor_test=true;
+			break;		
 		default:
 			break;
 		}
@@ -217,6 +220,9 @@ namespace mai
 		case MAI_BLENDING:
 			_render_state._enable_blending = false;
 			break;
+		case MAI_SCISSOR_TEST:
+			_render_state._enable_scissor_test = false;
+			break;	
 		default:
 			break;
 		}
@@ -291,4 +297,10 @@ namespace mai
 	{
 		_render_state._draw_dimension = value;
 	}
+
+	void GPU::set_scissor_rect(const ScissorRect& rect)
+	{
+		_render_state._scissor_clip_rect = rect;
+	}
+
 }

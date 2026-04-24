@@ -34,6 +34,7 @@
 #define MAI_CULL_FACE 1
 #define MAI_DEPTH_TEST 2
 #define MAI_BLENDING 3
+#define MAI_SCISSOR_TEST 4
 
 //剪裁相关
 #define MAI_FRONT_FACE_CW 0

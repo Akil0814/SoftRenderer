@@ -31,7 +31,7 @@ public:
 	void clear() noexcept;
 
 	// Debug helper.
-	void printVAO(uint32_t VAO_ID);
+	void print_VAO(uint32_t VAO_ID);
 
 	uint32_t gen_buffer();
 	void delete_buffer(uint32_t buffer_ID);
@@ -57,6 +57,8 @@ public:
 	void disable(uint8_t value);
 
 	void draw_dimension(uint8_t value);
+
+	void set_scissor_rect(const ScissorRect& rect);
 
 	// Cull face
 	void front_face(uint8_t value);
