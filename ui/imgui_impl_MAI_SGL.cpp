@@ -110,9 +110,8 @@ mai::vec4f unpack_color(ImU32 color)
         static_cast<float>((color >> IM_COL32_A_SHIFT) & 0xFF) * inv_255);
 }
 
-std::vector<MaiImGuiVertex> convert_vertices(const ImDrawList* draw_list, const ImDrawData* draw_data, int framebuffer_height)
+std::vector<MaiImGuiVertex> convert_vertices(const ImDrawList* draw_list, const ImDrawData* draw_data)
 {
-    const ImVec2 display_pos = draw_data->DisplayPos;
     const ImVec2 framebuffer_scale = draw_data->FramebufferScale;
 
     std::vector<MaiImGuiVertex> vertices;
@@ -120,11 +119,11 @@ std::vector<MaiImGuiVertex> convert_vertices(const ImDrawList* draw_list, const 
 
     for (const ImDrawVert& src : draw_list->VtxBuffer)
     {
-        const float x = (src.pos.x - display_pos.x) * framebuffer_scale.x;
-        const float y_top = (src.pos.y - display_pos.y) * framebuffer_scale.y;
+        const float x = src.pos.x * framebuffer_scale.x;
+        const float y = src.pos.y * framebuffer_scale.y;
 
         MaiImGuiVertex dst;
-        dst.pos = mai::vec4f(x, static_cast<float>(framebuffer_height) - y_top, 0.0f, 1.0f);
+        dst.pos = mai::vec4f(x, y, 0.0f, 1.0f);
         dst.color = unpack_color(src.col);
         dst.uv = mai::vec2f(src.uv.x, src.uv.y);
         vertices.push_back(dst);
@@ -190,8 +189,15 @@ void restore_gpu_state(const SavedGpuState& state)
     MAI_SGL->bind_buffer(MAI_ELEMENT_ARRAY_BUFFER, state.element_array_buffer);
 }
 
-void setup_render_state(ImGuiMaiSglBackendData* backend_data, int framebuffer_width, int framebuffer_height)
+void setup_render_state(ImGuiMaiSglBackendData* backend_data, const ImDrawData* draw_data, int framebuffer_width, int framebuffer_height)
 {
+    const ImVec2 display_pos = draw_data->DisplayPos;
+    const ImVec2 framebuffer_scale = draw_data->FramebufferScale;
+    const float left = display_pos.x * framebuffer_scale.x;
+    const float top = display_pos.y * framebuffer_scale.y;
+    const float right = left + static_cast<float>(framebuffer_width - 1);
+    const float bottom = top + static_cast<float>(framebuffer_height - 1);
+
     MAI_SGL->draw_dimension(MAI_DRAW_2D);
     MAI_SGL->disable(MAI_DEPTH_TEST);
     MAI_SGL->disable(MAI_CULL_FACE);
@@ -203,8 +209,8 @@ void setup_render_state(ImGuiMaiSglBackendData* backend_data, int framebuffer_wi
     MAI_SGL->bind_buffer(MAI_ELEMENT_ARRAY_BUFFER, backend_data->index_ebo);
 
     backend_data->shader->_transform_matrix = mai::orthographic(
-        0.0f, static_cast<float>(framebuffer_width),
-        0.0f, static_cast<float>(framebuffer_height),
+        left, right,
+        bottom, top,
         -1.0f, 1.0f);
     backend_data->shader->_modulate_vertex_color = true;
 }
@@ -284,11 +290,11 @@ void ImGui_Impl_MAI_SGL_RenderDrawData(ImDrawData* draw_data)
     ImGuiMaiSglBackendData* backend_data = get_backend_data();
     IM_ASSERT(backend_data != nullptr && "Context or backend not initialized! Did you call ImGui_Impl_MAI_SGL_Init()?");
 
-    setup_render_state(backend_data, framebuffer_width, framebuffer_height);
+    setup_render_state(backend_data, draw_data, framebuffer_width, framebuffer_height);
 
     for (const ImDrawList* draw_list : draw_data->CmdLists)
     {
-        std::vector<MaiImGuiVertex> vertices = convert_vertices(draw_list, draw_data, framebuffer_height);
+        std::vector<MaiImGuiVertex> vertices = convert_vertices(draw_list, draw_data);
         if (vertices.empty())
             continue;
 
@@ -301,7 +307,7 @@ void ImGui_Impl_MAI_SGL_RenderDrawData(ImDrawData* draw_data)
             if (draw_cmd->UserCallback != nullptr)
             {
                 if (draw_cmd->UserCallback == ImDrawCallback_ResetRenderState)
-                    setup_render_state(backend_data, framebuffer_width, framebuffer_height);
+                    setup_render_state(backend_data, draw_data, framebuffer_width, framebuffer_height);
                 else
                     draw_cmd->UserCallback(draw_list, draw_cmd);
                 continue;
