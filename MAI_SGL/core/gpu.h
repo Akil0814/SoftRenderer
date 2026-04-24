@@ -52,6 +52,7 @@ public:
 	void tex_parameter(uint8_t param, uint32_t value);
 
 	void use_program(Shader* shader);
+	Shader* get_program() const;
 
 	void enable(uint8_t value);
 	void disable(uint8_t value);
@@ -70,6 +71,9 @@ public:
 
 	RenderState get_render_state() const;
 	void set_render_state(const RenderState& state);
+	uint32_t get_bound_vertex_array() const;
+	uint32_t get_bound_array_buffer() const;
+	uint32_t get_bound_element_array_buffer() const;
 
 	void draw_element(uint8_t draw_mode, size_t first, size_t count);
 

@@ -99,9 +99,10 @@ void on_render(float delta_time)
 
 }
 
-void prepare()
+bool prepare()
 {
-	init_imgui_for_MAI_SGL();
+	if (!init_imgui_for_MAI_SGL())
+		return false;
 
 	camera = new Camera(60.0f, (float)window_width / (float)window_height, 0.1f, 100.0f, { 0.0f, 1.0f, 0.0f });
 	camera->set_position({ 0.0f, 0.0f, 3.0f });
@@ -200,6 +201,8 @@ void prepare()
 	MAI_SGL->bind_vertex_array(0);
 
 	MAI_SGL->print_VAO(vao);
+
+	return true;
 }
 
 
@@ -215,7 +218,8 @@ int APIENTRY wWinMain(
 	//将bmp指向的内存配置到sgl当中
 	MAI_SGL->init_surface(MAI_APP->get_width(), MAI_APP->get_height(), MAI_APP->get_canvas());
 
-	prepare();
+	if (!prepare())
+		return -1;
 
 
 	bool active = true;
@@ -247,6 +251,7 @@ int APIENTRY wWinMain(
 		MAI_APP->show();
 	}
 
+	shutdown_imgui_for_MAI_SGL();
 	MAI_SGL->delete_texture(texture);
 	mai::Image::destroy_image(image);
 

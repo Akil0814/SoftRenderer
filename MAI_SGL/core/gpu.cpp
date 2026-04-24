@@ -147,6 +147,11 @@ namespace mai
 		_shader = shader;
 	}
 
+	Shader* GPU::get_program() const
+	{
+		return _shader;
+	}
+
 	void GPU::draw_element(uint8_t draw_mode, size_t first, size_t count)
 	{
 		if (_current_VAO == 0 || _shader == nullptr || count == 0)
@@ -311,5 +316,20 @@ namespace mai
 	void  GPU::set_render_state(const RenderState& state)
 	{
 		_render_state = state;
+	}
+
+	uint32_t GPU::get_bound_vertex_array() const
+	{
+		return _current_VAO;
+	}
+
+	uint32_t GPU::get_bound_array_buffer() const
+	{
+		return _current_VBO;
+	}
+
+	uint32_t GPU::get_bound_element_array_buffer() const
+	{
+		return _current_EBO;
 	}
 }

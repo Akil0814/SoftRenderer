@@ -19,6 +19,16 @@ struct ImGuiMaiSglBackendData
     uint32_t vao{ 0 };
     uint32_t vertex_vbo{ 0 };
     uint32_t index_ebo{ 0 };
+    uint32_t font_texture{ 0 };
+};
+
+struct SavedGpuState
+{
+    mai::RenderState render_state{};
+    mai::Shader* shader{ nullptr };
+    uint32_t vao{ 0 };
+    uint32_t array_buffer{ 0 };
+    uint32_t element_array_buffer{ 0 };
 };
 
 ImGuiMaiSglBackendData* get_backend_data()
@@ -31,72 +41,15 @@ mai::RGBA make_rgba(byte r, byte g, byte b, byte a)
     return mai::RGBA(r, g, b, a);
 }
 
-std::vector<mai::RGBA> convert_texture_pixels(ImTextureData* texture)
+std::vector<mai::RGBA> convert_rgba_pixels(const unsigned char* src, int width, int height)
 {
-    std::vector<mai::RGBA> pixels(static_cast<size_t>(texture->Width) * static_cast<size_t>(texture->Height));
-
-    if (texture->Format == ImTextureFormat_RGBA32)
+    std::vector<mai::RGBA> pixels(static_cast<size_t>(width) * static_cast<size_t>(height));
+    for (size_t i = 0; i < pixels.size(); ++i)
     {
-        const unsigned char* src = static_cast<const unsigned char*>(texture->GetPixels());
-        for (size_t i = 0; i < pixels.size(); ++i)
-        {
-            const unsigned char* p = src + i * 4;
-            pixels[i] = make_rgba(p[0], p[1], p[2], p[3]);
-        }
+        const unsigned char* p = src + i * 4;
+        pixels[i] = make_rgba(p[0], p[1], p[2], p[3]);
     }
-    else if (texture->Format == ImTextureFormat_Alpha8)
-    {
-        const unsigned char* src = static_cast<const unsigned char*>(texture->GetPixels());
-        for (size_t i = 0; i < pixels.size(); ++i)
-            pixels[i] = make_rgba(255, 255, 255, src[i]);
-    }
-
     return pixels;
-}
-
-void update_texture(ImTextureData* texture)
-{
-    if (texture->Status == ImTextureStatus_WantCreate)
-    {
-        uint32_t texture_id = MAI_SGL->get_texture();
-        std::vector<mai::RGBA> pixels = convert_texture_pixels(texture);
-
-        MAI_SGL->bind_texture(texture_id);
-        MAI_SGL->tex_image_2D(texture->Width, texture->Height, pixels.data());
-        MAI_SGL->tex_parameter(MAI_TEXTURE_FILTER, MAI_TEXTURE_FILTER_LINEAR);
-        MAI_SGL->tex_parameter(MAI_TEXTURE_WRAP_U, MAI_TEXTURE_WRAP_REPEAT);
-        MAI_SGL->tex_parameter(MAI_TEXTURE_WRAP_V, MAI_TEXTURE_WRAP_REPEAT);
-        MAI_SGL->bind_texture(0);
-
-        texture->SetTexID(static_cast<ImTextureID>(texture_id));
-        texture->SetStatus(ImTextureStatus_OK);
-    }
-    else if (texture->Status == ImTextureStatus_WantUpdates)
-    {
-        uint32_t texture_id = static_cast<uint32_t>(texture->GetTexID());
-        if (texture_id == 0)
-        {
-            texture->SetStatus(ImTextureStatus_WantCreate);
-            update_texture(texture);
-            return;
-        }
-
-        std::vector<mai::RGBA> pixels = convert_texture_pixels(texture);
-        MAI_SGL->bind_texture(texture_id);
-        MAI_SGL->tex_image_2D(texture->Width, texture->Height, pixels.data());
-        MAI_SGL->bind_texture(0);
-
-        texture->SetStatus(ImTextureStatus_OK);
-    }
-    else if (texture->Status == ImTextureStatus_WantDestroy && texture->UnusedFrames > 0)
-    {
-        uint32_t texture_id = static_cast<uint32_t>(texture->GetTexID());
-        if (texture_id != 0)
-            MAI_SGL->delete_texture(texture_id);
-
-        texture->SetTexID(ImTextureID_Invalid);
-        texture->SetStatus(ImTextureStatus_Destroyed);
-    }
 }
 
 ImTextureID make_texture_id(uint32_t id)
@@ -119,16 +72,31 @@ bool create_fonts_texture(ImGuiMaiSglBackendData* backend_data)
 
     io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
 
-    uint32_t tex = MAI_SGL->get_texture();
-    MAI_SGL->bind_texture(tex);
-    MAI_SGL->tex_image_2D(width, height, pixels);
+    std::vector<mai::RGBA> converted_pixels = convert_rgba_pixels(pixels, width, height);
+
+    backend_data->font_texture = MAI_SGL->get_texture();
+    MAI_SGL->bind_texture(backend_data->font_texture);
+    MAI_SGL->tex_image_2D(width, height, converted_pixels.data());
     MAI_SGL->tex_parameter(MAI_TEXTURE_FILTER, MAI_TEXTURE_FILTER_LINEAR);
     MAI_SGL->tex_parameter(MAI_TEXTURE_WRAP_U, MAI_TEXTURE_WRAP_REPEAT);
     MAI_SGL->tex_parameter(MAI_TEXTURE_WRAP_V, MAI_TEXTURE_WRAP_REPEAT);
     MAI_SGL->bind_texture(0);
 
-    io.Fonts->SetTexID(make_texture_id(tex));
+    io.Fonts->SetTexID(make_texture_id(backend_data->font_texture));
+    io.Fonts->ClearTexData();
     return true;
+}
+
+void destroy_fonts_texture(ImGuiMaiSglBackendData* backend_data)
+{
+    if (backend_data->font_texture != 0)
+    {
+        MAI_SGL->delete_texture(backend_data->font_texture);
+        backend_data->font_texture = 0;
+    }
+
+    ImGuiIO& io = ImGui::GetIO();
+    io.Fonts->SetTexID(ImTextureID_Invalid);
 }
 
 
@@ -202,21 +170,43 @@ mai::ScissorRect make_scissor_rect(const ImDrawCmd* draw_cmd, const ImDrawData* 
     return rect;
 }
 
-void setup_render_state(ImGuiMaiSglBackendData* backend_data, const ImDrawData* draw_data, int framebuffer_width, int framebuffer_height)
+SavedGpuState save_gpu_state()
+{
+    SavedGpuState state;
+    state.render_state = MAI_SGL->get_render_state();
+    state.shader = MAI_SGL->get_program();
+    state.vao = MAI_SGL->get_bound_vertex_array();
+    state.array_buffer = MAI_SGL->get_bound_array_buffer();
+    state.element_array_buffer = MAI_SGL->get_bound_element_array_buffer();
+    return state;
+}
+
+void restore_gpu_state(const SavedGpuState& state)
+{
+    MAI_SGL->set_render_state(state.render_state);
+    MAI_SGL->use_program(state.shader);
+    MAI_SGL->bind_vertex_array(state.vao);
+    MAI_SGL->bind_buffer(MAI_ARRAY_BUFFER, state.array_buffer);
+    MAI_SGL->bind_buffer(MAI_ELEMENT_ARRAY_BUFFER, state.element_array_buffer);
+}
+
+void setup_render_state(ImGuiMaiSglBackendData* backend_data, int framebuffer_width, int framebuffer_height)
 {
     MAI_SGL->draw_dimension(MAI_DRAW_2D);
     MAI_SGL->disable(MAI_DEPTH_TEST);
     MAI_SGL->disable(MAI_CULL_FACE);
     MAI_SGL->enable(MAI_BLENDING);
     MAI_SGL->enable(MAI_SCISSOR_TEST);
+    MAI_SGL->use_program(backend_data->shader);
+    MAI_SGL->bind_vertex_array(backend_data->vao);
+    MAI_SGL->bind_buffer(MAI_ARRAY_BUFFER, backend_data->vertex_vbo);
+    MAI_SGL->bind_buffer(MAI_ELEMENT_ARRAY_BUFFER, backend_data->index_ebo);
 
     backend_data->shader->_transform_matrix = mai::orthographic(
         0.0f, static_cast<float>(framebuffer_width),
         0.0f, static_cast<float>(framebuffer_height),
         -1.0f, 1.0f);
     backend_data->shader->_modulate_vertex_color = true;
-
-    (void)draw_data;
 }
 
 }
@@ -260,8 +250,9 @@ void ImGui_Impl_MAI_SGL_Shutdown()
     ImGuiIO& io = ImGui::GetIO();
     io.BackendRendererName = nullptr;
     io.BackendRendererUserData = nullptr;
-    io.BackendFlags &= ~(ImGuiBackendFlags_RendererHasVtxOffset | ImGuiBackendFlags_RendererHasTextures);
+    io.BackendFlags &= ~ImGuiBackendFlags_RendererHasVtxOffset;
 
+    destroy_fonts_texture(backend_data);
     MAI_SGL->delete_buffer(backend_data->vertex_vbo);
     MAI_SGL->delete_buffer(backend_data->index_ebo);
     MAI_SGL->delete_vertex_array(backend_data->vao);
@@ -272,34 +263,28 @@ void ImGui_Impl_MAI_SGL_Shutdown()
 
 void ImGui_Impl_MAI_SGL_NewFrame()
 {
-    IM_ASSERT(get_backend_data() != nullptr && "Context or backend not initialized! Did you call ImGui_Impl_MAI_SGL_Init()?");
+    ImGuiMaiSglBackendData* backend_data = get_backend_data();
+    IM_ASSERT(backend_data != nullptr && "Context or backend not initialized! Did you call ImGui_Impl_MAI_SGL_Init()?");
+
+    if (backend_data->font_texture == 0)
+        create_fonts_texture(backend_data);
 }
 
 void ImGui_Impl_MAI_SGL_RenderDrawData(ImDrawData* draw_data)
 {
+    if (draw_data == nullptr || draw_data->TotalVtxCount == 0)
+        return;
+
     const int framebuffer_width = static_cast<int>(draw_data->DisplaySize.x * draw_data->FramebufferScale.x);
     const int framebuffer_height = static_cast<int>(draw_data->DisplaySize.y * draw_data->FramebufferScale.y);
     if (framebuffer_width <= 0 || framebuffer_height <= 0)
         return;
 
-    mai::RenderState old_state = MAI_SGL->get_render_state();
-
+    SavedGpuState old_state = save_gpu_state();
     ImGuiMaiSglBackendData* backend_data = get_backend_data();
     IM_ASSERT(backend_data != nullptr && "Context or backend not initialized! Did you call ImGui_Impl_MAI_SGL_Init()?");
 
-    if (draw_data->Textures != nullptr)
-    {
-        for (ImTextureData* texture : *draw_data->Textures)
-        {
-            if (texture->Status != ImTextureStatus_OK)
-                update_texture(texture);
-        }
-    }
-
-    setup_render_state(backend_data, draw_data, framebuffer_width, framebuffer_height);
-
-    MAI_SGL->use_program(backend_data->shader);
-    MAI_SGL->bind_vertex_array(backend_data->vao);
+    setup_render_state(backend_data, framebuffer_width, framebuffer_height);
 
     for (const ImDrawList* draw_list : draw_data->CmdLists)
     {
@@ -316,7 +301,7 @@ void ImGui_Impl_MAI_SGL_RenderDrawData(ImDrawData* draw_data)
             if (draw_cmd->UserCallback != nullptr)
             {
                 if (draw_cmd->UserCallback == ImDrawCallback_ResetRenderState)
-                    setup_render_state(backend_data, draw_data, framebuffer_width, framebuffer_height);
+                    setup_render_state(backend_data, framebuffer_width, framebuffer_height);
                 else
                     draw_cmd->UserCallback(draw_list, draw_cmd);
                 continue;
@@ -330,18 +315,13 @@ void ImGui_Impl_MAI_SGL_RenderDrawData(ImDrawData* draw_data)
             if (indices.empty())
                 continue;
 
-            backend_data->shader->_diffuse_texture = static_cast<uint32_t>(draw_cmd->GetTexID());
+            backend_data->shader->_diffuse_texture = get_texture_id(draw_cmd->GetTexID());
 
             MAI_SGL->set_scissor_rect(scissor_rect);
-            MAI_SGL->bind_buffer(MAI_ELEMENT_ARRAY_BUFFER, backend_data->index_ebo);
             MAI_SGL->buffer_data(MAI_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(uint32_t), indices.data());
             MAI_SGL->draw_element(MAI_DRAW_TRIANGLES, 0, indices.size());
         }
     }
 
-    MAI_SGL->bind_vertex_array(0);
-    MAI_SGL->bind_buffer(MAI_ARRAY_BUFFER, 0);
-    MAI_SGL->bind_buffer(MAI_ELEMENT_ARRAY_BUFFER, 0);
-
-    MAI_SGL->set_render_state(old_state);
+    restore_gpu_state(old_state);
 }

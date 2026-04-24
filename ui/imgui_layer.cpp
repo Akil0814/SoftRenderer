@@ -36,6 +36,16 @@ bool init_imgui_for_MAI_SGL()
     return true;
 }
 
+void shutdown_imgui_for_MAI_SGL()
+{
+    if (ImGui::GetCurrentContext() == nullptr)
+        return;
+
+    ImGui_Impl_MAI_SGL_Shutdown();
+    ImGui_ImplWin32_Shutdown();
+    ImGui::DestroyContext();
+}
+
 void rend_imgui()
 {
     static bool show_demo_window = false;
