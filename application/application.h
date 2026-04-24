@@ -28,6 +28,12 @@ public:
 	uint32_t get_width() const { return _width; }
 	uint32_t get_height() const { return _height; }
 	void* get_canvas() const { return _canvas_buffer; }
+	HDC get_hdc() const { return _hDC; }
+	HWND get_hwnd() const { return _hwnd; }
+	HINSTANCE get_hinstance() const { return _window_inst; }
+	HDC get_canvas_dc() const { return _CanvasDC; }
+	HBITMAP get_canvas_bitmap() const { return _hBmp; }
+	const WCHAR* get_window_class_name() const { return _window_class_name; }
 
 	void set_camera(Camera* camera);
 
@@ -44,9 +50,9 @@ private:
 
 	bool _active = {true};
 
-	HINSTANCE _window_inst;
+	HINSTANCE _window_inst{ nullptr };
 	WCHAR _window_class_name[100] = L"AppWindow";
-	HWND _hwnd;
+	HWND _hwnd{ nullptr };
 
 	int _width = 800;
 	int _height = 600;

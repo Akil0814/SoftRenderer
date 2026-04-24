@@ -1,1 +1,86 @@
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#include <windows.h>
+
+#include "../application/application.h"
+#include "../imgui/imgui.h"
+#include "../imgui/imgui_impl_win32.h"
+
+#include "imgui_impl_MAI_SGL.h"
 #include "imgui_layer.h"
+
+bool init_imgui_for_MAI_SGL()
+{
+    ImGui_ImplWin32_EnableDpiAwareness();
+    float main_scale = ImGui_ImplWin32_GetDpiScaleForMonitor(::MonitorFromPoint(POINT{ 0, 0 }, MONITOR_DEFAULTTOPRIMARY));
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+
+    ImGui::StyleColorsDark();
+
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.ScaleAllSizes(main_scale);
+    style.FontScaleDpi = main_scale;
+
+    if (!ImGui_ImplWin32_Init(MAI_APP->get_hwnd()))
+        return false;
+
+    if (!ImGui_Impl_MAI_SGL_Init())
+        return false;
+
+    return true;
+}
+
+void rend_imgui()
+{
+    static bool show_demo_window = false;
+    static bool show_metrics_window = false;
+    static bool show_style_editor = false;
+
+    ImGui_Impl_MAI_SGL_NewFrame();
+    ImGui_ImplWin32_NewFrame();
+    ImGui::NewFrame();
+
+    ImGui::Begin("MAI SGL");
+    ImGuiIO& io = ImGui::GetIO();
+
+    ImGui::Text("Dear ImGui is rendering through MAI_SGL.");
+    ImGui::Separator();
+
+    ImGui::Text("Window: %u x %u", MAI_APP->get_width(), MAI_APP->get_height());
+    ImGui::Text("Display: %.0f x %.0f", io.DisplaySize.x, io.DisplaySize.y);
+    ImGui::Text("Framebuffer scale: %.2f, %.2f", io.DisplayFramebufferScale.x, io.DisplayFramebufferScale.y);
+    ImGui::Text("FPS: %.1f", io.Framerate);
+    ImGui::Text("Mouse: %.1f, %.1f", io.MousePos.x, io.MousePos.y);
+
+    ImGui::Separator();
+    ImGui::Text("Platform: %s", io.BackendPlatformName ? io.BackendPlatformName : "none");
+    ImGui::Text("Renderer: %s", io.BackendRendererName ? io.BackendRendererName : "none");
+
+    ImGui::Separator();
+    ImGui::Checkbox("Demo Window", &show_demo_window);
+    ImGui::Checkbox("Metrics Window", &show_metrics_window);
+    ImGui::Checkbox("Style Editor", &show_style_editor);
+    ImGui::End();
+
+    if (show_demo_window)
+        ImGui::ShowDemoWindow(&show_demo_window);
+
+    if (show_metrics_window)
+        ImGui::ShowMetricsWindow(&show_metrics_window);
+
+    if (show_style_editor)
+    {
+        ImGui::Begin("Style Editor", &show_style_editor);
+        ImGui::ShowStyleEditor();
+        ImGui::End();
+    }
+
+    ImGui::Render();
+    ImGui_Impl_MAI_SGL_RenderDrawData(ImGui::GetDrawData());
+}

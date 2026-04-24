@@ -1,5 +1,26 @@
 #include "application.h"
 #include<windowsx.h>
+#include "../imgui/imgui.h"
+#include "../imgui/imgui_impl_win32.h"
+
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+namespace
+{
+
+bool is_mouse_message(UINT message)
+{
+	return message >= WM_MOUSEFIRST && message <= WM_MOUSELAST;
+}
+
+bool is_keyboard_message(UINT message)
+{
+	return message == WM_KEYDOWN || message == WM_KEYUP ||
+		message == WM_SYSKEYDOWN || message == WM_SYSKEYUP ||
+		message == WM_CHAR || message == WM_SYSCHAR;
+}
+
+}
 
 namespace mai
 {
@@ -164,8 +185,14 @@ bool Application::peek_message()//取消息
 
 	//从消息队列里取一条消息出来，然后交给系统分发处理
 	//如果有，就取出一条，放进 msg, PM_REMOVE 表示取出来后顺便从队列里移除
-	if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 	{
+		if (msg.message == WM_QUIT)
+		{
+			_active = false;
+			break;
+		}
+
 		TranslateMessage(&msg);//键盘字符输入辅助处理
 		DispatchMessage(&msg);//把消息真正派发给对应窗口的 WndProc//把消息转发到窗口
 	}
@@ -176,6 +203,19 @@ bool Application::peek_message()//取消息
 //真正处理窗口消息
 LRESULT Application::handle_message(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)//处理消息
 {
+	if (ImGui::GetCurrentContext() != nullptr && ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
+		return true;
+
+	if (ImGui::GetCurrentContext() != nullptr)
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		if ((io.WantCaptureMouse && is_mouse_message(message)) ||
+			(io.WantCaptureKeyboard && is_keyboard_message(message)))
+		{
+			return 0;
+		}
+	}
+
 	switch (message)
 	{
 	case WM_KEYDOWN:

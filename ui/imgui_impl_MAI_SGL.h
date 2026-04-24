@@ -1,8 +1,7 @@
+#pragma once
+
 #include "../imgui/imgui.h"
-#include"../imgui/imgui_impl_win32.h"
-
 #include "../MAI_SGL/math/math.h"
-
 
 struct MaiImGuiVertex
 {
@@ -12,6 +11,6 @@ struct MaiImGuiVertex
 };
 
 bool ImGui_Impl_MAI_SGL_Init();
+void ImGui_Impl_MAI_SGL_Shutdown();
 void ImGui_Impl_MAI_SGL_NewFrame();
 void ImGui_Impl_MAI_SGL_RenderDrawData(ImDrawData* data);
-
