@@ -36,6 +36,7 @@ namespace mai
 		output._depth = input._position.z;
 
 		auto iter = textures.find(_diffuse_texture);
+		
 		if (iter == textures.end() || iter->second == nullptr)
 		{
 			output._color = vector_to_RGBA(input._color);
@@ -45,6 +46,14 @@ namespace mai
 		Texture* texture = iter->second;
 
 		mai::vec4f diffuseColor = texture->get_color(input._UV.x, input._UV.y);
+		if (_modulate_vertex_color)
+		{
+			diffuseColor.x *= input._color.x;
+			diffuseColor.y *= input._color.y;
+			diffuseColor.z *= input._color.z;
+			diffuseColor.w *= input._color.w;
+		}
+
 		output._color = vector_to_RGBA(diffuseColor);
 	}
 

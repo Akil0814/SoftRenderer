@@ -24,7 +24,7 @@ public:
 		const std::map<uint32_t, Texture*>& textures) override;
 
 public:
-	// TODO: Define the final 2D transform convention before implementation.
+	bool _modulate_vertex_color{ false };
 	mai::mat4f _transform_matrix;
 	uint32_t _diffuse_texture{ 0 };
 };

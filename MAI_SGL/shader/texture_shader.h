@@ -20,7 +20,6 @@ public:
 	void fragment_shader(const VsOutput& input, FsOutput& output, const std::map<uint32_t, Texture*>& textures)override;
 
 public:
-	//uniforms
 	mai::mat4f _model_matrix;
 	mai::mat4f _view_matrix;
 	mai::mat4f _projection_matrix;
