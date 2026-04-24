@@ -56,7 +56,7 @@ namespace mai
 			screen_mapping(context, output);
 		}
 
-		Raster::rasterize(draw_mode, cull_outputs, raster_outputs);
+		Raster::rasterize(context,draw_mode, cull_outputs, raster_outputs);
 		if (raster_outputs.empty())
 			return;
 
@@ -79,7 +79,7 @@ namespace mai
 			screen_mapping(context, output);
 		}
 
-		Raster::rasterize(draw_mode, clip_outputs, raster_outputs);
+		Raster::rasterize(context,draw_mode, clip_outputs, raster_outputs);
 
 		if (raster_outputs.empty())
 			return;

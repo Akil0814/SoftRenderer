@@ -5,14 +5,14 @@ namespace mai
 {
 
 	void Raster::rasterize(
-		uint8_t draw_mode, const std::vector<VertexShaderOutput>& inputs,
+		const DrawContext& context,uint8_t draw_mode, const std::vector<VertexShaderOutput>& inputs,
 		std::vector<VertexShaderOutput>& results)
 	{
 		if (draw_mode == MAI_DRAW_LINES)
 		{
 			for (uint32_t i = 0; i < inputs.size(); i += 2)
 			{
-				rasterize_line(inputs[i], inputs[i + 1], results);
+				rasterize_line(context,inputs[i], inputs[i + 1], results);
 			}
 		}
 
@@ -20,13 +20,13 @@ namespace mai
 		{
 			for (uint32_t i = 0; i < inputs.size(); i += 3)
 			{
-				rasterize_triangle(inputs[i], inputs[i + 1], inputs[i + 2], results);
+				rasterize_triangle(context,inputs[i], inputs[i + 1], inputs[i + 2], results);
 			}
 		}
 	}
 
 void Raster::rasterize_line(
-	const VertexShaderOutput& v0, const VertexShaderOutput& v1,
+	const DrawContext& context, const VertexShaderOutput& v0, const VertexShaderOutput& v1,
 	std::vector<VertexShaderOutput>& results
 )
 {
@@ -38,7 +38,19 @@ void Raster::rasterize_line(
 	if (start._position.x > end._position.x)
 		std::swap(start, end);
 
-	results.push_back(start);
+	auto in_scissor_rect = [&context](const VsOutput& point) noexcept
+	{
+		if (!context._state._enable_scissor_test)
+			return true;
+
+		const auto& rect = context._state._scissor_clip_rect;
+		return rect.contains(
+			static_cast<int>(point._position.x),
+			static_cast<int>(point._position.y));
+	};
+
+	if (in_scissor_rect(start))
+		results.push_back(start);
 
 	//保证y方向也是从小到大
 	bool flip_y = false;
@@ -97,18 +109,32 @@ void Raster::rasterize_line(
 
 		interpolant_line(v0, v1, current_point);
 
-		results.push_back(current_point);
+		if (in_scissor_rect(current_point))
+			results.push_back(current_point);
 	}
 }
 
 void Raster::rasterize_triangle(
-	const VertexShaderOutput& v0, const VertexShaderOutput& v1, const VertexShaderOutput& v2,
+	const DrawContext& context, const VertexShaderOutput& v0, const VertexShaderOutput& v1, const VertexShaderOutput& v2,
 	std::vector<VertexShaderOutput>& results)
 {
+	//raster bbox
 	int max_X = static_cast<int>(std::max(v0._position.x, std::max(v1._position.x, v2._position.x)));
 	int min_X = static_cast<int>(std::min(v0._position.x, std::min(v1._position.x, v2._position.x)));
 	int max_Y = static_cast<int>(std::max(v0._position.y, std::max(v1._position.y, v2._position.y)));
 	int min_Y = static_cast<int>(std::min(v0._position.y, std::min(v1._position.y, v2._position.y)));
+
+	if(context._state._enable_scissor_test)
+	{
+		const auto& rect = context._state._scissor_clip_rect;
+		min_X = std::max(min_X, rect._min_x);
+   		min_Y = std::max(min_Y, rect._min_y);
+    	max_X = std::min(max_X, rect._max_x - 1);
+   		max_Y = std::min(max_Y, rect._max_y - 1);
+	}
+
+	if (min_X > max_X || min_Y > max_Y)
+    	return;
 
 	mai::vec2f pv0, pv1, pv2;
 	VsOutput result;

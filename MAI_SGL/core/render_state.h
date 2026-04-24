@@ -20,6 +20,13 @@ struct ScissorRect
 
     int height() const noexcept
     	{ return _max_y - _min_y; }
+
+
+	bool contains(int x, int y) const noexcept
+    {
+        return x >= _min_x && x < _max_x &&
+               y >= _min_y && y < _max_y;
+    }
 };
 
 struct RenderState

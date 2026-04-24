@@ -10,6 +10,15 @@ namespace mai
 		for (size_t i = 0; i < raster_outputs.size(); ++i)
 		{
 			context._shader.fragment_shader(raster_outputs[i], fs_output, context._texture_map);
+
+			if(context._state._enable_scissor_test)
+			{
+				const ScissorRect& rect = context._state._scissor_clip_rect;
+				if(!rect.contains(fs_output._pixel_pos.x,fs_output._pixel_pos.y))
+				 continue;
+
+			}
+
 			pixel_pos = static_cast<size_t>(fs_output._pixel_pos.y) * context._frame_buffer._width + static_cast<size_t>(fs_output._pixel_pos.x);
 
 			if (context._state._enable_depth_test && !depth_test(context, fs_output))
