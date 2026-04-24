@@ -6,6 +6,7 @@
 #include "../application/application.h"
 #include "../imgui/imgui.h"
 #include "../imgui/imgui_impl_win32.h"
+#include "../MAI_SGL/core/gpu.h"
 
 #include "imgui_impl_MAI_SGL.h"
 #include "imgui_layer.h"
@@ -71,6 +72,13 @@ void rend_imgui()
     ImGui::Separator();
     ImGui::Text("Platform: %s", io.BackendPlatformName ? io.BackendPlatformName : "none");
     ImGui::Text("Renderer: %s", io.BackendRendererName ? io.BackendRendererName : "none");
+
+    const mai::RenderStats stats = MAI_SGL->get_render_stats();
+    ImGui::Separator();
+    ImGui::Text("Renderer Stats");
+    ImGui::Text("Draw Calls: %llu", static_cast<unsigned long long>(stats._frame_draw_calls));
+    ImGui::Text("Triangles: %llu", static_cast<unsigned long long>(stats._frame_triangles));
+    ImGui::Text("Vertices: %llu", static_cast<unsigned long long>(stats._frame_vertices));
 
     ImGui::End();
 

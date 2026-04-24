@@ -41,6 +41,7 @@ namespace mai
 
 	void GPU::clear() noexcept
 	{
+		reset_render_stats();
 		size_t pixelSize = _frame_buffer->_width * _frame_buffer->_height;
 		std::fill_n(_frame_buffer->_color_buffer, pixelSize, RGBA(0, 0, 0, 0));
 		std::fill_n(_frame_buffer->_depth_buffer, pixelSize, 1.0f);
@@ -188,6 +189,7 @@ namespace mai
 			_screen_matrix
 		};
 
+		accumulate_draw_stats(draw_mode, count);
 		_draw_pipeline.draw_elements(context, draw_mode, first, count);
 	}
 
@@ -331,5 +333,24 @@ namespace mai
 	uint32_t GPU::get_bound_element_array_buffer() const
 	{
 		return _current_EBO;
+	}
+
+	RenderStats GPU::get_render_stats() const
+	{
+		return _render_stats;
+	}
+
+	void GPU::reset_render_stats() noexcept
+	{
+		_render_stats = RenderStats{};
+	}
+
+	void GPU::accumulate_draw_stats(uint8_t draw_mode, size_t count) noexcept
+	{
+		++_render_stats._frame_draw_calls;
+		_render_stats._frame_vertices += count;
+
+		if (draw_mode == MAI_DRAW_TRIANGLES)
+			_render_stats._frame_triangles += count / 3;
 	}
 }
