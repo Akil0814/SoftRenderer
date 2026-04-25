@@ -52,6 +52,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)/
 //HINSTANCE hInstance 本应用程序实例句柄，唯一指代当前程序
 bool Application::init(HINSTANCE hInstance, uint32_t width, uint32_t height)
 {
+	ImGui_ImplWin32_EnableDpiAwareness();
+
 	_width = width;
 	_height = height;
 

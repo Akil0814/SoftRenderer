@@ -13,8 +13,7 @@
 
 bool init_imgui_for_MAI_SGL()
 {
-    ImGui_ImplWin32_EnableDpiAwareness();
-    float main_scale = ImGui_ImplWin32_GetDpiScaleForMonitor(::MonitorFromPoint(POINT{ 0, 0 }, MONITOR_DEFAULTTOPRIMARY));
+    const float main_scale = ImGui_ImplWin32_GetDpiScaleForHwnd(MAI_APP->get_hwnd());
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -57,10 +56,12 @@ void rend_imgui()
 
     ImGui_Impl_MAI_SGL_NewFrame();
     ImGui_ImplWin32_NewFrame();
+    ImGuiIO& io = ImGui::GetIO();
+    io.DisplaySize = ImVec2(static_cast<float>(MAI_APP->get_width()), static_cast<float>(MAI_APP->get_height()));
+    io.DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
     ImGui::NewFrame();
 
     ImGui::Begin("MAI SGL");
-    ImGuiIO& io = ImGui::GetIO();
     const bool is_window_hovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem);
     const ImVec2 window_pos = ImGui::GetWindowPos();
     const ImVec2 window_size = ImGui::GetWindowSize();
