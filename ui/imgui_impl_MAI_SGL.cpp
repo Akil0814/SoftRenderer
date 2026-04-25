@@ -100,7 +100,7 @@ bool create_fonts_texture(ImGuiMaiSglBackendData* backend_data)
 
     std::vector<mai::RGBA> converted_pixels = convert_rgba_pixels(pixels, width, height);
 
-    backend_data->font_texture = MAI_SGL->get_texture();
+    backend_data->font_texture = MAI_SGL->gen_texture();
     MAI_SGL->bind_texture(backend_data->font_texture);
     MAI_SGL->tex_image_2D(width, height, converted_pixels.data());
     MAI_SGL->tex_parameter(MAI_TEXTURE_FILTER, MAI_TEXTURE_FILTER_LINEAR);

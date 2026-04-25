@@ -9,6 +9,7 @@
 #include "../resource/texture.h"
 #include "../resource/VAO.h"
 #include "../shader/shader.h"
+#include "gpu_debug.h"
 #include "gpu_stats.h"
 #include "render_state.h"
 
@@ -28,15 +29,9 @@ public:
 	// Initialize the framebuffer surface.
 	void init_surface(uint32_t width, uint32_t height, void* buffer = nullptr);
 
-	// Clear color and depth buffers.
 	void clear() noexcept;
 
-	// Debug-only helper: dumps a VAO layout for manual inspection.
-	void print_VAO(uint32_t VAO_ID);
-	// Debug-only placeholder: reserved for printing per-frame renderer stats to the console/log.
-	void print_frame_stats();
-	// Debug-only placeholder: reserved for printing accumulated renderer stats to the console/log.
-	void print_summary_stats();
+	void draw_element(uint8_t draw_mode, size_t first, size_t count);
 
 	uint32_t gen_buffer();
 	void delete_buffer(uint32_t buffer_ID);
@@ -46,11 +41,9 @@ public:
 	uint32_t gen_vertex_array();
 	void delete_vertex_array(uint32_t VAO_ID);
 	void bind_vertex_array(uint32_t VAO_ID);
-	void vertex_attribute_pointer(
-		uint32_t binding, size_t item_size,
-		size_t stride, size_t offset);
+	void vertex_attribute_pointer(uint32_t binding, size_t item_size,size_t stride, size_t offset);
 
-	uint32_t get_texture();
+	uint32_t gen_texture();
 	void delete_texture(uint32_t tex_ID);
 	void bind_texture(uint32_t tex_ID);
 	void tex_image_2D(uint32_t width, uint32_t height, void* data);
@@ -74,27 +67,41 @@ public:
 	void depth_function(uint8_t value);
 
 
+
+
+
 	RenderState get_render_state() const;
 	void set_render_state(const RenderState& state);
 	uint32_t get_bound_vertex_array() const;
 	uint32_t get_bound_array_buffer() const;
 	uint32_t get_bound_element_array_buffer() const;
 	RenderStats get_render_stats() const;
+	RenderStats get_summary_stats() const;
 	void add_rasterized_pixels(uint64_t count) noexcept;
 	void add_fragments(uint64_t count) noexcept;
 	void add_texture_samples(uint64_t count) noexcept;
+	gpu_debug::ErrorCode get_error() noexcept;
+	gpu_debug::ErrorCode peek_error() const noexcept;
 
-	void draw_element(uint8_t draw_mode, size_t first, size_t count);
+
+	// Debug-only.
+	void print_VAO(uint32_t VAO_ID);
+	void print_frame_stats();
+	void print_summary_stats();
+
 
 private:
 	void reset_render_stats() noexcept;
 	void accumulate_draw_stats(uint8_t draw_mode, size_t count) noexcept;
+	void set_error(gpu_debug::ErrorCode error) noexcept;
 
 	static GPU* _instance;
 	FrameBuffer* _frame_buffer = { nullptr };
 	DrawPipeline _draw_pipeline;
 	RenderState _render_state;
 	RenderStats _render_stats;
+	RenderStats _summary_render_stats;
+	gpu_debug::ErrorCode _error_code{ gpu_debug::ErrorCode::NoError };
 
 	// VBO/EBO state
 	uint32_t _current_EBO = { 0 };
