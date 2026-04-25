@@ -9,6 +9,7 @@
 #include "../resource/texture.h"
 #include "../resource/VAO.h"
 #include "../shader/shader.h"
+#include "gpu_stats.h"
 #include "render_state.h"
 
 // Software Graphics Library
@@ -16,16 +17,6 @@
 
 namespace mai
 {
-
-struct RenderStats
-{
-	uint64_t _frame_draw_calls{ 0 };
-	uint64_t _frame_triangles{ 0 };
-	uint64_t _frame_vertices{ 0 };
-	uint64_t _frame_rasterized_pixels{ 0 };
-	uint64_t _frame_fragments{ 0 };
-	uint64_t _frame_texture_samples{ 0 };
-};
 
 class GPU
 {
@@ -40,8 +31,12 @@ public:
 	// Clear color and depth buffers.
 	void clear() noexcept;
 
-	// Debug helper.
+	// Debug-only helper: dumps a VAO layout for manual inspection.
 	void print_VAO(uint32_t VAO_ID);
+	// Debug-only placeholder: reserved for printing per-frame renderer stats to the console/log.
+	void print_frame_stats();
+	// Debug-only placeholder: reserved for printing accumulated renderer stats to the console/log.
+	void print_summary_stats();
 
 	uint32_t gen_buffer();
 	void delete_buffer(uint32_t buffer_ID);

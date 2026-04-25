@@ -182,7 +182,7 @@ bool prepare()
 		std::cerr << "false" << std::endl;
 	if (image != nullptr)
 	{
-		texture = MAI_SGL->get_texture();
+		texture = MAI_SGL->gen_texture();
 		MAI_SGL->bind_texture(texture);
 		MAI_SGL->tex_image_2D(image->_width, image->_height, image->_data);
 		MAI_SGL->tex_parameter(MAI_TEXTURE_FILTER, MAI_TEXTURE_FILTER_LINEAR);

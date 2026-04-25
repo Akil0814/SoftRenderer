@@ -66,15 +66,12 @@ void rend_imgui()
     const ImVec2 window_pos = ImGui::GetWindowPos();
     const ImVec2 window_size = ImGui::GetWindowSize();
 
-    ImGui::Text("Dear ImGui is rendering through MAI_SGL.");
-    ImGui::Separator();
 
     ImGui::Text("Window: %u x %u", MAI_APP->get_width(), MAI_APP->get_height());
     ImGui::Text("ImGui Window Hovered: %s", is_window_hovered ? "true" : "false");
     ImGui::Text("Display: %.0f x %.0f", io.DisplaySize.x, io.DisplaySize.y);
     ImGui::Text("Framebuffer scale: %.2f, %.2f", io.DisplayFramebufferScale.x, io.DisplayFramebufferScale.y);
     ImGui::Text("FPS: %.1f", io.Framerate);
-    ImGui::Text("Mouse: %.1f, %.1f", io.MousePos.x, io.MousePos.y);
 
     ImGui::Separator();
     ImGui::Text("Platform: %s", io.BackendPlatformName ? io.BackendPlatformName : "none");
