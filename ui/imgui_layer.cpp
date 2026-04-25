@@ -71,7 +71,6 @@ void rend_imgui()
 
     ImGui::Text("Window: %u x %u", MAI_APP->get_width(), MAI_APP->get_height());
     ImGui::Text("ImGui Window Hovered: %s", is_window_hovered ? "true" : "false");
-    ImGui::Text("ImGui Window Pos/Size: (%.1f, %.1f) / (%.1f, %.1f)", window_pos.x, window_pos.y, window_size.x, window_size.y);
     ImGui::Text("Display: %.0f x %.0f", io.DisplaySize.x, io.DisplaySize.y);
     ImGui::Text("Framebuffer scale: %.2f, %.2f", io.DisplayFramebufferScale.x, io.DisplayFramebufferScale.y);
     ImGui::Text("FPS: %.1f", io.Framerate);

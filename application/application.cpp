@@ -234,6 +234,30 @@ LRESULT Application::handle_message(HWND hWnd, UINT message, WPARAM wParam, LPAR
 		}
 		break;
 	}
+	case WM_LBUTTONDOWN: {
+		if (_camera) {
+			_camera->on_l_mouse_down(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		}
+		break;
+	}
+	case WM_LBUTTONUP: {
+		if (_camera) {
+			_camera->on_l_mouse_up(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		}
+		break;
+	}
+	case WM_MBUTTONDOWN: {
+		if (_camera) {
+			_camera->on_m_mouse_down(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		}
+		break;
+	}
+	case WM_MBUTTONUP: {
+		if (_camera) {
+			_camera->on_m_mouse_up(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		}
+		break;
+	}
 	case WM_RBUTTONDOWN: {
 		if (_camera) {
 			_camera->on_r_mouse_down(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
@@ -250,6 +274,12 @@ LRESULT Application::handle_message(HWND hWnd, UINT message, WPARAM wParam, LPAR
 	case WM_MOUSEMOVE: {
 		if (_camera) {
 			_camera->on_mouse_move(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+		}
+		break;
+	}
+	case WM_MOUSEWHEEL: {
+		if (_camera) {
+			_camera->on_mouse_wheel(static_cast<float>(GET_WHEEL_DELTA_WPARAM(wParam)) / static_cast<float>(WHEEL_DELTA));
 		}
 		break;
 	}

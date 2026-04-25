@@ -2,23 +2,24 @@
 #include <chrono>
 #include <Windows.h>
 
-#include "application/application.h"
-#include "application/camera.h"
-
 #include "MAI_SGL/data_structures.h"
-
 #include "MAI_SGL/shader/color_shader.h"
 #include "MAI_SGL/shader/texture_shader.h"
 #include "MAI_SGL/shader/color_shader_2D.h"
-
 #include "MAI_SGL/core/gpu.h"
-
 #include "MAI_SGL/resource/texture.h"
 #include "MAI_SGL/resource/image.h"
-
 #include "MAI_SGL/math/math.h"
 
+#include "application/application.h"
+#include "application/camera.h"
+
+#include "MAIframework/geometry.h"
+
 #include "ui/imgui_layer.h"
+
+
+
 
 #pragma comment(linker, "/subsystem:console /entry:wWinMainCRTStartup" )//更改main入口
 
@@ -28,19 +29,9 @@ uint32_t window_width = 1080;
 uint32_t window_height = 720;
 
 mai::Image* image = nullptr;
-
 uint32_t texture = 0;
 
-//三个属性对应vbo
-uint32_t position_vbo = 0;
-uint32_t color_vbo = 0;
-uint32_t uv_vbo = 0;
-
-//三角形的indices
-uint32_t ebo = 0;
-
-//本三角形专属vao
-uint32_t vao = 0;
+mai::Geometry* geometry = nullptr;
 
 mai::TextureShader* texture_shader = nullptr;
 mai::ColorShader* color_shader = nullptr;
@@ -57,81 +48,18 @@ constexpr float rotation_speed = 0.6f;
 constexpr float max_delta_time = 0.1f;
 constexpr float fps_smoothing = 0.1f;
 
-void transform(float delta_time)
+
+//三个属性对应vbo
+uint32_t position_vbo = 0;
+uint32_t color_vbo = 0;
+uint32_t uv_vbo = 0;
+//三角形的indices
+uint32_t ebo = 0;
+//本三角形专属vao
+uint32_t vao = 0;
+void test_triangle()
 {
-	angle += rotation_speed * delta_time;
-	//模型变换
-	model_matrix = mai::rotate(mai::mat4f(1.0f), angle, mai::vec3f{ 0.0f, 1.0f, 0.0f });
-}
-
-void on_render(float delta_time)
-{
-	transform(delta_time);
-	
-	const mai::mat4f& view_matrix = camera->get_view_matrix();
-	const mai::mat4f& projection_matrix = camera->get_projection_matrix();
-
-	texture_shader->_model_matrix = model_matrix;
-	texture_shader->_view_matrix = view_matrix;
-	texture_shader->_projection_matrix = projection_matrix;
-	texture_shader->_diffuse_texture = texture;
-
-	color_shader->_model_matrix = model_matrix;
-	color_shader->_view_matrix = view_matrix;
-	color_shader->_projection_matrix = projection_matrix;
-
-	MAI_SGL->clear();
-	MAI_SGL->draw_dimension(MAI_DRAW_3D);
-	MAI_SGL->enable(MAI_DEPTH_TEST);
-
-	MAI_SGL->bind_vertex_array(vao);
-	MAI_SGL->bind_buffer(MAI_ELEMENT_ARRAY_BUFFER, ebo);
-
-	MAI_SGL->use_program(texture_shader);
-	MAI_SGL->draw_element(MAI_DRAW_TRIANGLES, 0, 6);
-
-	MAI_SGL->disable(MAI_DEPTH_TEST);
-	MAI_SGL->draw_dimension(MAI_DRAW_2D);
-	MAI_SGL->use_program(color_shader_2d);
-	MAI_SGL->draw_element(MAI_DRAW_TRIANGLES, 6, 3);
-	MAI_SGL->draw_dimension(MAI_DRAW_3D);
-	MAI_SGL->enable(MAI_DEPTH_TEST);
-
-}
-
-bool prepare()
-{
-	if (!init_imgui_for_MAI_SGL())
-		return false;
-
-	camera = new Camera(60.0f, (float)window_width / (float)window_height, 0.1f, 100.0f, { 0.0f, 1.0f, 0.0f });
-	camera->set_position({ 0.0f, 0.0f, 3.0f });
-	MAI_APP->set_camera(camera);
-
-	texture_shader = new mai::TextureShader();
-	color_shader = new mai::ColorShader();
-	color_shader_2d = new mai::ColorShader2D();
-	color_shader_2d->_transform_matrix = mai::orthographic(0.0f,static_cast<float>(window_width - 1),
-		0.0f,static_cast<float>(window_height - 1),-1.0f,1.0f);
-
-	image = mai::Image::create_image("assets/textures/mai.png");
-	if (image == nullptr)
-		std::cerr << "false" << std::endl;
-
-	if (image != nullptr)
-	{
-		texture = MAI_SGL->get_texture();
-		MAI_SGL->bind_texture(texture);
-		MAI_SGL->tex_image_2D(image->_width, image->_height, image->_data);
-		MAI_SGL->tex_parameter(MAI_TEXTURE_FILTER, MAI_TEXTURE_FILTER_LINEAR);
-		MAI_SGL->tex_parameter(MAI_TEXTURE_WRAP_U, MAI_TEXTURE_WRAP_REPEAT);
-		MAI_SGL->tex_parameter(MAI_TEXTURE_WRAP_V, MAI_TEXTURE_WRAP_REPEAT);
-		MAI_SGL->bind_texture(0);
-	}
-
-	MAI_SGL->disable(MAI_CULL_FACE);
 	MAI_SGL->enable(MAI_BLENDING);
-	//MAI_SGL->disable(MAI_DEPTH_TEST);
 
 	float positions[] =
 	{
@@ -201,6 +129,69 @@ bool prepare()
 	MAI_SGL->bind_vertex_array(0);
 
 	MAI_SGL->print_VAO(vao);
+}
+
+
+void transform(float delta_time)
+{
+	angle += rotation_speed * delta_time;
+	//模型变换
+	model_matrix = mai::rotate(mai::mat4f(1.0f), angle, mai::vec3f{ 0.0f, 1.0f, 0.0f });
+}
+
+void on_render(float delta_time)
+{
+	//transform(delta_time);
+	
+	const mai::mat4f& view_matrix = camera->get_view_matrix();
+	const mai::mat4f& projection_matrix = camera->get_projection_matrix();
+
+	texture_shader->_model_matrix = model_matrix;
+	texture_shader->_view_matrix = view_matrix;
+	texture_shader->_projection_matrix = projection_matrix;
+	texture_shader->_diffuse_texture = texture;
+
+
+	MAI_SGL->clear();
+	MAI_SGL->draw_dimension(MAI_DRAW_3D);
+	MAI_SGL->enable(MAI_DEPTH_TEST);
+
+	MAI_SGL->bind_vertex_array(geometry->get_VAO());
+	MAI_SGL->bind_buffer(MAI_ELEMENT_ARRAY_BUFFER, geometry->get_EBO());
+
+	MAI_SGL->use_program(texture_shader);
+	MAI_SGL->draw_element(MAI_DRAW_TRIANGLES, 0, geometry->get_indices_count());
+}
+
+bool prepare()
+{
+	if (!init_imgui_for_MAI_SGL())
+		return false;
+
+	//init camera
+	camera = new Camera(60.0f, (float)window_width / (float)window_height, 0.1f, 100.0f, { 0.0f, 1.0f, 0.0f });
+	camera->set_position({ 0.0f, 0.0f, 3.0f });
+	MAI_APP->set_camera(camera);
+
+	MAI_SGL->disable(MAI_CULL_FACE);
+
+	//init texture
+	texture_shader = new mai::TextureShader();
+	image = mai::Image::create_image("assets/textures/mai.png");
+	if (image == nullptr)
+		std::cerr << "false" << std::endl;
+	if (image != nullptr)
+	{
+		texture = MAI_SGL->get_texture();
+		MAI_SGL->bind_texture(texture);
+		MAI_SGL->tex_image_2D(image->_width, image->_height, image->_data);
+		MAI_SGL->tex_parameter(MAI_TEXTURE_FILTER, MAI_TEXTURE_FILTER_LINEAR);
+		MAI_SGL->tex_parameter(MAI_TEXTURE_WRAP_U, MAI_TEXTURE_WRAP_REPEAT);
+		MAI_SGL->tex_parameter(MAI_TEXTURE_WRAP_V, MAI_TEXTURE_WRAP_REPEAT);
+		MAI_SGL->bind_texture(0);
+	}
+
+	geometry = mai::Geometry::create_box(1.0f);
 
 	return true;
 }
@@ -257,3 +248,4 @@ int APIENTRY wWinMain(
 
 	return 0;
 }
+
