@@ -55,8 +55,8 @@ namespace mai
 
 struct RGBA
 {
-	byte _G;
 	byte _B;
+	byte _G;
 	byte _R;
 	byte _A;
 
