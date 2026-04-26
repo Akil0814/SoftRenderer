@@ -103,7 +103,7 @@ namespace mai
 		[[nodiscard]] Vector2<T> operator/(T f) const noexcept
 		{
 			assert(f != 0);
-			float inv = static_cast<T>(1) / f;
+			const float inv = 1.0f / static_cast<float>(f);
 
 			return Vector2(x * inv, y * inv);
 		}
@@ -113,7 +113,7 @@ namespace mai
 		Vector2<T>& operator/=(T f)noexcept
 		{
 			assert(f != 0);
-			float inv = static_cast<T>(1) / f;
+			const float inv = 1.0f / static_cast<float>(f);
 			x *= inv; y *= inv;
 			return *this;
 		}
@@ -219,14 +219,14 @@ namespace mai
 		[[nodiscard]] Vector3<T> operator/(T f) const noexcept
 		{
 			assert(f != 0);
-			float inv = 1.0 / f;
+			const float inv = 1.0f / static_cast<float>(f);
 			return Vector3<T>(x * inv, y * inv, z * inv);
 		}
 
 		Vector3<T>& operator/=(T f)noexcept
 		{
 			assert(f != 0);
-			float inv = 1.0 / f;
+			const float inv = 1.0f / static_cast<float>(f);
 			x *= inv; y *= inv; z *= inv;
 			return *this;
 		}
@@ -341,14 +341,14 @@ namespace mai
 		[[nodiscard]] Vector4<T> operator/(T f) const noexcept
 		{
 			assert(f != 0);
-			float inv = 1.0 / f;
+			const float inv = 1.0f / static_cast<float>(f);
 			return Vector4<T>(x * inv, y * inv, z * inv, w * inv);
 		}
 
 		Vector4<T>& operator/=(T f)noexcept
 		{
 			assert(f != 0);
-			float inv = 1.0 / f;
+			const float inv = 1.0f / static_cast<float>(f);
 			x *= inv; y *= inv; z *= inv; w *= inv;
 			return *this;
 		}

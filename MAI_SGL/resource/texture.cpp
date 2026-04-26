@@ -49,8 +49,8 @@ mai::vec4f Texture::get_color(float u, float v, uint64_t& sample_count)
 	if (_filter == MAI_TEXTURE_FILTER_NEAREST)
 	{
 		sample_count += 1;
-		int x = std::round(u * (_width - 1));
-		int y = std::round(v * (_height - 1));
+		int x = static_cast<int>(std::round(u * static_cast<float>(_width - 1)));
+		int y = static_cast<int>(std::round(v * static_cast<float>(_height - 1)));
 
 		int position = y * _width + x;
 		result_color = _buffer[position];
@@ -61,10 +61,10 @@ mai::vec4f Texture::get_color(float u, float v, uint64_t& sample_count)
 		float x = u * static_cast<float>(_width - 1);
 		float y = v * static_cast<float>(_height - 1);
 
-		int left = std::floor(x);
-		int right = std::ceil(x);
-		int bottom = std::floor(y);
-		int top = std::ceil(y);
+		int left = static_cast<int>(std::floor(x));
+		int right = static_cast<int>(std::ceil(x));
+		int bottom = static_cast<int>(std::floor(y));
+		int top = static_cast<int>(std::ceil(y));
 
 		//对上下插值，得到左右
 		float y_scale = 0.0f;
@@ -92,10 +92,10 @@ mai::vec4f Texture::get_color(float u, float v, uint64_t& sample_count)
 	}
 
 	mai::vec4f result;
-	result.x = static_cast<float>(result_color._R) / 255.0;
-	result.y = static_cast<float>(result_color._G) / 255.0;
-	result.z = static_cast<float>(result_color._B) / 255.0;
-	result.w = static_cast<float>(result_color._A) / 255.0;
+	result.x = static_cast<float>(result_color._R) / 255.0f;
+	result.y = static_cast<float>(result_color._G) / 255.0f;
+	result.z = static_cast<float>(result_color._B) / 255.0f;
+	result.w = static_cast<float>(result_color._A) / 255.0f;
 
 	return result;
 }

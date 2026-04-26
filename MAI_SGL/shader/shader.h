@@ -1,4 +1,5 @@
 #pragma once
+#include <algorithm>
 #include<map>
 
 #include "../base.h"
@@ -36,10 +37,10 @@ public:
 
 	RGBA vector_to_RGBA(const vec4f& v) {
 		RGBA color;
-		color._R = v.x * 255.0;
-		color._G = v.y * 255.0;
-		color._B = v.z * 255.0;
-		color._A = v.w * 255.0;
+		color._R = static_cast<byte>(std::clamp(v.x, 0.0f, 1.0f) * 255.0f);
+		color._G = static_cast<byte>(std::clamp(v.y, 0.0f, 1.0f) * 255.0f);
+		color._B = static_cast<byte>(std::clamp(v.z, 0.0f, 1.0f) * 255.0f);
+		color._A = static_cast<byte>(std::clamp(v.w, 0.0f, 1.0f) * 255.0f);
 
 		return color;
 	}

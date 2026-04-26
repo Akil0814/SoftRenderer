@@ -1,5 +1,7 @@
 #include "fragment_stage.h"
 
+#include <algorithm>
+
 namespace mai
 {
 
@@ -69,10 +71,10 @@ namespace mai
 
 		float weight = static_cast<float>(src._A) / 255.0f;
 
-		result._R = static_cast<float>(src._R) * weight + static_cast<float>(dst._R) * (1.0f - weight);
-		result._G = static_cast<float>(src._G) * weight + static_cast<float>(dst._G) * (1.0f - weight);
-		result._B = static_cast<float>(src._B) * weight + static_cast<float>(dst._B) * (1.0f - weight);
-		result._A = static_cast<float>(src._A) * weight + static_cast<float>(dst._A) * (1.0f - weight);
+		result._R = static_cast<byte>(std::clamp(static_cast<float>(src._R) * weight + static_cast<float>(dst._R) * (1.0f - weight), 0.0f, 255.0f));
+		result._G = static_cast<byte>(std::clamp(static_cast<float>(src._G) * weight + static_cast<float>(dst._G) * (1.0f - weight), 0.0f, 255.0f));
+		result._B = static_cast<byte>(std::clamp(static_cast<float>(src._B) * weight + static_cast<float>(dst._B) * (1.0f - weight), 0.0f, 255.0f));
+		result._A = static_cast<byte>(std::clamp(static_cast<float>(src._A) * weight + static_cast<float>(dst._A) * (1.0f - weight), 0.0f, 255.0f));
 
 		return result;
 	}

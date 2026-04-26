@@ -117,8 +117,8 @@ namespace mai
             if (flip_y)
                 result_y = -result_y;
 
-            current_point._position.x = result_x;
-            current_point._position.y = result_y;
+            current_point._position.x = static_cast<float>(result_x);
+            current_point._position.y = static_cast<float>(result_y);
 
             interpolant_line(v0, v1, current_point);
 
@@ -192,8 +192,8 @@ namespace mai
                     continue;
 
                 interpolant_triangle(v0, v1, v2, px, py, result);
-                result._position.x = i;
-                result._position.y = j;
+                result._position.x = static_cast<float>(i);
+                result._position.y = static_cast<float>(j);
                 results.push_back(result);
                 ++rasterized_pixels;
             }
