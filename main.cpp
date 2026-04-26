@@ -47,89 +47,7 @@ float smoothed_fps = 0.0f;
 constexpr float rotation_speed = 0.6f;
 constexpr float max_delta_time = 0.1f;
 constexpr float fps_smoothing = 0.1f;
-
-
-//三个属性对应vbo
-uint32_t position_vbo = 0;
-uint32_t color_vbo = 0;
-uint32_t uv_vbo = 0;
-//三角形的indices
-uint32_t ebo = 0;
-//本三角形专属vao
-uint32_t vao = 0;
-void test_triangle()
-{
-	MAI_SGL->enable(MAI_BLENDING);
-
-	float positions[] =
-	{
-		-0.85f, -0.75f, 0.25f,
-		-0.85f,  0.75f, 0.25f,
-		 0.65f,  0.75f, 0.25f,
-		 0.65f, -0.75f, 0.25f,
-
-		80.0f, 80.0f, 0.0f,
-		220.0f, 260.0f, 0.0f,
-		360.0f, 110.0f, 0.0f,
-	};
-
-	float colors[] =
-	{
-		1.0f, 1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f, 1.0f,
-
-		0.2f, 0.4f, 1.0f, 0.9f,
-		0.2f, 0.8f, 1.0f, 0.9f,
-		0.5f, 1.0f, 0.9f, 0.9f,
-	};
-
-	float uvs[] =
-	{
-		0.0f, 0.0f,
-		0.0f, 1.0f,
-		1.0f, 1.0f,
-		1.0f, 0.0f,
-
-		0.0f, 0.0f,
-		0.0f, 1.0f,
-		1.0f, 0.0f,
-	};
-
-	uint32_t indices[] = { 0, 1, 2, 0, 2, 3, 4, 5, 6 };
-
-	//生成indices对应ebo
-	ebo = MAI_SGL->gen_buffer();
-	MAI_SGL->bind_buffer(MAI_ELEMENT_ARRAY_BUFFER, ebo);
-	MAI_SGL->buffer_data(MAI_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * 9, indices);
-	MAI_SGL->bind_buffer(MAI_ELEMENT_ARRAY_BUFFER, 0);
-
-	//生成vao并且绑定
-	vao = MAI_SGL->gen_vertex_array();
-	MAI_SGL->bind_vertex_array(vao);
-
-	//生成每个vbo，绑定后，设置属性ID及读取参数
-	position_vbo = MAI_SGL->gen_buffer();
-	MAI_SGL->bind_buffer(MAI_ARRAY_BUFFER, position_vbo);
-	MAI_SGL->buffer_data(MAI_ARRAY_BUFFER, sizeof(float) * 21, positions);
-	MAI_SGL->vertex_attribute_pointer(0, 3, 3 * sizeof(float), 0);
-
-	color_vbo = MAI_SGL->gen_buffer();
-	MAI_SGL->bind_buffer(MAI_ARRAY_BUFFER, color_vbo);
-	MAI_SGL->buffer_data(MAI_ARRAY_BUFFER, sizeof(float) * 28, colors);
-	MAI_SGL->vertex_attribute_pointer(1, 4, 4 * sizeof(float), 0);
-
-	uv_vbo = MAI_SGL->gen_buffer();
-	MAI_SGL->bind_buffer(MAI_ARRAY_BUFFER, uv_vbo);
-	MAI_SGL->buffer_data(MAI_ARRAY_BUFFER, sizeof(float) * 14, uvs);
-	MAI_SGL->vertex_attribute_pointer(2, 2, 2 * sizeof(float), 0);
-
-	MAI_SGL->bind_buffer(MAI_ARRAY_BUFFER, 0);
-	MAI_SGL->bind_vertex_array(0);
-
-	MAI_SGL->print_VAO(vao);
-}
+constexpr uint32_t fps_print_interval = 60;
 
 
 void transform(float delta_time)
@@ -196,6 +114,15 @@ bool prepare()
 	return true;
 }
 
+void print_debug_data()
+{
+	//MAI_SGL->print_frame_stats();
+	std::cout
+		<< "FPS: " << current_fps
+		<< " | Smoothed FPS: " << smoothed_fps
+		<< '\n';
+}
+
 
 int APIENTRY wWinMain(
 	_In_ HINSTANCE hInstance, //本应用程序实例句柄，唯一指代当前程序
@@ -214,8 +141,11 @@ int APIENTRY wWinMain(
 
 
 	bool active = true;
+	uint64_t frame_index = 0;
 	using Clock = std::chrono::steady_clock;
 	auto previous_frame_time = Clock::now();
+	rend_imgui();
+
 	while (active)
 	{
 		auto current_frame_time = Clock::now();
@@ -238,11 +168,14 @@ int APIENTRY wWinMain(
 		active = MAI_APP->peek_message();
 		camera->update(delta_time);
 		on_render(delta_time);
-		rend_imgui();
 		MAI_APP->show();
+		print_debug_data();
+
+		++frame_index;
 	}
 
 	shutdown_imgui_for_MAI_SGL();
+	MAI_SGL->print_summary_stats();
 	MAI_SGL->delete_texture(texture);
 	mai::Image::destroy_image(image);
 

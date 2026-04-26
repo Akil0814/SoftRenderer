@@ -24,8 +24,6 @@ const char* to_string(ErrorCode error) noexcept;
 const char* describe_error(ErrorCode error) noexcept;
 void print_error(ErrorCode error);
 void print_vao(VertexArrayObject& vao);
-void print_frame_stats(const RenderStats& stats);
-void print_summary_stats(const RenderStats& stats);
 
 }
 

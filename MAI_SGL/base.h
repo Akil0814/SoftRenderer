@@ -3,6 +3,10 @@
 #include <cassert>
 #include "math/vector.h"
 
+//#define MAI_PIXEL_FORMAT_BGRA 1
+ #define MAI_PIXEL_FORMAT_RGBA 1
+
+
 #define MAI_PI					3.14159265358979323f
 #define MAI_DEG2RAD(theta)		(0.01745329251994329 * (theta))
 #define MAI_FRACTION(v)			((v) - (int)(v))//返回小数部分
@@ -53,16 +57,33 @@ using byte = std::uint8_t;
 namespace mai
 {
 
-struct RGBA
-{
-	byte _B;
-	byte _G;
-	byte _R;
-	byte _A;
+#if defined(MAI_PIXEL_FORMAT_BGRA)
+	struct RGBA
+	{
+		byte _B;
+		byte _G;
+		byte _R;
+		byte _A;
 
-	constexpr RGBA(byte r = 255,byte g = 255,byte b = 255,byte a = 255) 
-		: _R(r), _G(g), _B(b), _A(a) {}
-};
+		constexpr RGBA(byte r = 255, byte g = 255, byte b = 255, byte a = 255)
+			: _R(r), _G(g), _B(b), _A(a) {
+		}
+	};
+#elif defined(MAI_PIXEL_FORMAT_RGBA)
+	struct RGBA
+	{
+		byte _R;
+		byte _G;
+		byte _B;
+		byte _A;
+
+		constexpr RGBA(byte r = 255, byte g = 255, byte b = 255, byte a = 255)
+			: _R(r), _G(g), _B(b), _A(a) {
+		}
+	};
+#else
+#error "Define one pixel format"
+#endif
 
 namespace Color
 {

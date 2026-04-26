@@ -49,27 +49,18 @@ public:
 	void tex_image_2D(uint32_t width, uint32_t height, void* data);
 	void tex_parameter(uint8_t param, uint32_t value);
 
-	void use_program(Shader* shader);
-	Shader* get_program() const;
-
 	void enable(uint8_t value);
 	void disable(uint8_t value);
 
+	void use_program(Shader* shader);
 	void draw_dimension(uint8_t value);
-
 	void set_scissor_rect(const ScissorRect& rect);
-
-	// Cull face
 	void front_face(uint8_t value);
 	void cull_face(uint8_t value);
-
-	// Depth test
 	void depth_function(uint8_t value);
 
 
-
-
-
+	Shader* get_program() const;
 	RenderState get_render_state() const;
 	void set_render_state(const RenderState& state);
 	uint32_t get_bound_vertex_array() const;

@@ -4,24 +4,6 @@
 
 #include "gpu_debug.h"
 
-namespace
-{
-
-void print_stats_line(const char* label, const mai::RenderStats& stats)
-{
-	std::cout
-		<< label
-		<< " | Draw Calls: " << stats._frame_draw_calls
-		<< " | Triangles: " << stats._frame_triangles
-		<< " | Vertices: " << stats._frame_vertices
-		<< " | Rasterized Pixels: " << stats._frame_rasterized_pixels
-		<< " | Fragments: " << stats._frame_fragments
-		<< " | Texture Samples: " << stats._frame_texture_samples
-		<< '\n';
-}
-
-}
-
 namespace mai
 {
 namespace gpu_debug
@@ -32,17 +14,17 @@ const char* to_string(ErrorCode error) noexcept
 	switch (error)
 	{
 	case ErrorCode::NoError:
-		return "MAI_NO_ERROR";
+		return "NO_ERROR";
 	case ErrorCode::InvalidEnum:
-		return "MAI_INVALID_ENUM";
+		return "INVALID_ENUM";
 	case ErrorCode::InvalidValue:
-		return "MAI_INVALID_VALUE";
+		return "INVALID_VALUE";
 	case ErrorCode::InvalidOperation:
-		return "MAI_INVALID_OPERATION";
+		return "INVALID_OPERATION";
 	case ErrorCode::OutOfMemory:
-		return "MAI_OUT_OF_MEMORY";
+		return "OUT_OF_MEMORY";
 	default:
-		return "MAI_UNKNOWN_ERROR";
+		return "UNKNOWN_ERROR";
 	}
 }
 
@@ -81,16 +63,6 @@ void print_vao(VertexArrayObject& vao)
 	vao.print();
 }
 
-void print_frame_stats(const RenderStats& stats)
-{
-	print_stats_line("Frame Stats", stats);
-}
-
-void print_summary_stats(const RenderStats& stats)
-{
-	print_stats_line("Summary Stats", stats);
-}
-
 }
 
 gpu_debug::ErrorCode GPU::get_error() noexcept
@@ -126,12 +98,28 @@ void GPU::print_VAO(uint32_t VAO_ID)
 
 void GPU::print_frame_stats()
 {
-	gpu_debug::print_frame_stats(_render_stats);
+	std::cout
+		<< "Frame Stats"
+		<< " | Draw Calls: " << _render_stats._frame_draw_calls
+		<< " | Triangles: " << _render_stats._frame_triangles
+		<< " | Vertices: " << _render_stats._frame_vertices
+		<< " | Rasterized Pixels: " << _render_stats._frame_rasterized_pixels
+		<< " | Fragments: " << _render_stats._frame_fragments
+		<< " | Texture Samples: " << _render_stats._frame_texture_samples
+		<< '\n';
 }
 
 void GPU::print_summary_stats()
 {
-	gpu_debug::print_summary_stats(_summary_render_stats);
+	std::cout
+		<< "Summary Stats"
+		<< " | Draw Calls: " << _summary_render_stats._frame_draw_calls
+		<< " | Triangles: " << _summary_render_stats._frame_triangles
+		<< " | Vertices: " << _summary_render_stats._frame_vertices
+		<< " | Rasterized Pixels: " << _summary_render_stats._frame_rasterized_pixels
+		<< " | Fragments: " << _summary_render_stats._frame_fragments
+		<< " | Texture Samples: " << _summary_render_stats._frame_texture_samples
+		<< '\n';
 }
 
 }
