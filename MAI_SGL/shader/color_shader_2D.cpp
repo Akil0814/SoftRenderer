@@ -39,9 +39,11 @@ VsOutput ColorShader2D::vertex_shader(
 void ColorShader2D::fragment_shader(
 	const VsOutput& input,
 	FsOutput& output,
-	const std::map<uint32_t, Texture*>& textures)
+	const std::map<uint32_t, Texture*>& textures,
+	RenderStats& stats)
 {
 	(void)textures;
+	(void)stats;
 	output._pixel_pos.x = static_cast<int>(input._position.x);
 	output._pixel_pos.y = static_cast<int>(input._position.y);
 	output._depth = input._position.z;

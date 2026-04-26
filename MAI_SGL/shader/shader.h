@@ -2,6 +2,7 @@
 #include<map>
 
 #include "../base.h"
+#include "../core/gpu_stats.h"
 #include "../data_structures.h"
 #include "../resource/buffer_object.h"
 #include "../resource/texture.h"
@@ -22,7 +23,8 @@ public:
 	) = 0;
 
 	virtual void fragment_shader(const VsOutput& input, FsOutput& output,
-		const std::map<uint32_t, Texture*>& textures) = 0;
+		const std::map<uint32_t, Texture*>& textures,
+		RenderStats& stats) = 0;
 
 public:
 

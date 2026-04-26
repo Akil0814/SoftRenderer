@@ -1,5 +1,4 @@
 #include "texture.h"
-#include "../core/gpu.h"
 #include "../math/math.h"
 
 namespace mai {
@@ -35,6 +34,12 @@ void Texture::set_buffer_data(uint32_t width, uint32_t height, void* data)
 
 mai::vec4f Texture::get_color(float u, float v)
 {
+	uint64_t ignored_sample_count = 0;
+	return get_color(u, v, ignored_sample_count);
+}
+
+mai::vec4f Texture::get_color(float u, float v, uint64_t& sample_count)
+{
 	RGBA result_color;
 
 	//处理uv坐标
@@ -43,7 +48,7 @@ mai::vec4f Texture::get_color(float u, float v)
 
 	if (_filter == MAI_TEXTURE_FILTER_NEAREST)
 	{
-		MAI_SGL->add_texture_samples(1);
+		sample_count += 1;
 		int x = std::round(u * (_width - 1));
 		int y = std::round(v * (_height - 1));
 
@@ -52,7 +57,7 @@ mai::vec4f Texture::get_color(float u, float v)
 	}
 	else if (_filter == MAI_TEXTURE_FILTER_LINEAR)
 	{
-		MAI_SGL->add_texture_samples(4);
+		sample_count += 4;
 		float x = u * static_cast<float>(_width - 1);
 		float y = v * static_cast<float>(_height - 1);
 

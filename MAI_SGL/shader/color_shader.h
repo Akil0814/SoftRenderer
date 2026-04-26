@@ -18,7 +18,8 @@ public:
 
 	void fragment_shader(
 		const VsOutput& input, FsOutput& output,
-		const std::map<uint32_t, Texture*>& textures)override;
+		const std::map<uint32_t, Texture*>& textures,
+		RenderStats& stats) override;
 
 public:
 	//uniforms

@@ -3,6 +3,7 @@
 #include <map>
 
 #include "../core/render_state.h"
+#include "../core/gpu_stats.h"
 #include "../resource/buffer_object.h"
 #include "../resource/frame_buffer.h"
 #include "../resource/texture.h"
@@ -22,6 +23,7 @@ struct DrawContext
 	const VertexArrayObject& _vao;
 	const BufferObject& _ebo;
 	const mat4f& _screen_matrix;
+	RenderStats& _stats;
 };
 
 }

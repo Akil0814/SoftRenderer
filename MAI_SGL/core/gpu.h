@@ -84,6 +84,7 @@ public:
 private:
 	void reset_render_stats() noexcept;
 	void accumulate_draw_stats(uint8_t draw_mode, size_t count) noexcept;
+	void accumulate_pipeline_stats(const RenderStats& stats) noexcept;
 	void set_error(gpu_debug::ErrorCode error) noexcept;
 
 	static GPU* _instance;

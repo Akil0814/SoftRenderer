@@ -278,6 +278,7 @@ namespace mai
 
 		const BufferObject* ebo = EBO_iter->second;
 
+		RenderStats draw_stats{};
 		DrawContext context{
 			*_frame_buffer,
 			*_shader,
@@ -286,11 +287,13 @@ namespace mai
 			_texture_map,
 			*vao,
 			*ebo,
-			_screen_matrix
+			_screen_matrix,
+			draw_stats
 		};
 
 		accumulate_draw_stats(draw_mode, count);
 		_draw_pipeline.draw_elements(context, draw_mode, first, count);
+		accumulate_pipeline_stats(draw_stats);
 	}
 
 	void GPU::enable(uint8_t value)

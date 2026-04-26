@@ -1,6 +1,5 @@
 #include "raster.h"
 #include "../math/math.h"
-#include "../core/gpu.h"
 
 #include <cmath>
 
@@ -130,7 +129,7 @@ namespace mai
             }
         }
 
-        MAI_SGL->add_rasterized_pixels(rasterized_pixels);
+        context._stats._frame_rasterized_pixels += rasterized_pixels;
     }
 
     void Raster::rasterize_triangle(
@@ -200,7 +199,7 @@ namespace mai
             }
         }
 
-        MAI_SGL->add_rasterized_pixels(rasterized_pixels);
+        context._stats._frame_rasterized_pixels += rasterized_pixels;
     }
 
     void Raster::interpolant_line(const VertexShaderOutput& v0, const VertexShaderOutput& v1,

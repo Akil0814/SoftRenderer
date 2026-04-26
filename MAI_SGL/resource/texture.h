@@ -13,6 +13,7 @@ public:
 	//默认都是rgba格式
 	void set_buffer_data(uint32_t width, uint32_t height, void* data);
 	mai::vec4f get_color(float u, float v);
+	mai::vec4f get_color(float u, float v, uint64_t& sample_count);
 	void set_parameter(uint8_t type, uint32_t value);
 
 private:

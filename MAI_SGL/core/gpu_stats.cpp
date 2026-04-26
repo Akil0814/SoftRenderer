@@ -50,4 +50,15 @@ void GPU::accumulate_draw_stats(uint8_t draw_mode, size_t count) noexcept
 	}
 }
 
+void GPU::accumulate_pipeline_stats(const RenderStats& stats) noexcept
+{
+	_render_stats._frame_rasterized_pixels += stats._frame_rasterized_pixels;
+	_render_stats._frame_fragments += stats._frame_fragments;
+	_render_stats._frame_texture_samples += stats._frame_texture_samples;
+
+	_summary_render_stats._frame_rasterized_pixels += stats._frame_rasterized_pixels;
+	_summary_render_stats._frame_fragments += stats._frame_fragments;
+	_summary_render_stats._frame_texture_samples += stats._frame_texture_samples;
+}
+
 }

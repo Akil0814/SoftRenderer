@@ -17,7 +17,11 @@ public:
 		size_t index
 	)override;
 
-	void fragment_shader(const VsOutput& input, FsOutput& output, const std::map<uint32_t, Texture*>& textures)override;
+	void fragment_shader(
+		const VsOutput& input,
+		FsOutput& output,
+		const std::map<uint32_t, Texture*>& textures,
+		RenderStats& stats) override;
 
 public:
 	mai::mat4f _model_matrix;
