@@ -1,0 +1,14 @@
+-----------------------------summary-----------------------------
+Total Frames: 12
+Total Draw Calls: 34
+Total Triangles: 3378
+Total Vertices: 10134
+Total Rasterized Pixels: 3313628
+Total Fragments: 3313628
+Total Texture Samples: 13254512
+Total Triangle Flow:
+ Input: 3378 | Clipped: 0 | Clip Discarded: 0 | Clip Output: 3378 | Culled: 0 | Raster Input: 3378 | Degenerate: 0
+Total Timing(ms):
+ Vertex: 14.134 | Primitive: 777.604 | Clip: 17.269 | PerspDiv: 0.014 | Cull: 0.000 | Screen: 0.204 | Raster: 748.554 | Recover: 11.212 | Fragment: 1543.312
+Avg Timing(ms/frame):
+ Vertex: 1.178 | Primitive: 64.800 | Clip: 1.439 | PerspDiv: 0.001 | Cull: 0.000 | Screen: 0.017 | Raster: 62.380 | Recover: 0.934 | Fragment: 128.609

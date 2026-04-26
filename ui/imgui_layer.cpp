@@ -75,6 +75,17 @@ void rend_imgui()
     ImGui::Text("Platform: %s", io.BackendPlatformName ? io.BackendPlatformName : "none");
     ImGui::Text("Renderer: %s", io.BackendRendererName ? io.BackendRendererName : "none");
 
+    bool cull_face = MAI_SGL->get_render_state()._enable_cull_face;
+
+    if (ImGui::Checkbox("Cull Face", &cull_face))
+    {
+        if (cull_face)
+            MAI_SGL->enable(MAI_CULL_FACE);
+        else
+            MAI_SGL->disable(MAI_CULL_FACE);
+    }
+
+
     ImGui::End();
 
     ImGui::Render();

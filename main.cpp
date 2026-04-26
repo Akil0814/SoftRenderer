@@ -1,6 +1,7 @@
 #include <iostream>
 #include <chrono>
 #include <iomanip>
+#include <string>
 #include <Windows.h>
 
 #include "MAI_SGL/data_structures.h"
@@ -19,6 +20,9 @@
 
 #include "ui/imgui_layer.h"
 
+#ifndef SOFTWARE_RENDERING_ROOT_DIR
+#define SOFTWARE_RENDERING_ROOT_DIR "."
+#endif
 
 
 
@@ -141,7 +145,9 @@ int APIENTRY wWinMain(
 
 	//将bmp指向的内存配置到sgl当中
 	MAI_SGL->init_surface(MAI_APP->get_width(), MAI_APP->get_height(), MAI_APP->get_canvas());
-	if (!MAI_SGL->set_stats_output_path("profile/gpu_stats"))
+
+	const std::string stats_output_path = std::string(SOFTWARE_RENDERING_ROOT_DIR) + "/doc/logs/logs";
+	if (!MAI_SGL->set_stats_output_path(stats_output_path))
 		std::cerr << "Failed to open GPU stats output files." << std::endl;
 
 	if (!prepare())

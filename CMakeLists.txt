@@ -24,4 +24,6 @@ add_subdirectory(ui)
 #本工程所有cpp文件编译链接，生成exe
 add_executable(SoftRenderer "main.cpp")
 
+target_compile_definitions(SoftRenderer PRIVATE SOFTWARE_RENDERING_ROOT_DIR="${CMAKE_SOURCE_DIR}")
+
 target_link_libraries(SoftRenderer applicationLib fw ui MAI_SGL_Lib imguilib)
