@@ -3,8 +3,8 @@
 #include <cassert>
 #include "math/vector.h"
 
-//#define MAI_PIXEL_FORMAT_BGRA 1
- #define MAI_PIXEL_FORMAT_RGBA 1
+#define MAI_PIXEL_FORMAT_BGRA 1
+//#define MAI_PIXEL_FORMAT_RGBA 1
 
 
 #define MAI_PI					3.14159265358979323f

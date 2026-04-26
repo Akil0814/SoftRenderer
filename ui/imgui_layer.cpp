@@ -62,13 +62,11 @@ void rend_imgui()
     ImGui::NewFrame();
 
     ImGui::Begin("MAI SGL");
-    const bool is_window_hovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem);
     const ImVec2 window_pos = ImGui::GetWindowPos();
     const ImVec2 window_size = ImGui::GetWindowSize();
 
 
     ImGui::Text("Window: %u x %u", MAI_APP->get_width(), MAI_APP->get_height());
-    ImGui::Text("ImGui Window Hovered: %s", is_window_hovered ? "true" : "false");
     ImGui::Text("Display: %.0f x %.0f", io.DisplaySize.x, io.DisplaySize.y);
     ImGui::Text("Framebuffer scale: %.2f, %.2f", io.DisplayFramebufferScale.x, io.DisplayFramebufferScale.y);
     ImGui::Text("FPS: %.1f", io.Framerate);
@@ -76,23 +74,6 @@ void rend_imgui()
     ImGui::Separator();
     ImGui::Text("Platform: %s", io.BackendPlatformName ? io.BackendPlatformName : "none");
     ImGui::Text("Renderer: %s", io.BackendRendererName ? io.BackendRendererName : "none");
-
-    ImGui::Separator();
-    ImGui::Text("Completed Frame Stats (Prev Frame)");
-    ImGui::Text("Draw Calls: %llu", static_cast<unsigned long long>(last_completed_frame_stats._frame_draw_calls));
-    ImGui::Text("Triangles: %llu", static_cast<unsigned long long>(last_completed_frame_stats._frame_triangles));
-    ImGui::Text("Vertices: %llu", static_cast<unsigned long long>(last_completed_frame_stats._frame_vertices));
-    ImGui::Text("Rasterized Pixels: %llu", static_cast<unsigned long long>(last_completed_frame_stats._frame_rasterized_pixels));
-    ImGui::Text("Fragments: %llu", static_cast<unsigned long long>(last_completed_frame_stats._frame_fragments));
-    ImGui::Text("Texture Samples: %llu", static_cast<unsigned long long>(last_completed_frame_stats._frame_texture_samples));
-
-    ImGui::Separator();
-    ImGui::Text("ImGui Submitted (Prev Frame)");
-    ImGui::Text("Draw Lists: %llu", static_cast<unsigned long long>(last_imgui_submitted_stats._draw_lists));
-    ImGui::Text("Draw Calls: %llu", static_cast<unsigned long long>(last_imgui_submitted_stats._draw_calls));
-    ImGui::Text("Vertices: %llu", static_cast<unsigned long long>(last_imgui_submitted_stats._vertices));
-    ImGui::Text("Indices: %llu", static_cast<unsigned long long>(last_imgui_submitted_stats._indices));
-    ImGui::Text("Triangles: %llu", static_cast<unsigned long long>(last_imgui_submitted_stats._triangles));
 
     ImGui::End();
 

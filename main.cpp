@@ -1,5 +1,6 @@
 #include <iostream>
 #include <chrono>
+#include <iomanip>
 #include <Windows.h>
 
 #include "MAI_SGL/data_structures.h"
@@ -42,6 +43,7 @@ mai::mat4f model_matrix;
 float angle = 0.0f;
 float delta_time = 0.0f;
 float current_fps = 0.0f;
+float smoothed_delta_time = 0.0f;
 float smoothed_fps = 0.0f;
 
 constexpr float rotation_speed = 0.6f;
@@ -53,7 +55,6 @@ constexpr uint32_t fps_print_interval = 60;
 void transform(float delta_time)
 {
 	angle += rotation_speed * delta_time;
-	//模型变换
 	model_matrix = mai::rotate(mai::mat4f(1.0f), angle, mai::vec3f{ 0.0f, 1.0f, 0.0f });
 }
 
@@ -116,11 +117,19 @@ bool prepare()
 
 void print_debug_data()
 {
-	//MAI_SGL->print_frame_stats();
+	MAI_SGL->print_frame_stats();
 	std::cout
+		<< std::fixed << std::setprecision(2)
 		<< "FPS: " << current_fps
 		<< " | Smoothed FPS: " << smoothed_fps
 		<< '\n';
+}
+
+void print_summary_debug_data()
+{
+	MAI_SGL->print_summary_stats();
+
+
 }
 
 
@@ -145,6 +154,8 @@ int APIENTRY wWinMain(
 	using Clock = std::chrono::steady_clock;
 	auto previous_frame_time = Clock::now();
 	rend_imgui();
+	previous_frame_time = Clock::now();
+	const auto fps_stats_start_time = previous_frame_time;
 
 	while (active)
 	{
@@ -152,30 +163,45 @@ int APIENTRY wWinMain(
 		std::chrono::duration<float> frame_duration = current_frame_time - previous_frame_time;
 		previous_frame_time = current_frame_time;
 
-		delta_time = frame_duration.count();
+		const float raw_delta_time = frame_duration.count();
+
+		delta_time = raw_delta_time;
 		if (delta_time > max_delta_time)
 			delta_time = max_delta_time;
 
-		if (delta_time > 0.0f)
+		if (raw_delta_time > 0.0f)
 		{
-			current_fps = 1.0f / delta_time;
-			if (smoothed_fps <= 0.0f)
-				smoothed_fps = current_fps;
+			current_fps = 1.0f / raw_delta_time;
+			if (smoothed_delta_time <= 0.0f)
+				smoothed_delta_time = raw_delta_time;
 			else
-				smoothed_fps += (current_fps - smoothed_fps) * fps_smoothing;
+				smoothed_delta_time += (raw_delta_time - smoothed_delta_time) * fps_smoothing;
+
+			smoothed_fps = 1.0f / smoothed_delta_time;
 		}
 
 		active = MAI_APP->peek_message();
 		camera->update(delta_time);
 		on_render(delta_time);
+		rend_imgui();
 		MAI_APP->show();
 		print_debug_data();
 
 		++frame_index;
 	}
 
+
+	print_summary_debug_data();
+	const auto fps_stats_end_time = Clock::now();
+	const std::chrono::duration<float> total_frame_duration = fps_stats_end_time - fps_stats_start_time;
+	const float total_frame_seconds = total_frame_duration.count();
+	if (total_frame_seconds > 0.0f)
+	{
+		const float average_fps = static_cast<float>(frame_index) / total_frame_seconds;
+		std::cout << "Average FPS: " << average_fps << '\n';
+	}
+
 	shutdown_imgui_for_MAI_SGL();
-	MAI_SGL->print_summary_stats();
 	MAI_SGL->delete_texture(texture);
 	mai::Image::destroy_image(image);
 

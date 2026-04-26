@@ -99,8 +99,7 @@ void GPU::print_VAO(uint32_t VAO_ID)
 void GPU::print_frame_stats()
 {
 	std::cout
-		<< "Frame Stats"
-		<< " | Draw Calls: " << _render_stats._frame_draw_calls
+		<< "Draw Calls: " << _render_stats._frame_draw_calls
 		<< " | Triangles: " << _render_stats._frame_triangles
 		<< " | Vertices: " << _render_stats._frame_vertices
 		<< " | Rasterized Pixels: " << _render_stats._frame_rasterized_pixels
@@ -111,15 +110,14 @@ void GPU::print_frame_stats()
 
 void GPU::print_summary_stats()
 {
-	std::cout
-		<< "Summary Stats"
-		<< " | Draw Calls: " << _summary_render_stats._frame_draw_calls
-		<< " | Triangles: " << _summary_render_stats._frame_triangles
-		<< " | Vertices: " << _summary_render_stats._frame_vertices
-		<< " | Rasterized Pixels: " << _summary_render_stats._frame_rasterized_pixels
-		<< " | Fragments: " << _summary_render_stats._frame_fragments
-		<< " | Texture Samples: " << _summary_render_stats._frame_texture_samples
-		<< '\n';
+	std::cout << "-----------------------------summary-----------------------------\n";
+	std::cout<< "Total Draw Calls: " << _summary_render_stats._frame_draw_calls << '\n';
+	std::cout<< "Total Triangles: " << _summary_render_stats._frame_triangles << '\n';
+	std::cout<< "Total Vertices: " << _summary_render_stats._frame_vertices << '\n';
+	std::cout<< "Total Rasterized Pixels: " << _summary_render_stats._frame_rasterized_pixels << '\n';
+	std::cout<< "Total Fragments: " << _summary_render_stats._frame_fragments << '\n';
+	std::cout<< "Total Texture Samples: " << _summary_render_stats._frame_texture_samples << '\n';
+		
 }
 
 }
