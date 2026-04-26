@@ -1,4 +1,6 @@
 #pragma once
+#include <fstream>
+#include <string>
 #include <vector>
 
 #include "../base.h"
@@ -77,6 +79,7 @@ public:
 
 	// Debug-only.
 	void print_VAO(uint32_t VAO_ID);
+	bool set_stats_output_path(const std::string& output_path_prefix);
 	void print_frame_stats();
 	void print_summary_stats();
 
@@ -86,6 +89,8 @@ private:
 	void accumulate_draw_stats(uint8_t draw_mode, size_t count) noexcept;
 	void accumulate_pipeline_stats(const RenderStats& stats) noexcept;
 	void set_error(gpu_debug::ErrorCode error) noexcept;
+	void write_frame_stats_csv();
+	void write_summary_stats_txt();
 
 	static GPU* _instance;
 	FrameBuffer* _frame_buffer = { nullptr };
@@ -94,6 +99,9 @@ private:
 	RenderStats _render_stats;
 	RenderStats _summary_render_stats;
 	gpu_debug::ErrorCode _error_code{ gpu_debug::ErrorCode::NoError };
+	std::ofstream _frame_stats_file;
+	std::ofstream _summary_stats_file;
+	uint64_t _stats_output_frame_index{ 0 };
 
 	// VBO/EBO state
 	uint32_t _current_EBO = { 0 };

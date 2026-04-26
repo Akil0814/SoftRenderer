@@ -158,7 +158,10 @@ namespace mai
 
         float area = edge_function(v0, v1, v2._position.x, v2._position.y);
         if (std::abs(area) <= edge_epsilon)
+        {
+            ++context._stats._frame_degenerate_triangles;
             return;
+        }
 
         const bool flip_winding = area < 0.0f;
         if (flip_winding)

@@ -26,7 +26,7 @@ namespace mai
 		std::vector<VsOutput> clip_outputs{};
 		{
 			ScopedTimer timer(context._stats._clip_ms);
-			Clipper::do_clip_space(draw_mode, vs_outputs, clip_outputs);
+			Clipper::do_clip_space(draw_mode, vs_outputs, clip_outputs, &context._stats);
 		}
 		if (clip_outputs.empty())
 			return;
@@ -47,16 +47,21 @@ namespace mai
 				cull_outputs.clear();
 				for (uint32_t i = 0; i < clip_outputs.size() - 2; i += 3)
 				{
-					if (Clipper::cull_face(
+					const bool keep_triangle = Clipper::cull_face(
 						context._state._front_face,
 						context._state._cull_face,
 						clip_outputs[i],
 						clip_outputs[i + 1],
-						clip_outputs[i + 2]))
+						clip_outputs[i + 2]);
+					if (keep_triangle)
 					{
 						auto start = clip_outputs.begin() + i;
 						auto end = clip_outputs.begin() + i + 3;
 						cull_outputs.insert(cull_outputs.end(), start, end);
+					}
+					else
+					{
+						++context._stats._frame_culled_triangles;
 					}
 				}
 			}
@@ -72,6 +77,8 @@ namespace mai
 
 		{
 			ScopedTimer timer(context._stats._raster_ms);
+			if (draw_mode == MAI_DRAW_TRIANGLES)
+				context._stats._frame_raster_input_triangles += cull_outputs.size() / 3;
 			Raster::rasterize(context,draw_mode, cull_outputs, raster_outputs);
 		}
 		if (raster_outputs.empty())
@@ -92,7 +99,7 @@ namespace mai
 		std::vector<VsOutput> clip_outputs{};
 		{
 			ScopedTimer timer(context._stats._clip_ms);
-			Clipper::do_clip_space(draw_mode, vs_outputs, clip_outputs);
+			Clipper::do_clip_space(draw_mode, vs_outputs, clip_outputs, &context._stats);
 		}
 		if (clip_outputs.empty())
 			return;
@@ -107,6 +114,8 @@ namespace mai
 
 		{
 			ScopedTimer timer(context._stats._raster_ms);
+			if (draw_mode == MAI_DRAW_TRIANGLES)
+				context._stats._frame_raster_input_triangles += clip_outputs.size() / 3;
 			Raster::rasterize(context,draw_mode, clip_outputs, raster_outputs);
 		}
 

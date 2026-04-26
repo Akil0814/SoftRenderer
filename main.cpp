@@ -92,8 +92,6 @@ bool prepare()
 	camera->set_position({ 0.0f, 0.0f, 3.0f });
 	MAI_APP->set_camera(camera);
 
-	MAI_SGL->disable(MAI_CULL_FACE);
-
 	//init texture
 	texture_shader = new mai::TextureShader();
 	image = mai::Image::create_image("assets/textures/mai.png");
@@ -117,6 +115,7 @@ bool prepare()
 
 void print_debug_data()
 {
+	std::cout << "-------------------------------------------------------------------\n";
 	MAI_SGL->print_frame_stats();
 	std::cout
 		<< std::fixed << std::setprecision(2)
@@ -128,8 +127,6 @@ void print_debug_data()
 void print_summary_debug_data()
 {
 	MAI_SGL->print_summary_stats();
-
-
 }
 
 
@@ -144,6 +141,8 @@ int APIENTRY wWinMain(
 
 	//将bmp指向的内存配置到sgl当中
 	MAI_SGL->init_surface(MAI_APP->get_width(), MAI_APP->get_height(), MAI_APP->get_canvas());
+	if (!MAI_SGL->set_stats_output_path("profile/gpu_stats"))
+		std::cerr << "Failed to open GPU stats output files." << std::endl;
 
 	if (!prepare())
 		return -1;

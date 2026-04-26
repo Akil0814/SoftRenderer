@@ -6,6 +6,11 @@ namespace mai
 
 void Clipper::do_clip_space(uint8_t draw_mode, const std::vector<VsOutput>& primitives, std::vector<VsOutput>& outputs)
 {
+	do_clip_space(draw_mode, primitives, outputs, nullptr);
+}
+
+void Clipper::do_clip_space(uint8_t draw_mode, const std::vector<VsOutput>& primitives, std::vector<VsOutput>& outputs, RenderStats* stats)
+{
 	outputs.clear();
 
 	if (draw_mode == MAI_DRAW_TRIANGLES)
@@ -20,11 +25,23 @@ void Clipper::do_clip_space(uint8_t draw_mode, const std::vector<VsOutput>& prim
 			auto start = primitives.begin() + i;
 			auto end = primitives.begin() + i + 3;
 			primitive.assign(start, end);
+			const bool clipped = needs_clipping(primitive);
 
 			Clipper::sutherland_hodgman(draw_mode, primitive, results);
 
 			if (results.empty())
+			{
+				if (stats != nullptr)
+					++stats->_frame_clip_discarded_triangles;
 				continue;
+			}
+
+			if (stats != nullptr)
+			{
+				stats->_frame_clip_output_triangles += results.size() - 2;
+				if (clipped)
+					++stats->_frame_clipped_triangles;
+			}
 
 			//进行三角形缝补
 			for (uint32_t c = 0; c < results.size() - 2; ++c)
@@ -56,6 +73,32 @@ void Clipper::do_clip_space(uint8_t draw_mode, const std::vector<VsOutput>& prim
 			outputs.push_back(results[1]);
 		}
 	}
+}
+
+
+bool Clipper::needs_clipping(const std::vector<VsOutput>& primitive)
+{
+	static const mai::vec4f clipPlanes[] =
+	{
+		mai::vec4f(0.0f, 0.0f, 0.0f, 1.0f),
+		mai::vec4f(0.0f, 0.0f, 1.0f, 1.0f),
+		mai::vec4f(0.0f, 0.0f, -1.0f, 1.0f),
+		mai::vec4f(1.0f, 0.0f, 0.0f, 1.0f),
+		mai::vec4f(-1.0f, 0.0f, 0.0f, 1.0f),
+		mai::vec4f(0.0f, -1.0f, 0.0f, 1.0f),
+		mai::vec4f(0.0f, 1.0f, 0.0f, 1.0f)
+	};
+
+	for (const auto& vertex : primitive)
+	{
+		for (const auto& plane : clipPlanes)
+		{
+			if (!inside(vertex._position, plane))
+				return true;
+		}
+	}
+
+	return false;
 }
 
 

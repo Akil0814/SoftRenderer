@@ -47,8 +47,11 @@ void GPU::accumulate_draw_stats(uint8_t draw_mode, size_t count) noexcept
 
 	if (draw_mode == MAI_DRAW_TRIANGLES)
 	{
-		_render_stats._frame_triangles += count / 3;
-		_summary_render_stats._frame_triangles += count / 3;
+		const uint64_t triangles = count / 3;
+		_render_stats._frame_triangles += triangles;
+		_render_stats._frame_input_triangles += triangles;
+		_summary_render_stats._frame_triangles += triangles;
+		_summary_render_stats._frame_input_triangles += triangles;
 	}
 }
 
@@ -57,6 +60,12 @@ void GPU::accumulate_pipeline_stats(const RenderStats& stats) noexcept
 	_render_stats._frame_rasterized_pixels += stats._frame_rasterized_pixels;
 	_render_stats._frame_fragments += stats._frame_fragments;
 	_render_stats._frame_texture_samples += stats._frame_texture_samples;
+	_render_stats._frame_clipped_triangles += stats._frame_clipped_triangles;
+	_render_stats._frame_clip_discarded_triangles += stats._frame_clip_discarded_triangles;
+	_render_stats._frame_clip_output_triangles += stats._frame_clip_output_triangles;
+	_render_stats._frame_culled_triangles += stats._frame_culled_triangles;
+	_render_stats._frame_raster_input_triangles += stats._frame_raster_input_triangles;
+	_render_stats._frame_degenerate_triangles += stats._frame_degenerate_triangles;
 	_render_stats._vertex_ms += stats._vertex_ms;
 	_render_stats._primitive_ms += stats._primitive_ms;
 	_render_stats._clip_ms += stats._clip_ms;
@@ -70,6 +79,12 @@ void GPU::accumulate_pipeline_stats(const RenderStats& stats) noexcept
 	_summary_render_stats._frame_rasterized_pixels += stats._frame_rasterized_pixels;
 	_summary_render_stats._frame_fragments += stats._frame_fragments;
 	_summary_render_stats._frame_texture_samples += stats._frame_texture_samples;
+	_summary_render_stats._frame_clipped_triangles += stats._frame_clipped_triangles;
+	_summary_render_stats._frame_clip_discarded_triangles += stats._frame_clip_discarded_triangles;
+	_summary_render_stats._frame_clip_output_triangles += stats._frame_clip_output_triangles;
+	_summary_render_stats._frame_culled_triangles += stats._frame_culled_triangles;
+	_summary_render_stats._frame_raster_input_triangles += stats._frame_raster_input_triangles;
+	_summary_render_stats._frame_degenerate_triangles += stats._frame_degenerate_triangles;
 	_summary_render_stats._vertex_ms += stats._vertex_ms;
 	_summary_render_stats._primitive_ms += stats._primitive_ms;
 	_summary_render_stats._clip_ms += stats._clip_ms;
