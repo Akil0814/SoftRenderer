@@ -1,5 +1,7 @@
 #include "primitive_stage.h"
 
+#include "../core/gpu_profiler.h"
+
 #include "clipper.h"
 #include "raster.h"
 
@@ -22,47 +24,65 @@ namespace mai
 		const std::vector<VsOutput>& vs_outputs, std::vector<VsOutput>& raster_outputs) const
 	{
 		std::vector<VsOutput> clip_outputs{};
-		Clipper::do_clip_space(draw_mode, vs_outputs, clip_outputs);
+		{
+			ScopedTimer timer(context._stats._clip_ms);
+			Clipper::do_clip_space(draw_mode, vs_outputs, clip_outputs);
+		}
 		if (clip_outputs.empty())
 			return;
 
-		for (auto& output : clip_outputs)
 		{
-			perspective_division(output);
+			ScopedTimer timer(context._stats._perspective_division_ms);
+			for (auto& output : clip_outputs)
+			{
+				perspective_division(output);
+			}
 		}
 
 		std::vector<VsOutput> cull_outputs = clip_outputs;
 		if (draw_mode == MAI_DRAW_TRIANGLES && context._state._enable_cull_face)
 		{
-			cull_outputs.clear();
-			for (uint32_t i = 0; i < clip_outputs.size() - 2; i += 3)
 			{
-				if (Clipper::cull_face(
-					context._state._front_face,
-					context._state._cull_face,
-					clip_outputs[i],
-					clip_outputs[i + 1],
-					clip_outputs[i + 2]))
+				ScopedTimer timer(context._stats._cull_ms);
+				cull_outputs.clear();
+				for (uint32_t i = 0; i < clip_outputs.size() - 2; i += 3)
 				{
-					auto start = clip_outputs.begin() + i;
-					auto end = clip_outputs.begin() + i + 3;
-					cull_outputs.insert(cull_outputs.end(), start, end);
+					if (Clipper::cull_face(
+						context._state._front_face,
+						context._state._cull_face,
+						clip_outputs[i],
+						clip_outputs[i + 1],
+						clip_outputs[i + 2]))
+					{
+						auto start = clip_outputs.begin() + i;
+						auto end = clip_outputs.begin() + i + 3;
+						cull_outputs.insert(cull_outputs.end(), start, end);
+					}
 				}
 			}
 		}
 
-		for (auto& output : cull_outputs)
 		{
-			screen_mapping(context, output);
+			ScopedTimer timer(context._stats._screen_mapping_ms);
+			for (auto& output : cull_outputs)
+			{
+				screen_mapping(context, output);
+			}
 		}
 
-		Raster::rasterize(context,draw_mode, cull_outputs, raster_outputs);
+		{
+			ScopedTimer timer(context._stats._raster_ms);
+			Raster::rasterize(context,draw_mode, cull_outputs, raster_outputs);
+		}
 		if (raster_outputs.empty())
 			return;
 
-		for (auto& output : raster_outputs)
 		{
-			perspective_recover(output);
+			ScopedTimer timer(context._stats._perspective_recover_ms);
+			for (auto& output : raster_outputs)
+			{
+				perspective_recover(output);
+			}
 		}
 	}
 
@@ -70,16 +90,25 @@ namespace mai
 		const std::vector<VsOutput>& vs_outputs, std::vector<VsOutput>& raster_outputs) const
 	{
 		std::vector<VsOutput> clip_outputs{};
-		Clipper::do_clip_space(draw_mode, vs_outputs, clip_outputs);
+		{
+			ScopedTimer timer(context._stats._clip_ms);
+			Clipper::do_clip_space(draw_mode, vs_outputs, clip_outputs);
+		}
 		if (clip_outputs.empty())
 			return;
 
-		for (auto& output : clip_outputs)
 		{
-			screen_mapping(context, output);
+			ScopedTimer timer(context._stats._screen_mapping_ms);
+			for (auto& output : clip_outputs)
+			{
+				screen_mapping(context, output);
+			}
 		}
 
-		Raster::rasterize(context,draw_mode, clip_outputs, raster_outputs);
+		{
+			ScopedTimer timer(context._stats._raster_ms);
+			Raster::rasterize(context,draw_mode, clip_outputs, raster_outputs);
+		}
 
 		if (raster_outputs.empty())
 			return;

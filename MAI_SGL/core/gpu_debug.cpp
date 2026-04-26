@@ -1,5 +1,6 @@
 #include "gpu.h"
 
+#include <iomanip>
 #include <iostream>
 
 #include "gpu_debug.h"
@@ -106,18 +107,60 @@ void GPU::print_frame_stats()
 		<< " | Fragments: " << _render_stats._frame_fragments
 		<< " | Texture Samples: " << _render_stats._frame_texture_samples
 		<< '\n';
+
+	std::cout
+		<< std::fixed << std::setprecision(3)
+		<< "Timing(ms)"
+		<< " | Vertex: " << _render_stats._vertex_ms
+		<< " | Primitive: " << _render_stats._primitive_ms
+		<< " | Clip: " << _render_stats._clip_ms
+		<< " | PerspDiv: " << _render_stats._perspective_division_ms
+		<< " | Cull: " << _render_stats._cull_ms
+		<< " | Screen: " << _render_stats._screen_mapping_ms
+		<< " | Raster: " << _render_stats._raster_ms
+		<< " | Recover: " << _render_stats._perspective_recover_ms
+		<< " | Fragment: " << _render_stats._fragment_ms
+		<< '\n';
 }
 
 void GPU::print_summary_stats()
 {
+	const double frame_count = static_cast<double>(_summary_render_stats._frame_count);
+	const double inv_frame_count = frame_count > 0.0 ? 1.0 / frame_count : 0.0;
+
 	std::cout << "-----------------------------summary-----------------------------\n";
+	std::cout<< "Total Frames: " << _summary_render_stats._frame_count << '\n';
 	std::cout<< "Total Draw Calls: " << _summary_render_stats._frame_draw_calls << '\n';
 	std::cout<< "Total Triangles: " << _summary_render_stats._frame_triangles << '\n';
 	std::cout<< "Total Vertices: " << _summary_render_stats._frame_vertices << '\n';
 	std::cout<< "Total Rasterized Pixels: " << _summary_render_stats._frame_rasterized_pixels << '\n';
 	std::cout<< "Total Fragments: " << _summary_render_stats._frame_fragments << '\n';
 	std::cout<< "Total Texture Samples: " << _summary_render_stats._frame_texture_samples << '\n';
-		
+	std::cout
+		<< std::fixed << std::setprecision(3)
+		<< "Total Timing(ms)"
+		<< " | Vertex: " << _summary_render_stats._vertex_ms
+		<< " | Primitive: " << _summary_render_stats._primitive_ms
+		<< " | Clip: " << _summary_render_stats._clip_ms
+		<< " | PerspDiv: " << _summary_render_stats._perspective_division_ms
+		<< " | Cull: " << _summary_render_stats._cull_ms
+		<< " | Screen: " << _summary_render_stats._screen_mapping_ms
+		<< " | Raster: " << _summary_render_stats._raster_ms
+		<< " | Recover: " << _summary_render_stats._perspective_recover_ms
+		<< " | Fragment: " << _summary_render_stats._fragment_ms
+		<< '\n';
+	std::cout
+		<< "Avg Timing(ms/frame)"
+		<< " | Vertex: " << _summary_render_stats._vertex_ms * inv_frame_count
+		<< " | Primitive: " << _summary_render_stats._primitive_ms * inv_frame_count
+		<< " | Clip: " << _summary_render_stats._clip_ms * inv_frame_count
+		<< " | PerspDiv: " << _summary_render_stats._perspective_division_ms * inv_frame_count
+		<< " | Cull: " << _summary_render_stats._cull_ms * inv_frame_count
+		<< " | Screen: " << _summary_render_stats._screen_mapping_ms * inv_frame_count
+		<< " | Raster: " << _summary_render_stats._raster_ms * inv_frame_count
+		<< " | Recover: " << _summary_render_stats._perspective_recover_ms * inv_frame_count
+		<< " | Fragment: " << _summary_render_stats._fragment_ms * inv_frame_count
+		<< '\n';
 }
 
 }

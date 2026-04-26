@@ -153,8 +153,6 @@ int APIENTRY wWinMain(
 	uint64_t frame_index = 0;
 	using Clock = std::chrono::steady_clock;
 	auto previous_frame_time = Clock::now();
-	rend_imgui();
-	previous_frame_time = Clock::now();
 	const auto fps_stats_start_time = previous_frame_time;
 
 	while (active)
